@@ -1,2 +1,2 @@
-npm run test -- --run
-npm run build --configuration=production
+ng test --no-watch
+ng build

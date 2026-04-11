@@ -1,0 +1,20 @@
+[
+  {
+    "id": "esiea",
+    "school": "ESIEA Paris",
+    "degree": "Cycle ingénieur",
+    "speciality": "DevSecOps & Cloud Computing",
+    "dateStart": "2024-09",
+    "dateEnd": "2027-08",
+    "description": "Formation d'ingénieur informatique avec spécialisation DevSecOps et Cloud. Alternance chez WeVii avec focus sur l'architecture cloud sécurisée et l'automatisation."
+  },
+  {
+    "id": "iut",
+    "school": "IUT Paris Rives de Seine",
+    "degree": "BUT Informatique",
+    "speciality": "Déploiement d'applications sécurisées",
+    "dateStart": "2022-09",
+    "dateEnd": "2024-06",
+    "description": "Formation complète en informatique : développement web, bases de données, réseau, gestion de projets. Spécialisation DevOps et cloud."
+  }
+]

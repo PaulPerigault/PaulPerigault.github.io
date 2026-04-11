@@ -1,0 +1,58 @@
+{
+  "nav": {
+    "about": "About",
+    "skills": "Stack",
+    "experience": "Experience",
+    "formation": "Education",
+    "projects": "Projects",
+    "certifications": "Certifications",
+    "contact": "Contact"
+  },
+  "hero": {
+    "role": "DevSecOps Engineer",
+    "school": "ESIEA Paris · Apprentice at WeVii",
+    "cta_cv": "Download CV",
+    "cta_contact": "Get in touch",
+    "available": "Available for speaking & mentoring"
+  },
+  "about": {
+    "title": "About",
+    "body": "DevSecOps engineering student at ESIEA Paris, apprentice at WeVii working on multicloud and CI/CD. Passionate about knowledge sharing, I look to participate in hackathons and student projects.",
+    "location": "Paris, France"
+  },
+  "skills": {
+    "title": "Tech stack"
+  },
+  "experience": {
+    "title": "Experience",
+    "present": "Present"
+  },
+  "formation": {
+    "title": "Education"
+  },
+  "projects": {
+    "title": "Projects",
+    "view_code": "Code",
+    "view_demo": "Demo",
+    "loading": "Loading..."
+  },
+  "certifications": {
+    "title": "Certifications",
+    "in_progress": "In progress"
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Available for discussions, hackathons or student projects.",
+    "email": "perigault.paul@gmail.com",
+    "linkedin": "paul-perigault",
+    "github": "PaulPerigault"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "lang": {
+    "fr": "Français",
+    "en": "English"
+  }
+}

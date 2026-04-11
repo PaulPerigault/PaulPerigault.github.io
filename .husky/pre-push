@@ -1,0 +1,2 @@
+npx ng test --no-watch
+npx ng build

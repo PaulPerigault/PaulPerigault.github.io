@@ -1,2 +1,2 @@
-ng test --no-watch
-ng build
+npx ng test --no-watch
+npx ng build

@@ -6,7 +6,6 @@ import { ThemeService } from '../../core/services/theme.service';
   selector: 'pp-navbar',
   imports: [TranslatePipe],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
 })
 export class Navbar {
   readonly #translate = inject(TranslateService);

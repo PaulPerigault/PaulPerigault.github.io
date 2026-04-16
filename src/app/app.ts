@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { ThemeService } from './core/services/theme.service';
+import { environment } from '../environments/environment';
 import { Navbar } from './layout/navbar/navbar';
 import { Footer } from './layout/footer/footer';
 import { Hero } from './features/hero/hero';
@@ -27,7 +28,6 @@ import { Contact } from './features/contact/contact';
     Contact,
   ],
   templateUrl: './app.html',
-  styleUrl: './app.css',
 })
 export class App implements OnInit {
   readonly #theme = inject(ThemeService);
@@ -35,9 +35,10 @@ export class App implements OnInit {
 
   ngOnInit(): void {
     this.#theme.init();
-    const browser = this.#translate.getBrowserLang() ?? 'fr';
     const stored = localStorage.getItem('lang');
-    const lang = stored ?? (['fr', 'en'].includes(browser) ? browser : 'fr');
+    const browser = this.#translate.getBrowserLang() ?? environment.defaultLang;
+    const lang =
+      stored ?? (environment.supportedLangs.includes(browser) ? browser : environment.defaultLang);
     this.#translate.use(lang);
   }
 }

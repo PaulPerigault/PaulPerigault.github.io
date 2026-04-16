@@ -1,34 +1,45 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { SkillCategory, Experience, Formation, Certification, ProjectsConfig } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class ContentService {
   readonly #http = inject(HttpClient);
-  readonly #supportedLocales = new Set(['fr']);
+  readonly #supported = new Set(environment.supportedLangs);
 
   #locale(lang: string): string {
-    return this.#supportedLocales.has(lang) ? lang : 'fr';
+    return this.#supported.has(lang) ? lang : environment.defaultLang;
   }
 
-  getSkills(lang = 'fr'): Observable<SkillCategory[]> {
-    return this.#http.get<SkillCategory[]>(`/data/${this.#locale(lang)}/skills.json`);
+  getSkills(lang = environment.defaultLang): Observable<SkillCategory[]> {
+    return this.#http.get<SkillCategory[]>(
+      `${environment.dataPath}${this.#locale(lang)}/skills.json`,
+    );
   }
 
-  getExperience(lang = 'fr'): Observable<Experience[]> {
-    return this.#http.get<Experience[]>(`/data/${this.#locale(lang)}/experience.json`);
+  getExperience(lang = environment.defaultLang): Observable<Experience[]> {
+    return this.#http.get<Experience[]>(
+      `${environment.dataPath}${this.#locale(lang)}/experience.json`,
+    );
   }
 
-  getFormation(lang = 'fr'): Observable<Formation[]> {
-    return this.#http.get<Formation[]>(`/data/${this.#locale(lang)}/formation.json`);
+  getFormation(lang = environment.defaultLang): Observable<Formation[]> {
+    return this.#http.get<Formation[]>(
+      `${environment.dataPath}${this.#locale(lang)}/formation.json`,
+    );
   }
 
-  getCertifications(lang = 'fr'): Observable<Certification[]> {
-    return this.#http.get<Certification[]>(`/data/${this.#locale(lang)}/certifications.json`);
+  getCertifications(lang = environment.defaultLang): Observable<Certification[]> {
+    return this.#http.get<Certification[]>(
+      `${environment.dataPath}${this.#locale(lang)}/certifications.json`,
+    );
   }
 
-  getProjectsConfig(lang = 'fr'): Observable<ProjectsConfig> {
-    return this.#http.get<ProjectsConfig>(`/data/${this.#locale(lang)}/projects-config.json`);
+  getProjectsConfig(lang = environment.defaultLang): Observable<ProjectsConfig> {
+    return this.#http.get<ProjectsConfig>(
+      `${environment.dataPath}${this.#locale(lang)}/projects-config.json`,
+    );
   }
 }

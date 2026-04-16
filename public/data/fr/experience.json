@@ -1,0 +1,48 @@
+[
+  {
+    "id": "wevii",
+    "company": "WeVii",
+    "role": "Apprenti DevSecOps Cloud",
+    "location": "Bordeaux (télétravail)",
+    "dateStart": "2023-09",
+    "dateEnd": null,
+    "description": "Développement d'applications RH en Java et Angular, R&D multicloud en Golang. Pipelines CI/CD, infrastructures Cloud AWS/GCP avec Terraform et Kubernetes. Sécurisation : Vault, SOPS, ArgoCD, monitoring Prometheus/Grafana.",
+    "tags": [
+      "Go",
+      "Angular",
+      "Java",
+      "Kubernetes",
+      "Terraform",
+      "AWS",
+      "GCP",
+      "ArgoCD"
+    ]
+  },
+  {
+    "id": "42",
+    "company": "École 42",
+    "role": "Piscine — formation intensive",
+    "location": "Paris",
+    "dateStart": "2022-08",
+    "dateEnd": "2022-08",
+    "description": "Programme immersif 4 semaines : algorithmie, C, peer-learning sans encadrement.",
+    "tags": [
+      "C",
+      "Algorithmie",
+      "Peer-learning",
+      "Shell"
+    ]
+  },
+  {
+    "id": "patounes",
+    "company": "Les Patounes de Bezons",
+    "role": "Bénévole",
+    "location": "Bezons",
+    "dateStart": "2022-01",
+    "dateEnd": "2022-12",
+    "description": "Gestion de l'accueil et du bien-être des animaux abandonnés.",
+    "tags": [
+      "Bénévolat"
+    ]
+  }
+]

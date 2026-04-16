@@ -1,0 +1,80 @@
+[
+  {
+    "category": "Cloud & DevOps",
+    "icon": "cloud",
+    "items": [
+      "AWS (EC2, S3, Lambda)",
+      "GCP (GKE, Cloud Run)",
+      "Docker",
+      "Kubernetes",
+      "Terraform",
+      "Ansible",
+      "ArgoCD",
+      "Helm",
+      "GitOps",
+      "GitHub Actions",
+      "GitLab CI",
+      "Jenkins"
+    ]
+  },
+  {
+    "category": "Développement",
+    "icon": "code",
+    "items": [
+      "Go / Golang",
+      "Python",
+      "Java",
+      "Angular",
+      "TypeScript",
+      "JavaScript",
+      "Node.js",
+      "Shell Script",
+      "C",
+      "PHP"
+    ]
+  },
+  {
+    "category": "Sécurité",
+    "icon": "shield",
+    "items": [
+      "Nmap",
+      "Wireshark",
+      "Metasploit",
+      "Pentest",
+      "Vault",
+      "SOPS",
+      "Analyse de vulnérabilités",
+      "Sécurité réseau"
+    ]
+  },
+  {
+    "category": "Monitoring",
+    "icon": "chart",
+    "items": [
+      "Prometheus",
+      "Grafana",
+      "ELK Stack",
+      "Alerting"
+    ]
+  },
+  {
+    "category": "Bases de données",
+    "icon": "database",
+    "items": [
+      "PostgreSQL",
+      "MySQL",
+      "MongoDB"
+    ]
+  },
+  {
+    "category": "Systèmes",
+    "icon": "terminal",
+    "items": [
+      "Linux / Unix",
+      "LFS (Linux From Scratch)",
+      "Windows Server",
+      "Administration réseau",
+      "VPN (WireGuard, OpenVPN)"
+    ]
+  }
+]

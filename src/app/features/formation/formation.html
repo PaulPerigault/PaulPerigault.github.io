@@ -7,7 +7,7 @@
         <div class="flex flex-wrap items-baseline justify-between gap-2 mb-1">
           <h3 class="font-semibold text-gray-900 dark:text-white">{{ item.school }}</h3>
           <span class="text-xs font-mono text-gray-400">
-            {{ formatDate(item.dateStart) }} — {{ formatDate(item.dateEnd) }}
+            {{ item.dateStart | formatDate }} — {{ item.dateEnd | formatDate }}
           </span>
         </div>
         <p class="text-sm text-teal-600 mb-2">{{ item.degree }} · {{ item.speciality }}</p>

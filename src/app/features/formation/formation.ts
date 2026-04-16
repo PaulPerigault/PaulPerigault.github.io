@@ -1,11 +1,12 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { FormatDatePipe } from '../../shared/pipes';
 import { PortfolioFacade } from '../../core/services/portfolio.facade';
 import type { Formation as FormationItem } from '../../core/models';
 
 @Component({
   selector: 'pp-formation',
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, FormatDatePipe],
   templateUrl: './formation.html',
 })
 export class Formation implements OnInit {

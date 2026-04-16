@@ -15,7 +15,7 @@
           @if (item.inProgress) {
           <span class="text-xs font-mono text-amber-500">{{ 'certifications.in_progress' | translate }}</span>
           } @else {
-          <span class="text-xs font-mono text-gray-400">{{ formatDate(item.dateIssued!) }}</span>
+          <span class="text-xs font-mono text-gray-400">{{ item.dateIssued! | formatDate }}</span>
           }
         </div>
       </div>

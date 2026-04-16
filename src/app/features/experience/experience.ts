@@ -1,11 +1,12 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
+import { FormatDatePipe } from '../../shared/pipes';
 import { PortfolioFacade } from '../../core/services/portfolio.facade';
 import type { Experience as ExperienceItem } from '../../core/models';
 
 @Component({
   selector: 'pp-experience',
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, FormatDatePipe],
   templateUrl: './experience.html',
 })
 export class Experience implements OnInit {

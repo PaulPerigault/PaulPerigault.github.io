@@ -10,7 +10,7 @@
         <div class="flex flex-wrap items-baseline justify-between gap-2 mb-1">
           <h3 class="font-semibold text-gray-900 dark:text-white">{{ item.role }}</h3>
           <span class="text-xs font-mono text-gray-400">
-            {{ formatDate(item.dateStart) }} — {{ item.dateEnd ? formatDate(item.dateEnd) : ('experience.present' |
+            {{ item.dateStart | formatDate }} — {{ item.dateEnd ? (item.dateEnd | formatDate) : ('experience.present' |
             translate) }}
           </span>
         </div>

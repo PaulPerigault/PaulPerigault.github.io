@@ -1,59 +1,59 @@
-# PaulPortfolio
+# paulperigault.fr
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
+Portfolio personnel — Paul Perigault, Ingénieur DevSecOps.
 
-## Development server
+## Stack
 
-To start a local development server, run:
+- Angular 21 · Zoneless · Signals
+- Tailwind CSS v4
+- ngx-translate (FR/EN)
+- Vitest · 33 tests
+- GitHub Actions · Lighthouse CI · CodeQL · Dependabot
+- Docker · Nginx · GitHub Pages
 
-```bash
-ng serve
-```
+## Lancer en local
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+    npm install
+    npm start
 
-## Code scaffolding
+## Tests
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+    npm test
 
-```bash
-ng generate component component-name
-```
+## Build production
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+    npm run build
 
-```bash
-ng generate --help
-```
+## Docker
 
-## Building
+    docker compose up
 
-To build the project run:
+## Architecture
 
-```bash
-ng build
-```
+    src/
+    app/
+        core/
+            models/        # Interfaces TypeScript
+            services/      # ContentService, GithubService, ThemeService
+        features/          # Composants sections (hero, about, skills...)
+        layout/            # Navbar, Footer
+        shared/
+            pipes/         # FormatDatePipe
+    environments/          # Config dev/prod
+    public/
+        data/fr/           # Données JSON
+        i18n/              # Traductions FR/EN
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## CI/CD
 
-## Running unit tests
+| Workflow | Déclencheur | Action |
+|---|---|---|
+| ci.yml | PR | lint + test + build |
+| deploy.yml | push main | GitHub Pages |
+| security.yml | PR + hebdo | npm audit + CodeQL + SBOM |
+| lighthouse.yml | PR | Perf >= 90, A11y = 100 |
+| release.yml | push main | CHANGELOG + tag semver |
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Déploiement alternatif
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Dockerfile multi-stage — déploiement sur Cloud Run, ECS ou Kubernetes sans modification du code.

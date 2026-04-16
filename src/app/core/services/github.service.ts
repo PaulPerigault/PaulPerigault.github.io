@@ -11,7 +11,9 @@ export class GithubService {
   getFeaturedRepos(config: ProjectsConfig): Observable<Project[]> {
     if (!config.featured.length) return of([]);
     const requests = config.featured.map((name) =>
-      this.#http.get<Project>(`${environment.githubApiUrl}/repos/${config.github_user}/${name}`),
+      this.#http.get<Project>(
+        `${environment.githubApiUrl}/repos/${environment.githubUser}/${name}`,
+      ),
     );
     return forkJoin(requests).pipe(
       map((repos) =>

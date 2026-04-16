@@ -11,7 +11,6 @@ export interface Project {
 }
 
 export interface ProjectsConfig {
-  github_user: string;
   featured: string[];
   excluded: string[];
 }

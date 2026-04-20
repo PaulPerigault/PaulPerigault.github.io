@@ -1,17 +1,19 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, map, of } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { Project, ProjectsConfig } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class GithubService {
   readonly #http = inject(HttpClient);
-  readonly #api = 'https://api.github.com';
 
   getFeaturedRepos(config: ProjectsConfig): Observable<Project[]> {
     if (!config.featured.length) return of([]);
     const requests = config.featured.map((name) =>
-      this.#http.get<Project>(`${this.#api}/repos/${config.github_user}/${name}`),
+      this.#http.get<Project>(
+        `${environment.githubApiUrl}/repos/${environment.githubUser}/${name}`,
+      ),
     );
     return forkJoin(requests).pipe(
       map((repos) =>

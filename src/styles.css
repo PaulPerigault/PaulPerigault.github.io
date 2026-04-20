@@ -1,2 +1,14 @@
 @import 'tailwindcss';
-/* You can add global styles to this file, and also import other style files */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white dark:bg-gray-950 text-gray-900 dark:text-white;
+}

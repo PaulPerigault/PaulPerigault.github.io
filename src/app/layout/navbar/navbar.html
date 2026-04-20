@@ -1,0 +1,82 @@
+<nav
+  class="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-800"
+>
+  <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+    <button
+      (click)="scrollTo('hero')"
+      class="font-mono text-sm font-semibold text-gray-900 dark:text-white tracking-tight"
+    >
+      paul<span class="text-teal-600">&#64;</span>perigault
+    </button>
+    <ul class="hidden md:flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+      <li>
+        <button (click)="scrollTo('about')" class="hover:text-teal-600 transition-colors">
+          {{ 'nav.about' | translate }}
+        </button>
+      </li>
+      <li>
+        <button (click)="scrollTo('skills')" class="hover:text-teal-600 transition-colors">
+          {{ 'nav.skills' | translate }}
+        </button>
+      </li>
+      <li>
+        <button (click)="scrollTo('experience')" class="hover:text-teal-600 transition-colors">
+          {{ 'nav.experience' | translate }}
+        </button>
+      </li>
+      <li>
+        <button (click)="scrollTo('projects')" class="hover:text-teal-600 transition-colors">
+          {{ 'nav.projects' | translate }}
+        </button>
+      </li>
+      <li>
+        <button (click)="scrollTo('contact')" class="hover:text-teal-600 transition-colors">
+          {{ 'nav.contact' | translate }}
+        </button>
+      </li>
+    </ul>
+    <div class="flex items-center gap-2">
+      <button
+        (click)="switchLang()"
+        [attr.aria-label]="currentLang === 'fr' ? 'Switch to English' : 'Passer en français'"
+        class="text-xs font-mono px-2 py-1 rounded border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-teal-500 transition-colors"
+      >
+        {{ currentLang === 'fr' ? 'EN' : 'FR' }}
+      </button>
+      <button
+        (click)="theme.toggle()"
+        [attr.aria-label]="theme.theme() === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'"
+        class="w-8 h-8 flex items-center justify-center rounded border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-teal-500 transition-colors text-sm"
+      >
+        {{ theme.theme() === 'dark' ? '☀' : '☾' }}
+      </button>
+      <button
+        (click)="toggleMenu()"
+        class="md:hidden w-8 h-8 flex items-center justify-center text-gray-600 dark:text-gray-400 text-lg"
+      >
+        {{ menuOpen() ? '&#10005;' : '&#9776;' }}
+      </button>
+    </div>
+  </div>
+  @if (menuOpen()) {
+  <div
+    class="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400"
+  >
+    <button (click)="scrollTo('about')" class="text-left hover:text-teal-600">{{ 'nav.about' | translate }}</button>
+    <button (click)="scrollTo('skills')" class="text-left hover:text-teal-600">{{ 'nav.skills' | translate }}</button>
+    <button (click)="scrollTo('experience')" class="text-left hover:text-teal-600">
+      {{ 'nav.experience' | translate }}
+    </button>
+    <button (click)="scrollTo('formation')" class="text-left hover:text-teal-600">
+      {{ 'nav.formation' | translate }}
+    </button>
+    <button (click)="scrollTo('projects')" class="text-left hover:text-teal-600">
+      {{ 'nav.projects' | translate }}
+    </button>
+    <button (click)="scrollTo('certifications')" class="text-left hover:text-teal-600">
+      {{ 'nav.certifications' | translate }}
+    </button>
+    <button (click)="scrollTo('contact')" class="text-left hover:text-teal-600">{{ 'nav.contact' | translate }}</button>
+  </div>
+  }
+</nav>

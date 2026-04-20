@@ -1,0 +1,19 @@
+<section class="py-20 px-4 bg-white dark:bg-gray-950">
+  <div class="max-w-2xl mx-auto">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-10">{{ 'formation.title' | translate }}</h2>
+    <div class="space-y-6">
+      @for (item of items(); track item.id) {
+      <div class="border border-gray-200 dark:border-gray-800 rounded-xl p-5 hover:border-teal-500 transition-colors">
+        <div class="flex flex-wrap items-baseline justify-between gap-2 mb-1">
+          <h3 class="font-semibold text-gray-900 dark:text-white">{{ item.school }}</h3>
+          <span class="text-xs font-mono text-gray-400">
+            {{ item.dateStart | formatDate }} — {{ item.dateEnd | formatDate }}
+          </span>
+        </div>
+        <p class="text-sm text-teal-600 mb-2">{{ item.degree }} · {{ item.speciality }}</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400">{{ item.description }}</p>
+      </div>
+      }
+    </div>
+  </div>
+</section>

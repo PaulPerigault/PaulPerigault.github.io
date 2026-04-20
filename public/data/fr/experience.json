@@ -2,7 +2,7 @@
   {
     "id": "wevii",
     "company": "WeVii",
-    "role": "Apprenti DevSecOps Cloud",
+    "role": "Apprenti DevOps Cloud",
     "location": "Bordeaux (télétravail)",
     "dateStart": "2023-09",
     "dateEnd": null,
@@ -25,7 +25,7 @@
     "location": "Paris",
     "dateStart": "2022-08",
     "dateEnd": "2022-08",
-    "description": "Programme immersif 4 semaines : algorithmie, C, peer-learning sans encadrement. Projets en autonomie sous contrainte de temps.",
+    "description": "Programme immersif 4 semaines : algorithmie, C, peer-learning sans encadrement.",
     "tags": [
       "C",
       "Algorithmie",

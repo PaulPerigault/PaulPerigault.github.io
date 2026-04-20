@@ -1,17 +1,9 @@
 {
   "featured": [
-    "rsa-ct-analyzer",
-    "Smart-Home-as-a-Service-SHaaS-",
     "GetUrlCloudRun",
     "appFytBack",
     "appFytFront",
-    "Le-quart-de-singe"
+    "Node-sb-01"
   ],
-  "excluded": [
-    "PaulPerigault",
-    "PaulPerigault.github.io",
-    "Rappport_Alternance",
-    "cv-latex",
-    "504GatewayTimeout"
-  ]
+  "excluded": []
 }

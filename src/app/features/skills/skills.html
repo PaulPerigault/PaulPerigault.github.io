@@ -1,1 +1,20 @@
-<p>skills works!</p>
+<section class="py-20 px-4 bg-white dark:bg-gray-950">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-10">{{ 'skills.title' | translate }}</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      @for (cat of skills(); track cat.category) {
+      <div class="border border-gray-200 dark:border-gray-800 rounded-xl p-5 hover:border-teal-500 transition-colors">
+        <h3 class="text-sm font-semibold text-teal-600 uppercase tracking-wider mb-3">{{ cat.category }}</h3>
+        <ul class="space-y-1">
+          @for (item of cat.items; track item) {
+          <li class="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
+            <span class="w-1 h-1 rounded-full bg-teal-500 flex-shrink-0"></span>
+            {{ item }}
+          </li>
+          }
+        </ul>
+      </div>
+      }
+    </div>
+  </div>
+</section>

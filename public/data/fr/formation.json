@@ -3,10 +3,10 @@
     "id": "esiea",
     "school": "ESIEA Paris",
     "degree": "Cycle ingénieur",
-    "speciality": "DevSecOps & Cloud Computing",
+    "speciality": "DevOps & Cloud Computing",
     "dateStart": "2024-09",
     "dateEnd": "2027-08",
-    "description": "Formation d'ingénieur informatique avec spécialisation DevSecOps et Cloud."
+    "description": "Formation d'ingénieur informatique avec spécialisation DevOps et Cloud."
   },
   {
     "id": "iut",

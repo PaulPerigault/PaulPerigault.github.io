@@ -51,7 +51,7 @@ describe('PortfolioFacade', () => {
         id: 'esiea',
         school: 'ESIEA',
         degree: 'Ingénieur',
-        speciality: 'DevSecOps',
+        speciality: 'DevOps',
         dateStart: '2024-09',
         dateEnd: '2027-08',
         description: 'desc',

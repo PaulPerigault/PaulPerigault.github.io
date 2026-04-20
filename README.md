@@ -1,6 +1,6 @@
 # paulperigault.fr
 
-Portfolio personnel — Paul Perigault, Ingénieur DevSecOps.
+Portfolio personnel — Paul Perigault, Apprenti Ingénieur DevOps.
 
 ## Stack
 

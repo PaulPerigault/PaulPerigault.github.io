@@ -15,19 +15,19 @@ describe('ThemeService', () => {
   });
 
   it('toggle switches from light to dark', () => {
-    service['theme'].set('light');
+    if (service.theme() !== 'light') service.toggle();
     service.toggle();
     expect(service.theme()).toBe('dark');
   });
 
   it('toggle switches from dark to light', () => {
-    service['theme'].set('dark');
+    if (service.theme() !== 'dark') service.toggle();
     service.toggle();
     expect(service.theme()).toBe('light');
   });
 
   it('persists theme in localStorage', () => {
-    service['theme'].set('light');
+    if (service.theme() !== 'light') service.toggle();
     service.toggle();
     expect(localStorage.getItem('theme')).toBe('dark');
   });

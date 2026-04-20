@@ -26,11 +26,11 @@ test.describe('portfolio', () => {
   test('language switcher exists and toggles', async ({ page }) => {
     const langBtn = page.locator('nav button').filter({ hasText: /EN|FR/ });
     await expect(langBtn).toBeVisible();
-    const before = await langBtn.textContent();
+    const before = (await langBtn.textContent())?.trim();
     await langBtn.click();
-    await page.waitForTimeout(300);
-    const after = await langBtn.textContent();
-    expect(after?.trim()).not.toBe(before?.trim());
+    await expect
+      .poll(async () => (await langBtn.textContent())?.trim(), { timeout: 5000 })
+      .not.toBe(before);
   });
 
   test('theme toggle switches dark mode', async ({ page }) => {

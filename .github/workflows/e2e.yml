@@ -15,8 +15,11 @@ jobs:
       - run: npm install
       - run: npx playwright install --with-deps chromium
       - run: npm run build
-      - name: Run E2E tests
-        run: npm run e2e
+      - name: Serve and run E2E tests
+        run: |
+          npx serve dist/paul-portfolio/browser -p 4201 &
+          npx wait-on http://localhost:4201 --timeout 30000
+          npm run e2e
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

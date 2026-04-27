@@ -61,7 +61,7 @@ test.describe('portfolio', () => {
   });
 
   test('contact section has email link', async ({ page }) => {
-    await expect(page.locator('a[href="mailto:perigault.paul@gmail.com"]').last()).toBeVisible();
+    await expect(page.locator('a[href="mailto:contact@paulperigault"]').last()).toBeVisible();
   });
 
   test('footer renders with domain', async ({ page }) => {

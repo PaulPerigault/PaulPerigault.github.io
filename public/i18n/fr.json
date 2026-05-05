@@ -17,7 +17,7 @@
   },
   "about": {
     "title": "À propos",
-    "body": "Étudiant ingénieur DevOps à l'ESIEA Paris, en alternance chez WeVii sur des sujets cloud multicloud et CI/CD. Passionné par la transmission, je cherche à participer à des hackathons et projets étudiants.",
+    "body": "Étudiant ingénieur DevOps à l'ESIEA Paris, en alternance chez WeVii sur des sujets cloud multicloud et CI/CD. Passionné par la transmission, je cherche à mentorer et accompagner des étudiants sur des projets techniques et hackathons.",
     "location": "Paris, France"
   },
   "skills": {
@@ -42,7 +42,7 @@
   },
   "contact": {
     "title": "Contact",
-    "subtitle": "Ingénieur DevOps en alternance — disponible pour intervenir en écoles et participer à des hackathons.",
+    "subtitle": "Ingénieur DevOps en alternance, disponible pour intervenir en écoles, mentorer des projets étudiants et encadrer des hackathons.",
     "email": "contact@paulperigault.fr",
     "linkedin": "paul-perigault",
     "github": "PaulPerigault"

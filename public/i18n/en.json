@@ -17,7 +17,7 @@
   },
   "about": {
     "title": "About",
-    "body": "DevOps engineering student at ESIEA Paris, apprentice at WeVii working on multicloud and CI/CD. Passionate about knowledge sharing, I look to participate in hackathons and student projects.",
+    "body": "DevOps engineering student at ESIEA Paris, apprentice at WeVii working on multicloud and CI/CD. Passionate about knowledge sharing, I look to mentor and support students on technical projects and hackathons.",
     "location": "Paris, France"
   },
   "skills": {
@@ -42,7 +42,7 @@
   },
   "contact": {
     "title": "Contact",
-    "subtitle": "DevOps engineer — available for school talks and hackathons.",
+    "subtitle": "DevOps engineer — available for school talks, student project mentoring and hackathon supervision.",
     "email": "contact@paulperigault.fr",
     "linkedin": "paul-perigault",
     "github": "PaulPerigault"

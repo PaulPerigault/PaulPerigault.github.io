@@ -20,7 +20,7 @@ jobs:
           npx serve dist/paul-portfolio/browser -p 4201 &
           npx wait-on http://localhost:4201 --timeout 30000
           npm run e2e
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report

@@ -2,9 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Navbar } from './navbar';
+import { LangService } from '../../core/services/lang.service';
 
 describe('Navbar', () => {
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [Navbar],
       providers: [provideTranslateService(), provideRouter([])],
@@ -36,5 +38,18 @@ describe('Navbar', () => {
     comp.switchLang();
 
     expect(navigateSpy).toHaveBeenCalledWith(initial === 'fr' ? '/en' : '/fr');
+  });
+
+  it('switchLang persists the new language via LangService', () => {
+    const fixture = TestBed.createComponent(Navbar);
+    const comp = fixture.componentInstance;
+    const router = TestBed.inject(Router);
+    vi.spyOn(router, 'navigateByUrl').mockResolvedValue(true);
+    const lang = TestBed.inject(LangService);
+
+    const initial = comp.currentLang;
+    comp.switchLang();
+
+    expect(lang.lang()).toBe(initial === 'fr' ? 'en' : 'fr');
   });
 });

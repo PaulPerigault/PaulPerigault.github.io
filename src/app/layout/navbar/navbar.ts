@@ -4,6 +4,7 @@ import { TranslateService, TranslatePipe } from '@ngx-translate/core';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 import { ThemeService } from '../../core/services/theme.service';
+import { LangService } from '../../core/services/lang.service';
 
 @Component({
   selector: 'pp-navbar',
@@ -15,6 +16,7 @@ export class Navbar {
   readonly #router = inject(Router);
   readonly #platformId = inject(PLATFORM_ID);
   readonly theme = inject(ThemeService);
+  readonly #lang = inject(LangService);
   readonly menuOpen = signal(false);
 
   get currentLang(): string {
@@ -30,6 +32,7 @@ export class Navbar {
 
   switchLang(): void {
     const next = this.currentLang === 'fr' ? 'en' : 'fr';
+    this.#lang.set(next);
     this.#router.navigateByUrl(`/${next}`);
   }
 

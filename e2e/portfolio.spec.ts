@@ -61,7 +61,7 @@ test.describe('portfolio', () => {
   });
 
   test('contact section has email link', async ({ page }) => {
-    await expect(page.locator('a[href="mailto:perigault.paul@gmail.com"]').last()).toBeVisible();
+    await expect(page.locator('a[href="mailto:contact@paulperigault.fr"]').last()).toBeVisible();
   });
 
   test('footer renders with domain', async ({ page }) => {
@@ -70,6 +70,23 @@ test.describe('portfolio', () => {
 
   test('navigation buttons count is correct', async ({ page }) => {
     const navItems = page.locator('nav ul button');
-    await expect(navItems).toHaveCount(5);
+    await expect(navItems).toHaveCount(7);
+  });
+
+  test('mobile menu button exposes aria-expanded and aria-label', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    const menuBtn = page.locator('nav button[aria-controls="pp-mobile-menu"]');
+    await expect(menuBtn).toHaveAttribute('aria-expanded', 'false');
+    await expect(menuBtn).toHaveAttribute('aria-label', /menu/i);
+    await menuBtn.click();
+    await expect(menuBtn).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  test('interactive elements show a visible focus outline', async ({ page }) => {
+    const themeBtn = page.locator('nav button[aria-label*="mode"]');
+    await themeBtn.focus();
+    await expect(themeBtn).toBeFocused();
+    const outline = await themeBtn.evaluate((el) => getComputedStyle(el).outlineStyle);
+    expect(outline).not.toBe('none');
   });
 });

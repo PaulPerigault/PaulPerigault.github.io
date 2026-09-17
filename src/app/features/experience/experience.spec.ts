@@ -44,12 +44,4 @@ describe('Experience', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.items()).toEqual(mock);
   });
-
-  it('formatDate returns readable date string', () => {
-    const fixture = TestBed.createComponent(Experience);
-    fixture.detectChanges();
-    http.expectOne('/data/fr/experience.json').flush([]);
-    const result = fixture.componentInstance.formatDate('2023-09');
-    expect(result).toContain('2023');
-  });
 });

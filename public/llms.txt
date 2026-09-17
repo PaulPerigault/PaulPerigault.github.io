@@ -1,21 +1,43 @@
 # Paul Perigault
 
-> Ingénieur DevOps en alternance (ESIEA Paris / WeVii), spécialisé cloud multicloud, CI/CD et infrastructure as code. Portfolio personnel présentant expériences, projets et certifications.
+> FR: Ingénieur DevOps & Cloud en alternance chez WeVii et étudiant à l'ESIEA Paris (promotion 2027). Spécialisé dans les architectures multicloud (AWS, GCP), l'IaC (Terraform), les approches GitOps (ArgoCD, Kubernetes) et le développement backend (Go, Java, Python). Disponible pour interventions pédagogiques, jurys et encadrement de hackathons.
+> EN: DevOps & Cloud engineer on a work-study program at WeVii, studying at ESIEA Paris (class of 2027). Specialized in multicloud architectures (AWS, GCP), IaC (Terraform), GitOps workflows (ArgoCD, Kubernetes) and backend development (Go, Java, Python). Available for guest lectures, juries and hackathon mentoring.
 
-Portfolio de Paul Perigault (paulperigault.fr). Le site est disponible en français (`/fr`) et en anglais (`/en`), pré-rendu côté serveur (SSR/SSG) : chaque page est livrée avec son contenu complet, sans nécessiter l'exécution de JavaScript pour être lue.
+Site personnel bilingue (FR/EN) : https://paulperigault.fr — pré-rendu en SSR/SSG pour une indexation directe sans exécution JavaScript. / Bilingual personal site (FR/EN), pre-rendered via SSR/SSG for direct indexing without JavaScript execution.
+
+## Profil & Expertise
+
+- **Cloud & Orchestration** : AWS (EC2, S3, Lambda, EKS), GCP (GKE, Cloud Run), Kubernetes, Docker, Helm.
+- **CI/CD & GitOps** : GitLab CI, GitHub Actions, ArgoCD.
+- **Infrastructure as Code & Sécurité** : Terraform, Ansible, HashiCorp Vault, SOPS, audit réseau (Nmap, Wireshark).
+- **Observabilité** : Prometheus, Grafana, stack ELK.
+- **Développement & R&D** : Go (Golang), Java (Spring Boot), Python, Angular, TypeScript, Shell Scripting, C.
+
+## Parcours
+
+- **WeVii (Sep 2023 - Présent)** : Apprenti DevOps Cloud — Conception de pipelines CI/CD et déploiements GitOps, automatisation IaC multicloud, sécurisation des secrets d'entreprise, monitoring d'infrastructures et développement applicatif fullstack / microservices.
+- **ESIEA Paris (2024 - 2027)** : Cycle Ingénieur — Spécialisation DevOps & Cloud Computing.
+- **IUT Paris Rives de Seine (2022 - 2024)** : BUT Informatique — Déploiement d'applications sécurisées.
+- **École 42 (2022)** : Piscine intensive en langage C et algorithmie.
+
+## Certifications
+
+- Google Cloud Associate Cloud Engineer (En cours de préparation)
+- AWS Cloud Quest: Cloud Practitioner (Mar 2026)
+- Google Cloud Digital Leader (Nov 2024)
 
 ## Sections
 
-- [À propos](https://paulperigault.fr/fr#about)
-- [Stack technique](https://paulperigault.fr/fr#skills)
-- [Expériences](https://paulperigault.fr/fr#experience)
-- [Formation](https://paulperigault.fr/fr#formation)
-- [Projets](https://paulperigault.fr/fr#projects)
-- [Certifications](https://paulperigault.fr/fr#certifications)
-- [Contact](https://paulperigault.fr/fr#contact)
+- [À propos](https://paulperigault.fr/fr#about) | [About](https://paulperigault.fr/en#about)
+- [Compétences techniques](https://paulperigault.fr/fr#skills) | [Skills](https://paulperigault.fr/en#skills)
+- [Expérience professionnelle](https://paulperigault.fr/fr#experience) | [Experience](https://paulperigault.fr/en#experience)
+- [Formations](https://paulperigault.fr/fr#formation) | [Education](https://paulperigault.fr/en#formation)
+- [Projets](https://paulperigault.fr/fr#projects) | [Projects](https://paulperigault.fr/en#projects)
+- [Certifications](https://paulperigault.fr/fr#certifications) | [Certifications](https://paulperigault.fr/en#certifications)
+- [Contact](https://paulperigault.fr/fr#contact) | [Contact](https://paulperigault.fr/en#contact)
 
 ## Optional
 
-- [Version anglaise](https://paulperigault.fr/en)
 - [GitHub](https://github.com/PaulPerigault)
 - [LinkedIn](https://linkedin.com/in/paul-perigault)
+- [Email direct](mailto:contact@paulperigault.fr)

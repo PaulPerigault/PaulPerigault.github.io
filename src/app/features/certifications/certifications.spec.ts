@@ -53,4 +53,24 @@ describe('Certifications', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.items()).toEqual([]);
   });
+
+  it('renders "in progress" instead of a date for a certification not yet issued', () => {
+    const fixture = TestBed.createComponent(Certifications);
+    const mock: Certification[] = [
+      {
+        id: 'aws',
+        name: 'AWS Cloud Quest',
+        issuer: 'AWS',
+        issuerLogo: 'aws',
+        dateIssued: null,
+        dateExpires: null,
+        inProgress: true,
+      },
+    ];
+    fixture.detectChanges();
+    http.expectOne('/data/fr/certifications.json').flush(mock);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('certifications.in_progress');
+  });
 });

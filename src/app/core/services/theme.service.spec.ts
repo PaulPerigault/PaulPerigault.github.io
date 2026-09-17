@@ -33,6 +33,43 @@ describe('ThemeService', () => {
     expect(localStorage.getItem('theme')).toBe('dark');
   });
 
+  it('initializes from a previously stored dark theme instead of the system preference', () => {
+    localStorage.setItem('theme', 'dark');
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const restored = TestBed.inject(ThemeService);
+
+    expect(restored.theme()).toBe('dark');
+  });
+
+  it('initializes from a previously stored light theme', () => {
+    localStorage.setItem('theme', 'light');
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const restored = TestBed.inject(ThemeService);
+
+    expect(restored.theme()).toBe('light');
+  });
+
+  it('falls back to the system dark preference when nothing is stored', () => {
+    const matchMediaSpy = vi.spyOn(window, 'matchMedia').mockReturnValue({
+      matches: true,
+      media: '',
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => false,
+    } as MediaQueryList);
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    const restored = TestBed.inject(ThemeService);
+
+    expect(restored.theme()).toBe('dark');
+    matchMediaSpy.mockRestore();
+  });
+
   describe('outside a browser (ssr/prerendering)', () => {
     let serverService: ThemeService;
 

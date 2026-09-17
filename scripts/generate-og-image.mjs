@@ -1,10 +1,11 @@
 import { chromium } from '@playwright/test';
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const outPath = join(__dirname, '../public/image/og-cover.png');
+const logoSvg = readFileSync(join(__dirname, '../public/image/logo.svg'), 'utf-8');
 
 const html = `
 <!doctype html>
@@ -23,6 +24,11 @@ const html = `
         font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         background: linear-gradient(135deg, #0f172a 0%, #134e4a 100%);
         color: #f8fafc;
+      }
+      .logo {
+        width: 72px;
+        height: 72px;
+        margin-bottom: 32px;
       }
       .kicker {
         font-family: 'Consolas', monospace;
@@ -46,6 +52,7 @@ const html = `
     </style>
   </head>
   <body>
+    <div class="logo">${logoSvg}</div>
     <div class="kicker">paul<span class="accent">&#64;</span>perigault</div>
     <h1>Paul Perigault</h1>
     <p>Ingénieur DevOps &mdash; ESIEA Paris &middot; Alternant chez WeVii</p>

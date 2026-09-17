@@ -1,7 +1,8 @@
 {
   "ci": {
     "collect": {
-      "staticDistDir": "./dist/paul-portfolio/browser"
+      "staticDistDir": "./dist/paul-portfolio/browser",
+      "url": ["/fr/", "/en/"]
     },
     "assert": {
       "assertions": {

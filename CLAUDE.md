@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Personal portfolio for Paul Perigault (paulperigault.fr), built with Angular 21 (zoneless, standalone components, signals), Tailwind CSS v4, and ngx-translate for FR/EN i18n. Server-side rendered at build time (`@angular/ssr`, static prerendering) for crawlability, with per-language routes and structured SEO metadata.
+Personal portfolio for Paul Perigault (paulperigault.fr), built with Angular 22 (zoneless, standalone components, signals), Tailwind CSS v4, and ngx-translate for FR/EN i18n. Server-side rendered at build time (`@angular/ssr`, static prerendering) for crawlability, with per-language routes and structured SEO metadata.
 
 ## Commands
 
@@ -51,7 +51,8 @@ Husky runs `lint-staged` on commit (eslint --fix + prettier on `*.ts`, prettier 
 - `src/app/shared/pipes/` — reusable pipes (e.g. `FormatDatePipe`), exported via `index.ts`.
 - Content data (skills, experience, formation, certifications, projects) only exists for `fr` under `public/data/fr/` and is always fetched with the `fr` locale regardless of the active UI language — `environment.defaultLang` is `fr` and `ContentService` falls back to it for any unsupported lang. UI-string translations (nav labels, headings, `seo.title`/`seo.description`, etc.) are separate and live in `public/i18n/{fr,en}.json`, loaded via `provideTranslateHttpLoader`.
 - Environment config (`src/environments/environment.ts` / `.prod.ts`) holds `githubApiUrl`, `githubUser`, `i18nPath`, `dataPath`, `defaultLang`, `supportedLangs`, `canonicalDomain` (`https://paulperigault.fr`, used for canonical/hreflang/OG URLs instead of `window.location`), `ogImagePath` — read these instead of hardcoding paths/URLs.
-- `provideHttpClient(withFetch())` is required (not just `provideHttpClient()`) so HTTP requests work isomorphically during server-side prerendering, where `XMLHttpRequest` isn't available.
+- `fetch` is the default `HttpClient` backend since Angular 22 (plain `provideHttpClient()`), which is what makes HTTP requests work isomorphically during server-side prerendering, where `XMLHttpRequest` isn't available — `withFetch()` is deprecated and no longer needed. Use `provideHttpClient(withXhr())` only if XHR-specific features (e.g. upload progress) are required.
+- Components rely on the Angular 22 default `ChangeDetectionStrategy.OnPush` (no component sets `changeDetection` explicitly) — consistent with the zoneless, signal-driven state used throughout.
 
 ## Conventions
 

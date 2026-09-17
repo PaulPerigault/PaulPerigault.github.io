@@ -21,7 +21,7 @@ describe('GithubService', () => {
   afterEach(() => http.verify());
 
   it('returns an empty array when no repo is featured', async () => {
-    const repos = await firstValueFrom(service.getFeaturedRepos({ featured: [], excluded: [] }));
+    const repos = await firstValueFrom(service.getFeaturedRepos({ featured: [] }));
     expect(repos).toEqual([]);
   });
 
@@ -29,9 +29,7 @@ describe('GithubService', () => {
     const repoA = { id: 1, updated_at: '2024-01-01T00:00:00Z' } as unknown as Project;
     const repoB = { id: 2, updated_at: '2025-01-01T00:00:00Z' } as unknown as Project;
 
-    const promise = firstValueFrom(
-      service.getFeaturedRepos({ featured: ['a', 'b'], excluded: [] }),
-    );
+    const promise = firstValueFrom(service.getFeaturedRepos({ featured: ['a', 'b'] }));
     http.expectOne(`${environment.githubApiUrl}/repos/${environment.githubUser}/a`).flush(repoA);
     http.expectOne(`${environment.githubApiUrl}/repos/${environment.githubUser}/b`).flush(repoB);
 
@@ -42,9 +40,7 @@ describe('GithubService', () => {
   it('skips a repo that fails to fetch (e.g. private or deleted) instead of failing the whole batch', async () => {
     const repo = { id: 1, updated_at: '2024-01-01T00:00:00Z' } as unknown as Project;
 
-    const promise = firstValueFrom(
-      service.getFeaturedRepos({ featured: ['ok', 'private-repo'], excluded: [] }),
-    );
+    const promise = firstValueFrom(service.getFeaturedRepos({ featured: ['ok', 'private-repo'] }));
     http.expectOne(`${environment.githubApiUrl}/repos/${environment.githubUser}/ok`).flush(repo);
     http
       .expectOne(`${environment.githubApiUrl}/repos/${environment.githubUser}/private-repo`)

@@ -12,5 +12,4 @@ export interface Project {
 
 export interface ProjectsConfig {
   featured: string[];
-  excluded: string[];
 }

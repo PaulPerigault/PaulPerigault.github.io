@@ -43,4 +43,14 @@ describe('Certifications', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.items()).toEqual(mock);
   });
+
+  it('falls back to an empty array when the request fails (silent fail)', () => {
+    const fixture = TestBed.createComponent(Certifications);
+    fixture.detectChanges();
+    http
+      .expectOne('/data/fr/certifications.json')
+      .flush('failed', { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+    expect(fixture.componentInstance.items()).toEqual([]);
+  });
 });

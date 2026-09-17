@@ -33,4 +33,14 @@ describe('Skills', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.skills()).toEqual(mock);
   });
+
+  it('falls back to an empty array when the request fails (silent fail)', () => {
+    const fixture = TestBed.createComponent(Skills);
+    fixture.detectChanges();
+    http
+      .expectOne('/data/fr/skills.json')
+      .flush('failed', { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+    expect(fixture.componentInstance.skills()).toEqual([]);
+  });
 });

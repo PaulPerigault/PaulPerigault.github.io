@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Personal portfolio for Paul Perigault (paulperigault.fr), built with Angular 21 (zoneless, standalone components, signals), Tailwind CSS v4, and ngx-translate for FR/EN i18n. Server-side rendered at build time (`@angular/ssr`, static prerendering) for crawlability, with per-language routes and structured SEO metadata.
+Personal portfolio for Paul Perigault (paulperigault.fr), built with Angular 22 (zoneless, standalone components, signals), Tailwind CSS v4, and ngx-translate for FR/EN i18n. Server-side rendered at build time (`@angular/ssr`, static prerendering) for crawlability, with per-language routes and structured SEO metadata.
 
 ## Commands
 
@@ -16,8 +16,10 @@ npm run watch          # dev build in watch mode
 npm test                                    # run all unit tests (Vitest via Angular builder)
 npm test -- --watch                         # watch mode
 npx vitest run src/app/features/skills      # run tests matching a path/pattern
+npm run test:coverage                       # unit tests with a v8 coverage report (needs @vitest/coverage-v8)
 
-npm run e2e            # Playwright e2e tests (npm run build runs first automatically, see playwright.config.ts)
+npm run e2e            # Playwright e2e tests — requires the app already built and served at localhost:4201
+                        # (npm run build && npx serve dist/paul-portfolio/browser -p 4201, see e2e.yml for the exact sequence CI runs)
 npm run e2e:ui         # Playwright UI mode
 
 npm run lint           # eslint src --ext .ts,.html
@@ -38,7 +40,10 @@ Husky runs `lint-staged` on commit (eslint --fix + prettier on `*.ts`, prettier 
   - `GithubService` fetches live repo data from the GitHub REST API for repos listed in `projects-config.json`, sorted by `updated_at`.
   - `PortfolioFacade` is the single entry point feature components use — it composes `ContentService` + `GithubService` (e.g. `getProjects()` reads the config then fetches the featured repos). Components should depend on `PortfolioFacade`, not on `ContentService`/`GithubService` directly.
   - `ThemeService` manages light/dark theme via a signal, persisted to `localStorage` and synced to `document.documentElement` classlist; guards all DOM/`localStorage` access behind `isPlatformBrowser` since the app can run outside a browser context (SSR/prerendering).
+  - `LangService` mirrors `ThemeService` (signal + `isPlatformBrowser`-guarded `localStorage` persistence) for the active language, so `PortfolioPage` (initial route render) and `Navbar.switchLang()` (manual switch) persist through the same guarded path instead of touching `localStorage` directly.
   - `SeoService` (see SEO section below) updates title, meta tags, canonical/hreflang links and a JSON-LD script for the current route/language.
+- Feature components (`Skills`, `Experience`, `Formation`, `Certifications`, `Projects`) load data with `toSignal()` (`@angular/core/rxjs-interop`) over the `PortfolioFacade` observable instead of `OnInit` + manual `.subscribe()`, with `catchError` preserving the previous silent-fail behavior (falls back to an empty array). `Projects` additionally exposes `loading`/`error`/`projects` as `computed()` signals derived from a single internal result signal, with `load()` re-triggering the fetch (e.g. for retry after an error) via an internal `Subject`.
+- `provideZonelessChangeDetection()` is registered in `app.config.ts` — required for the app to actually run zoneless (no `zone.js` in `package.json`, but the provider must still be explicitly registered).
 - `src/app/app.ts` — root shell, hosts `<router-outlet />` only (theme init). Routing determines which language variant renders.
 - `src/app/pages/portfolio-page/` — `PortfolioPage`, the routed component rendering the full one-page portfolio (navbar, hero, about, skills, experience, formation, projects, certifications, contact, footer). Reads `lang` from route `data`, sets the active ngx-translate language, and calls `SeoService.update()`.
 - `src/app/app.routes.ts` — `'' → redirect '/fr'`, `'fr'` and `'en'` both render `PortfolioPage` with `data: { lang }`, `'**' → redirect '/fr'`.
@@ -48,7 +53,8 @@ Husky runs `lint-staged` on commit (eslint --fix + prettier on `*.ts`, prettier 
 - `src/app/shared/pipes/` — reusable pipes (e.g. `FormatDatePipe`), exported via `index.ts`.
 - Content data (skills, experience, formation, certifications, projects) only exists for `fr` under `public/data/fr/` and is always fetched with the `fr` locale regardless of the active UI language — `environment.defaultLang` is `fr` and `ContentService` falls back to it for any unsupported lang. UI-string translations (nav labels, headings, `seo.title`/`seo.description`, etc.) are separate and live in `public/i18n/{fr,en}.json`, loaded via `provideTranslateHttpLoader`.
 - Environment config (`src/environments/environment.ts` / `.prod.ts`) holds `githubApiUrl`, `githubUser`, `i18nPath`, `dataPath`, `defaultLang`, `supportedLangs`, `canonicalDomain` (`https://paulperigault.fr`, used for canonical/hreflang/OG URLs instead of `window.location`), `ogImagePath` — read these instead of hardcoding paths/URLs.
-- `provideHttpClient(withFetch())` is required (not just `provideHttpClient()`) so HTTP requests work isomorphically during server-side prerendering, where `XMLHttpRequest` isn't available.
+- `fetch` is the default `HttpClient` backend since Angular 22 (plain `provideHttpClient()`), which is what makes HTTP requests work isomorphically during server-side prerendering, where `XMLHttpRequest` isn't available — `withFetch()` is deprecated and no longer needed. Use `provideHttpClient(withXhr())` only if XHR-specific features (e.g. upload progress) are required.
+- Components rely on the Angular 22 default `ChangeDetectionStrategy.OnPush` (no component sets `changeDetection` explicitly) — consistent with the zoneless, signal-driven state used throughout.
 
 ## Conventions
 

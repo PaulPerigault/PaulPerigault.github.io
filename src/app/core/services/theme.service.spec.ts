@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { PLATFORM_ID } from '@angular/core';
 import { ThemeService } from './theme.service';
 
 describe('ThemeService', () => {
@@ -30,5 +31,31 @@ describe('ThemeService', () => {
     if (service.theme() !== 'light') service.toggle();
     service.toggle();
     expect(localStorage.getItem('theme')).toBe('dark');
+  });
+
+  describe('outside a browser (ssr/prerendering)', () => {
+    let serverService: ThemeService;
+
+    beforeEach(() => {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [{ provide: PLATFORM_ID, useValue: 'server' }],
+      });
+      serverService = TestBed.inject(ThemeService);
+    });
+
+    it('defaults to light without touching localStorage', () => {
+      expect(serverService.theme()).toBe('light');
+    });
+
+    it('toggle updates the signal without touching the dom or localStorage', () => {
+      serverService.toggle();
+      expect(serverService.theme()).toBe('dark');
+      expect(localStorage.getItem('theme')).toBeNull();
+    });
+
+    it('init does not throw without a document', () => {
+      expect(() => serverService.init()).not.toThrow();
+    });
   });
 });

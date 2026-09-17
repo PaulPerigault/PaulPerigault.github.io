@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 import { provideTranslateService } from '@ngx-translate/core';
 import { Navbar } from './navbar';
 
@@ -6,7 +7,7 @@ describe('Navbar', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Navbar],
-      providers: [provideTranslateService()],
+      providers: [provideTranslateService(), provideRouter([])],
     }).compileComponents();
   });
 
@@ -25,11 +26,15 @@ describe('Navbar', () => {
     expect(comp.menuOpen()).toBe(false);
   });
 
-  it('switchLang toggles between fr and en', () => {
+  it('switchLang navigates to the other language route', () => {
     const fixture = TestBed.createComponent(Navbar);
     const comp = fixture.componentInstance;
+    const router = TestBed.inject(Router);
+    const navigateSpy = vi.spyOn(router, 'navigateByUrl');
+
     const initial = comp.currentLang;
     comp.switchLang();
-    expect(comp.currentLang).not.toBe(initial);
+
+    expect(navigateSpy).toHaveBeenCalledWith(initial === 'fr' ? '/en' : '/fr');
   });
 });

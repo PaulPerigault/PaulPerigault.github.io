@@ -48,6 +48,7 @@ describe('Projects', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.loading()).toBe(false);
     expect(fixture.componentInstance.error()).toBe(true);
+    expect(fixture.componentInstance.projects()).toEqual([]);
   });
 
   it('retrying after an error clears the error state and reloads', () => {

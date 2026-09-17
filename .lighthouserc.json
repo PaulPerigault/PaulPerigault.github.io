@@ -2,7 +2,11 @@
   "ci": {
     "collect": {
       "staticDistDir": "./dist/paul-portfolio/browser",
-      "url": ["/fr/", "/en/"]
+      "url": ["/fr/", "/en/"],
+      "numberOfRuns": 3,
+      "settings": {
+        "preset": "desktop"
+      }
     },
     "assert": {
       "assertions": {

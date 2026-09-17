@@ -21,20 +21,20 @@ describe('Projects', () => {
     const fixture = TestBed.createComponent(Projects);
     fixture.detectChanges();
     expect(fixture.componentInstance).toBeTruthy();
-    http.expectOne('/data/fr/projects-config.json').flush({ featured: [], excluded: [] });
+    http.expectOne('/data/fr/projects-config.json').flush({ featured: [] });
   });
 
   it('shows loading state initially', () => {
     const fixture = TestBed.createComponent(Projects);
     expect(fixture.componentInstance.loading()).toBe(true);
     fixture.detectChanges();
-    http.expectOne('/data/fr/projects-config.json').flush({ featured: [], excluded: [] });
+    http.expectOne('/data/fr/projects-config.json').flush({ featured: [] });
   });
 
   it('sets loading false after data loads', () => {
     const fixture = TestBed.createComponent(Projects);
     fixture.detectChanges();
-    http.expectOne('/data/fr/projects-config.json').flush({ featured: [], excluded: [] });
+    http.expectOne('/data/fr/projects-config.json').flush({ featured: [] });
     fixture.detectChanges();
     expect(fixture.componentInstance.loading()).toBe(false);
   });
@@ -61,6 +61,6 @@ describe('Projects', () => {
     fixture.componentInstance.load();
     expect(fixture.componentInstance.loading()).toBe(true);
     expect(fixture.componentInstance.error()).toBe(false);
-    http.expectOne('/data/fr/projects-config.json').flush({ featured: [], excluded: [] });
+    http.expectOne('/data/fr/projects-config.json').flush({ featured: [] });
   });
 });

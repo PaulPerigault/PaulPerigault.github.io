@@ -1,4 +1,6 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { catchError, of } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PortfolioFacade } from '../../core/services/portfolio.facade';
 import { SkillCategory } from '../../core/models';
@@ -8,11 +10,10 @@ import { SkillCategory } from '../../core/models';
   imports: [TranslatePipe],
   templateUrl: './skills.html',
 })
-export class Skills implements OnInit {
+export class Skills {
   readonly #facade = inject(PortfolioFacade);
-  readonly skills = signal<SkillCategory[]>([]);
 
-  ngOnInit(): void {
-    this.#facade.getSkills().subscribe((s) => this.skills.set(s));
-  }
+  readonly skills = toSignal(this.#facade.getSkills().pipe(catchError(() => of([]))), {
+    initialValue: [] as SkillCategory[],
+  });
 }

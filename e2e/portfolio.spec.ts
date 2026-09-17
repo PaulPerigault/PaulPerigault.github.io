@@ -89,4 +89,35 @@ test.describe('portfolio', () => {
     const outline = await themeBtn.evaluate((el) => getComputedStyle(el).outlineStyle);
     expect(outline).not.toBe('none');
   });
+
+  test('clicking a nav link scrolls the matching anchor section into view', async ({ page }) => {
+    const contactSection = page.locator('#contact');
+    await expect(contactSection).not.toBeInViewport();
+
+    await page
+      .locator('nav ul button')
+      .filter({ hasText: /contact/i })
+      .first()
+      .click();
+
+    await expect(contactSection).toBeInViewport({ timeout: 5000 });
+  });
+
+  test('projects section renders a repo card fetched live from the github api', async ({
+    page,
+  }) => {
+    // Client hydration's HTTP transfer cache reuses the SSR-time GitHub API response, so a
+    // page.route() mock here would never see a network request to intercept. This asserts the
+    // end-to-end facade -> github.service -> live GitHub API chain instead, against the one repo
+    // configured in public/data/fr/projects-config.json.
+    const projectsSection = page.locator('#projects');
+    await projectsSection.scrollIntoViewIfNeeded();
+
+    const card = projectsSection.locator(
+      'a[href="https://github.com/PaulPerigault/GetUrlCloudRun"]',
+    );
+    await expect(card).toBeVisible({ timeout: 10000 });
+    await expect(card).toContainText('GetUrlCloudRun');
+    await expect(card).toContainText('Go');
+  });
 });

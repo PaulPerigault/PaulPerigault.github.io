@@ -16,8 +16,10 @@ npm run watch          # dev build in watch mode
 npm test                                    # run all unit tests (Vitest via Angular builder)
 npm test -- --watch                         # watch mode
 npx vitest run src/app/features/skills      # run tests matching a path/pattern
+npm run test:coverage                       # unit tests with a v8 coverage report (needs @vitest/coverage-v8)
 
-npm run e2e            # Playwright e2e tests (npm run build runs first automatically, see playwright.config.ts)
+npm run e2e            # Playwright e2e tests — requires the app already built and served at localhost:4201
+                        # (npm run build && npx serve dist/paul-portfolio/browser -p 4201, see e2e.yml for the exact sequence CI runs)
 npm run e2e:ui         # Playwright UI mode
 
 npm run lint           # eslint src --ext .ts,.html

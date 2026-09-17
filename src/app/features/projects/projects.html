@@ -2,7 +2,18 @@
   <div class="max-w-4xl mx-auto">
     <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-10">{{ 'projects.title' | translate }}</h2>
     @if (loading()) {
-    <p class="text-sm text-gray-400 font-mono">{{ 'projects.loading' | translate }}</p>
+    <p class="text-sm text-gray-500 dark:text-gray-400 font-mono">{{ 'projects.loading' | translate }}</p>
+    } @else if (error()) {
+    <div class="text-sm text-gray-600 dark:text-gray-400">
+      <p class="mb-3">{{ 'projects.error' | translate }}</p>
+      <button
+        type="button"
+        (click)="load()"
+        class="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm font-medium hover:border-teal-500 transition-colors"
+      >
+        {{ 'projects.retry' | translate }}
+      </button>
+    </div>
     } @else {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       @for (p of projects(); track p.id) {
@@ -15,7 +26,7 @@
         <div class="flex items-start justify-between mb-2">
           <h3 class="font-semibold text-gray-900 dark:text-white text-sm">{{ p.name }}</h3>
           @if (p.language) {
-          <span class="text-xs font-mono text-teal-600 ml-2 flex-shrink-0">{{ p.language }}</span>
+          <span class="text-xs font-mono text-teal-700 dark:text-teal-400 ml-2 flex-shrink-0">{{ p.language }}</span>
           }
         </div>
         @if (p.description) {

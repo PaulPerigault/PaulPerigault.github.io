@@ -4,19 +4,22 @@
       <img
         src="image/Photo.jpg"
         alt="Paul Perigault"
+        width="200"
+        height="200"
+        fetchpriority="high"
         class="w-32 h-32 rounded-full object-cover border-2 border-teal-500"
       />
       <div>
         <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white tracking-tight mb-2">Paul Perigault</h1>
         <p class="text-xl text-gray-500 dark:text-gray-400">{{ 'hero.role' | translate }}</p>
       </div>
-      <p class="text-sm text-gray-400 dark:text-gray-500 font-mono -mt-4">{{ 'hero.school' | translate }}</p>
+      <p class="text-sm text-gray-500 dark:text-gray-400 font-mono -mt-4">{{ 'hero.school' | translate }}</p>
       <div class="flex flex-wrap gap-3">
         <a
           href="https://raw.githubusercontent.com/PaulPerigault/cv-latex/main/out/main.pdf"
           target="_blank"
           rel="noopener noreferrer"
-          class="px-5 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors"
+          class="px-5 py-2.5 bg-teal-700 text-white text-sm font-medium rounded-lg hover:bg-teal-800 transition-colors"
         >
           {{ 'hero.cta_cv' | translate }}
         </a>

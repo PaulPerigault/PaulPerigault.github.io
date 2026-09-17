@@ -38,7 +38,9 @@
     "title": "Projets",
     "view_code": "Code",
     "view_demo": "Demo",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "error": "Impossible de charger les projets pour le moment.",
+    "retry": "Réessayer"
   },
   "certifications": {
     "title": "Certifications",

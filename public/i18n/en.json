@@ -34,7 +34,9 @@
     "title": "Projects",
     "view_code": "Code",
     "view_demo": "Demo",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "error": "Couldn't load projects right now.",
+    "retry": "Retry"
   },
   "certifications": {
     "title": "Certifications",

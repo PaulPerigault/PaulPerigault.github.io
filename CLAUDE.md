@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Personal portfolio for Paul Perigault (paulperigault.fr), built with Angular 21 (zoneless, standalone components, signals), Tailwind CSS v4, and ngx-translate for FR/EN i18n. Server-side rendered at build time (`@angular/ssr`, static prerendering) for crawlability, with per-language routes and structured SEO metadata.
+Personal portfolio for Paul Perigault (paulperigault.fr), built with Angular 22 (zoneless, standalone components, signals), Tailwind CSS v4, and ngx-translate for FR/EN i18n. Server-side rendered at build time (`@angular/ssr`, static prerendering) for crawlability, with per-language routes and structured SEO metadata.
 
 ## Commands
 
@@ -16,8 +16,10 @@ npm run watch          # dev build in watch mode
 npm test                                    # run all unit tests (Vitest via Angular builder)
 npm test -- --watch                         # watch mode
 npx vitest run src/app/features/skills      # run tests matching a path/pattern
+npm run test:coverage                       # unit tests with a v8 coverage report (needs @vitest/coverage-v8)
 
-npm run e2e            # Playwright e2e tests (npm run build runs first automatically, see playwright.config.ts)
+npm run e2e            # Playwright e2e tests — requires the app already built and served at localhost:4201
+                        # (npm run build && npx serve dist/paul-portfolio/browser -p 4201, see e2e.yml for the exact sequence CI runs)
 npm run e2e:ui         # Playwright UI mode
 
 npm run lint           # eslint src --ext .ts,.html
@@ -38,7 +40,10 @@ Husky runs `lint-staged` on commit (eslint --fix + prettier on `*.ts`, prettier 
   - `GithubService` fetches live repo data from the GitHub REST API for repos listed in `projects-config.json`, sorted by `updated_at`.
   - `PortfolioFacade` is the single entry point feature components use — it composes `ContentService` + `GithubService` (e.g. `getProjects()` reads the config then fetches the featured repos). Components should depend on `PortfolioFacade`, not on `ContentService`/`GithubService` directly.
   - `ThemeService` manages light/dark theme via a signal, persisted to `localStorage` and synced to `document.documentElement` classlist; guards all DOM/`localStorage` access behind `isPlatformBrowser` since the app can run outside a browser context (SSR/prerendering).
+  - `LangService` mirrors `ThemeService` (signal + `isPlatformBrowser`-guarded `localStorage` persistence) for the active language, so `PortfolioPage` (initial route render) and `Navbar.switchLang()` (manual switch) persist through the same guarded path instead of touching `localStorage` directly.
   - `SeoService` (see SEO section below) updates title, meta tags, canonical/hreflang links and a JSON-LD script for the current route/language.
+- Feature components (`Skills`, `Experience`, `Formation`, `Certifications`, `Projects`) load data with `toSignal()` (`@angular/core/rxjs-interop`) over the `PortfolioFacade` observable instead of `OnInit` + manual `.subscribe()`, with `catchError` preserving the previous silent-fail behavior (falls back to an empty array). `Projects` additionally exposes `loading`/`error`/`projects` as `computed()` signals derived from a single internal result signal, with `load()` re-triggering the fetch (e.g. for retry after an error) via an internal `Subject`.
+- `provideZonelessChangeDetection()` is registered in `app.config.ts` — required for the app to actually run zoneless (no `zone.js` in `package.json`, but the provider must still be explicitly registered).
 - `src/app/app.ts` — root shell, hosts `<router-outlet />` only (theme init). Routing determines which language variant renders.
 - `src/app/pages/portfolio-page/` — `PortfolioPage`, the routed component rendering the full one-page portfolio (navbar, hero, about, skills, experience, formation, projects, certifications, contact, footer). Reads `lang` from route `data`, sets the active ngx-translate language, and calls `SeoService.update()`.
 - `src/app/app.routes.ts` — `'' → redirect '/fr'`, `'fr'` and `'en'` both render `PortfolioPage` with `data: { lang }`, `'**' → redirect '/fr'`.
@@ -48,7 +53,8 @@ Husky runs `lint-staged` on commit (eslint --fix + prettier on `*.ts`, prettier 
 - `src/app/shared/pipes/` — reusable pipes (e.g. `FormatDatePipe`), exported via `index.ts`.
 - Content data (skills, experience, formation, certifications, projects) only exists for `fr` under `public/data/fr/` and is always fetched with the `fr` locale regardless of the active UI language — `environment.defaultLang` is `fr` and `ContentService` falls back to it for any unsupported lang. UI-string translations (nav labels, headings, `seo.title`/`seo.description`, etc.) are separate and live in `public/i18n/{fr,en}.json`, loaded via `provideTranslateHttpLoader`.
 - Environment config (`src/environments/environment.ts` / `.prod.ts`) holds `githubApiUrl`, `githubUser`, `i18nPath`, `dataPath`, `defaultLang`, `supportedLangs`, `canonicalDomain` (`https://paulperigault.fr`, used for canonical/hreflang/OG URLs instead of `window.location`), `ogImagePath` — read these instead of hardcoding paths/URLs.
-- `provideHttpClient(withFetch())` is required (not just `provideHttpClient()`) so HTTP requests work isomorphically during server-side prerendering, where `XMLHttpRequest` isn't available.
+- `fetch` is the default `HttpClient` backend since Angular 22 (plain `provideHttpClient()`), which is what makes HTTP requests work isomorphically during server-side prerendering, where `XMLHttpRequest` isn't available — `withFetch()` is deprecated and no longer needed. Use `provideHttpClient(withXhr())` only if XHR-specific features (e.g. upload progress) are required.
+- Components rely on the Angular 22 default `ChangeDetectionStrategy.OnPush` (no component sets `changeDetection` explicitly) — consistent with the zoneless, signal-driven state used throughout.
 
 ## Conventions
 
@@ -102,9 +108,17 @@ A multi-stage `Dockerfile` + `nginx.conf` allow deploying the same build to Clou
 - **Routing:** `/` redirects to `/fr` (both client-side and at prerender time — the prerendered `/` page is a static meta-refresh redirect). `/fr` and `/en` are the two real, prerendered, indexable pages, each rendering `PortfolioPage` with the corresponding UI language.
 - **Canonical domain:** all canonical/OG/hreflang URLs are built from the fixed `environment.canonicalDomain` (`https://paulperigault.fr`), never from `window.location`, so they stay correct even if the app is temporarily served from another host (preview deploy, local dev, etc.).
 - **`SeoService`** (`src/app/core/services/seo.service.ts`) is called from `PortfolioPage.ngOnInit()` with the resolved language, path, and translated `seo.title`/`seo.description` strings. It sets: document title + `lang` attribute, `<meta name="description">`, Open Graph tags (`og:type`, `og:site_name`, `og:locale`, `og:title`, `og:description`, `og:url`, `og:image` + dimensions), Twitter Card tags (`summary_large_image`), a `rel="canonical"` link, `rel="alternate" hreflang="{fr,en,x-default}"` links, and a single `#pp-jsonld` `<script type="application/ld+json">` with a `@graph` of `Person` (Paul Perigault), `WebSite`, and `ProfilePage` nodes.
-- **OG image:** `public/image/og-cover.png` (1200×630) is generated by `scripts/generate-og-image.mjs`, which renders a small branded HTML template with Playwright's Chromium and screenshots it. Re-run the script and commit the PNG if the design needs to change; don't hand-edit the image.
+- **OG image:** `public/image/og-cover.png` (1200×630) is generated by `scripts/generate-og-image.mjs`, which renders a small branded HTML template (embedding `public/image/logo.svg` as the badge, see Branding below) with Playwright's Chromium and screenshots it. Re-run the script and commit the PNG if the design changes; don't hand-edit the image.
 - **`public/sitemap.xml`** lists `/fr` and `/en` with `xhtml:link rel="alternate"` entries for hreflang; **`public/robots.txt`** allows all crawlers and points to the sitemap.
+- **`public/llms.txt`** follows the [llms.txt](https://llmstxt.org) convention for LLM-oriented crawlers: an H1 with the site/person name, a one-line blockquote summary, a short context paragraph, then a `## Sections` list of markdown links (one per portfolio section — about, skills, experience, formation, projects, certifications, contact, anchored on the `/fr` canonical page) and an `## Optional` list for secondary links (the `/en` version, GitHub, LinkedIn). It's hand-maintained, not generated, and served as a plain static file at the site root (`https://paulperigault.fr/llms.txt`) via the same `public/` asset pipeline as `robots.txt`/`sitemap.xml` — no code reference needed, but update it whenever a section is added/removed/renamed or its copy changes meaningfully.
 - i18n copy for SEO lives under the `seo` key in `public/i18n/{fr,en}.json` (`seo.title`, `seo.description`), alongside the existing UI-string translations.
+
+## Branding
+
+- **`public/image/logo.svg` is the single source of truth** for the logo/favicon/OG identity — a teal (`#0f766e`) rounded-square monogram with a white monospace "P", matching the site's actual design tokens (teal accent used throughout `navbar.html`/`hero.html`, `font-mono` for the `paul@perigault` brand mark, moderate `rounded-lg`-scale radius, no illustration/multi-color artwork). There is intentionally only one logo file in `public/image/` — do not add competing variants (`logo.png`, alternate SVGs, etc.); if the design needs to change, edit `logo.svg` in place and regenerate everything derived from it.
+- Derived assets, all regenerated **from** `logo.svg`, never hand-edited: `favicon.ico` (16/32/48px, no 256px layer — kept lean since `apple-touch-icon.png` already covers the large sizes), `favicon-16x16.png`, `favicon-32x32.png`, `apple-touch-icon.png` (180×180), and the logo badge embedded in `public/image/og-cover.png` (via `scripts/generate-og-image.mjs`).
+- To regenerate the favicon set after changing `logo.svg`, use the `update-favicon` skill (`.claude/skills/update-favicon/SKILL.md`) — it rasterizes with `sharp-cli`, assembles the `.ico` with `to-ico` (not `png-to-ico`, which always injects an oversized 256px layer), and verifies dimensions/validity before touching Git. Then re-run `node scripts/generate-og-image.mjs` to refresh the OG image.
+- Always check legibility at 16px before finalizing a logo change — a design that reads fine at 200×200 can turn into a blur at favicon size.
 
 ## Maintenance
 

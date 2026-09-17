@@ -1,9 +1,5 @@
 {
   "featured": [
-    "GetUrlCloudRun",
-    "appFytBack",
-    "appFytFront",
-    "Node-sb-01"
-  ],
-  "excluded": []
+    "GetUrlCloudRun"
+  ]
 }

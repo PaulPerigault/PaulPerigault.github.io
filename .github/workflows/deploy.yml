@@ -28,7 +28,7 @@ jobs:
       - run: npm install
       - run: npm run build -- --base-href /
       - uses: actions/configure-pages@v4
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist/paul-portfolio/browser
       - uses: actions/deploy-pages@v4

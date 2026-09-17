@@ -3,7 +3,14 @@ import { Observable, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ContentService } from './content.service';
 import { GithubService } from './github.service';
-import { SkillCategory, Experience, Formation, Certification, Project } from '../models';
+import {
+  SkillCategory,
+  Experience,
+  Formation,
+  Certification,
+  Project,
+  ProjectsConfig,
+} from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class PortfolioFacade {
@@ -24,6 +31,10 @@ export class PortfolioFacade {
 
   getCertifications(lang = environment.defaultLang): Observable<Certification[]> {
     return this.#content.getCertifications(lang);
+  }
+
+  getProjectsConfig(lang = environment.defaultLang): Observable<ProjectsConfig> {
+    return this.#content.getProjectsConfig(lang);
   }
 
   getProjects(lang = environment.defaultLang): Observable<Project[]> {

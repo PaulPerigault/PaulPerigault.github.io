@@ -38,4 +38,29 @@ describe('Projects', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.loading()).toBe(false);
   });
+
+  it('sets an error state when the projects config request fails', () => {
+    const fixture = TestBed.createComponent(Projects);
+    fixture.detectChanges();
+    http
+      .expectOne('/data/fr/projects-config.json')
+      .flush('failed', { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+    expect(fixture.componentInstance.loading()).toBe(false);
+    expect(fixture.componentInstance.error()).toBe(true);
+  });
+
+  it('retrying after an error clears the error state and reloads', () => {
+    const fixture = TestBed.createComponent(Projects);
+    fixture.detectChanges();
+    http
+      .expectOne('/data/fr/projects-config.json')
+      .flush('failed', { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+
+    fixture.componentInstance.load();
+    expect(fixture.componentInstance.loading()).toBe(true);
+    expect(fixture.componentInstance.error()).toBe(false);
+    http.expectOne('/data/fr/projects-config.json').flush({ featured: [], excluded: [] });
+  });
 });

@@ -6,7 +6,7 @@
       (click)="scrollTo('hero')"
       class="font-mono text-sm font-semibold text-gray-900 dark:text-white tracking-tight"
     >
-      paul<span class="text-teal-600">&#64;</span>perigault
+      paul<span class="text-teal-600 dark:text-teal-400">&#64;</span>perigault
     </button>
     <ul class="hidden md:flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
       <li>
@@ -25,8 +25,18 @@
         </button>
       </li>
       <li>
+        <button (click)="scrollTo('formation')" class="hover:text-teal-600 transition-colors">
+          {{ 'nav.formation' | translate }}
+        </button>
+      </li>
+      <li>
         <button (click)="scrollTo('projects')" class="hover:text-teal-600 transition-colors">
           {{ 'nav.projects' | translate }}
+        </button>
+      </li>
+      <li>
+        <button (click)="scrollTo('certifications')" class="hover:text-teal-600 transition-colors">
+          {{ 'nav.certifications' | translate }}
         </button>
       </li>
       <li>
@@ -52,6 +62,9 @@
       </button>
       <button
         (click)="toggleMenu()"
+        [attr.aria-expanded]="menuOpen()"
+        aria-controls="pp-mobile-menu"
+        [attr.aria-label]="menuOpen() ? 'Fermer le menu' : 'Ouvrir le menu'"
         class="md:hidden w-8 h-8 flex items-center justify-center text-gray-600 dark:text-gray-400 text-lg"
       >
         {{ menuOpen() ? '&#10005;' : '&#9776;' }}
@@ -60,6 +73,7 @@
   </div>
   @if (menuOpen()) {
   <div
+    id="pp-mobile-menu"
     class="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3 flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-400"
   >
     <button (click)="scrollTo('about')" class="text-left hover:text-teal-600">{{ 'nav.about' | translate }}</button>

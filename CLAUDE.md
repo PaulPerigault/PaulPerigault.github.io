@@ -87,8 +87,11 @@ Husky runs `lint-staged` on commit (eslint --fix + prettier on `*.ts`, prettier 
 | security.yml | PR + weekly | npm audit + CodeQL + SBOM |
 | lighthouse.yml | PR | Perf >= 90, A11y = 100 |
 | release.yml | push main | CHANGELOG + semver tag (release-please) |
+| dependabot-auto-merge.yml | PR (dependabot only) | auto-approve + auto-merge patch/minor |
 
 `deploy.yml` builds with `npm run build -- --base-href /` and publishes `dist/paul-portfolio/browser` (the fully static, prerendered output — no Node server artifact is deployed) to GitHub Pages via `actions/upload-pages-artifact` + `actions/deploy-pages`.
+
+**Dependabot:** `.github/dependabot.yml` opens weekly PRs (Mondays) for `npm` and `github-actions` ecosystems; npm major bumps are excluded outright via an `ignore` rule, so only `github-actions` majors can still appear. `dependabot-auto-merge.yml` runs on every PR authored by `dependabot[bot]`, uses `dependabot/fetch-metadata` to read the update type, and for `version-update:semver-patch`/`semver-minor` only, approves the PR and runs `gh pr merge --auto --squash` — the actual merge only happens once `ci` + `commitlint` (both required status checks) go green, GitHub's native auto-merge handles the wait. Major-version PRs are left untouched for manual review. This requires the "Allow auto-merge" repository setting to be enabled; it's independent of branch protection's required-review setting.
 
 A multi-stage `Dockerfile` + `nginx.conf` allow deploying the same build to Cloud Run/ECS/Kubernetes without code changes (see `docker-compose.yml` for local usage).
 

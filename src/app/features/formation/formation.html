@@ -6,11 +6,11 @@
       <div class="border border-gray-200 dark:border-gray-800 rounded-xl p-5 hover:border-teal-500 transition-colors">
         <div class="flex flex-wrap items-baseline justify-between gap-2 mb-1">
           <h3 class="font-semibold text-gray-900 dark:text-white">{{ item.school }}</h3>
-          <span class="text-xs font-mono text-gray-400">
+          <span class="text-xs font-mono text-gray-500 dark:text-gray-400">
             {{ item.dateStart | formatDate }} — {{ item.dateEnd | formatDate }}
           </span>
         </div>
-        <p class="text-sm text-teal-600 mb-2">{{ item.degree }} · {{ item.speciality }}</p>
+        <p class="text-sm text-teal-700 dark:text-teal-400 mb-2">{{ item.degree }} · {{ item.speciality }}</p>
         <p class="text-sm text-gray-600 dark:text-gray-400">{{ item.description }}</p>
       </div>
       }

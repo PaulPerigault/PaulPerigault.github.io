@@ -1,5 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslateService, TranslatePipe } from '@ngx-translate/core';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
 import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
@@ -9,6 +12,8 @@ import { ThemeService } from '../../core/services/theme.service';
 })
 export class Navbar {
   readonly #translate = inject(TranslateService);
+  readonly #router = inject(Router);
+  readonly #platformId = inject(PLATFORM_ID);
   readonly theme = inject(ThemeService);
   readonly menuOpen = signal(false);
 
@@ -25,11 +30,11 @@ export class Navbar {
 
   switchLang(): void {
     const next = this.currentLang === 'fr' ? 'en' : 'fr';
-    this.#translate.use(next);
-    localStorage.setItem('lang', next);
+    this.#router.navigateByUrl(`/${next}`);
   }
 
   scrollTo(id: string): void {
+    if (!isPlatformBrowser(this.#platformId)) return;
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     this.closeMenu();
   }

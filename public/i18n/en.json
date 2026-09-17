@@ -1,4 +1,8 @@
 {
+  "seo": {
+    "title": "Paul Perigault — DevOps Engineer",
+    "description": "Portfolio of Paul Perigault, DevOps engineering apprentice at ESIEA Paris, working at WeVii."
+  },
   "nav": {
     "about": "About",
     "skills": "Stack",

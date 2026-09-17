@@ -1,12 +1,17 @@
 {
   "ci": {
     "collect": {
-      "staticDistDir": "./dist/paul-portfolio/browser"
+      "staticDistDir": "./dist/paul-portfolio/browser",
+      "url": ["/fr/", "/en/"],
+      "numberOfRuns": 3,
+      "settings": {
+        "preset": "desktop"
+      }
     },
     "assert": {
       "assertions": {
         "categories:performance": [
-          "warn",
+          "error",
           {
             "minScore": 0.85
           }
@@ -27,6 +32,36 @@
           "error",
           {
             "minScore": 0.9
+          }
+        ],
+        "largest-contentful-paint": [
+          "error",
+          {
+            "maxNumericValue": 2500
+          }
+        ],
+        "total-blocking-time": [
+          "error",
+          {
+            "maxNumericValue": 300
+          }
+        ],
+        "cumulative-layout-shift": [
+          "error",
+          {
+            "maxNumericValue": 0.1
+          }
+        ],
+        "total-byte-weight": [
+          "error",
+          {
+            "maxNumericValue": 600000
+          }
+        ],
+        "unused-javascript": [
+          "warn",
+          {
+            "minScore": 0.5
           }
         ]
       }

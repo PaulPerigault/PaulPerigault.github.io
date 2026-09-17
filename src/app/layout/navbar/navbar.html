@@ -1,3 +1,9 @@
+<a
+  href="#main-content"
+  class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-teal-700 focus:text-white focus:text-sm focus:font-medium focus:rounded-lg"
+>
+  {{ 'nav.skip_to_content' | translate }}
+</a>
 <nav
   class="fixed top-0 left-0 right-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-800"
 >
@@ -76,25 +82,28 @@
       </button>
       <button
         (click)="theme.toggle()"
-        [attr.aria-label]="theme.theme() === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre'"
+        [attr.aria-label]="(theme.theme() === 'dark' ? 'theme.toggle_to_light' : 'theme.toggle_to_dark') | translate"
         class="w-11 h-11 flex items-center justify-center rounded border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-teal-500 transition-colors text-sm"
       >
-        {{ theme.theme() === 'dark' ? '☀' : '☾' }}
+        <span aria-hidden="true">{{ theme.theme() === 'dark' ? '☀' : '☾' }}</span>
       </button>
       <button
+        #menuButton
         (click)="toggleMenu()"
         [attr.aria-expanded]="menuOpen()"
         aria-controls="pp-mobile-menu"
-        [attr.aria-label]="menuOpen() ? 'Fermer le menu' : 'Ouvrir le menu'"
+        [attr.aria-label]="(menuOpen() ? 'nav.menu_close' : 'nav.menu_open') | translate"
         class="md:hidden w-11 h-11 flex items-center justify-center text-gray-600 dark:text-gray-400 text-lg"
       >
-        {{ menuOpen() ? '&#10005;' : '&#9776;' }}
+        <span aria-hidden="true">{{ menuOpen() ? '&#10005;' : '&#9776;' }}</span>
       </button>
     </div>
   </div>
   @if (menuOpen()) {
   <div
+    #menuPanel
     id="pp-mobile-menu"
+    (keydown)="onMenuKeydown($event)"
     class="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-2 flex flex-col text-sm text-gray-600 dark:text-gray-400"
   >
     <button (click)="scrollTo('about')" class="min-h-11 flex items-center text-left hover:text-teal-600">

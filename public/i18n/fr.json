@@ -10,7 +10,10 @@
     "formation": "Formation",
     "projects": "Projets",
     "certifications": "Certifications",
-    "contact": "Contact"
+    "contact": "Contact",
+    "skip_to_content": "Aller au contenu principal",
+    "menu_open": "Ouvrir le menu",
+    "menu_close": "Fermer le menu"
   },
   "hero": {
     "role": "Ingénieur DevOps",
@@ -55,7 +58,9 @@
   },
   "theme": {
     "light": "Clair",
-    "dark": "Sombre"
+    "dark": "Sombre",
+    "toggle_to_light": "Passer en mode clair",
+    "toggle_to_dark": "Passer en mode sombre"
   },
   "lang": {
     "fr": "Français",

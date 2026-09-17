@@ -6,4 +6,6 @@ export const environment = {
   dataPath: '/data/',
   defaultLang: 'fr',
   supportedLangs: ['fr', 'en'],
+  canonicalDomain: 'https://paulperigault.fr',
+  ogImagePath: '/image/og-cover.png',
 };

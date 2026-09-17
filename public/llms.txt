@@ -1,0 +1,21 @@
+# Paul Perigault
+
+> Ingénieur DevOps en alternance (ESIEA Paris / WeVii), spécialisé cloud multicloud, CI/CD et infrastructure as code. Portfolio personnel présentant expériences, projets et certifications.
+
+Portfolio de Paul Perigault (paulperigault.fr). Le site est disponible en français (`/fr`) et en anglais (`/en`), pré-rendu côté serveur (SSR/SSG) : chaque page est livrée avec son contenu complet, sans nécessiter l'exécution de JavaScript pour être lue.
+
+## Sections
+
+- [À propos](https://paulperigault.fr/fr#about)
+- [Stack technique](https://paulperigault.fr/fr#skills)
+- [Expériences](https://paulperigault.fr/fr#experience)
+- [Formation](https://paulperigault.fr/fr#formation)
+- [Projets](https://paulperigault.fr/fr#projects)
+- [Certifications](https://paulperigault.fr/fr#certifications)
+- [Contact](https://paulperigault.fr/fr#contact)
+
+## Optional
+
+- [Version anglaise](https://paulperigault.fr/en)
+- [GitHub](https://github.com/PaulPerigault)
+- [LinkedIn](https://linkedin.com/in/paul-perigault)

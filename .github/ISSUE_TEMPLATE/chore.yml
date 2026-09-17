@@ -1,0 +1,23 @@
+name: Chore / Tech debt
+description: Maintenance, dette technique, dépendances, tooling
+labels: ["chore"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Que faut-il faire et pourquoi ?
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact si non traité
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexte additionnel
+    validations:
+      required: false

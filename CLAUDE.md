@@ -101,6 +101,17 @@ Husky runs `lint-staged` on commit (eslint --fix + prettier on `*.ts`, prettier 
 
 A multi-stage `Dockerfile` + `nginx.conf` allow deploying the same build to Cloud Run/ECS/Kubernetes without code changes (see `docker-compose.yml` for local usage).
 
+## Security
+
+- **`security.yml`** covers supply-chain and code scanning: `npm audit --audit-level=high`, CodeQL static analysis, and an SBOM artifact — on every PR and weekly on `main`/`develop`.
+- **Response security headers are NOT covered for the real production site.** `nginx.conf` sets a solid set of headers (CSP, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`) — but that config only applies to the `Dockerfile`/Cloud Run/ECS/Kubernetes deployment path. The site actually deployed via `deploy.yml` runs on **GitHub Pages**, a static host that does not support custom response headers at all — so `https://paulperigault.fr` currently ships with none of these headers in production, regardless of what `nginx.conf` says. Don't infer header coverage from `nginx.conf`'s existence; it only ever executes if someone deploys the Docker image instead of (or in addition to) GitHub Pages.
+- **Recommended fix (not implemented — requires an infra decision outside this repo):** put a service that supports custom response headers in front of GitHub Pages, e.g. Cloudflare's free tier:
+  1. Move DNS for `paulperigault.fr` to Cloudflare (free plan) and proxy the record used for GitHub Pages (orange-cloud "Proxied" DNS record) instead of DNS-only.
+  2. Under Cloudflare's Rules → **Transform Rules** (or a small Cloudflare Worker for more control), add a "Modify Response Headers" rule matching `paulperigault.fr/*` that injects the same header set already defined in `nginx.conf` (CSP, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`).
+  3. Keep the CSP's `connect-src`/`img-src` allowances in sync with `nginx.conf` if either changes (currently `connect-src 'self' https://api.github.com`), so the two configs don't silently drift apart.
+  4. Verify with `curl -I https://paulperigault.fr/fr` that the headers actually come back before considering this done — Cloudflare's proxy must be active (not "DNS only") for Transform Rules to apply.
+  This adds a third-party dependency in front of the site (DNS + edge proxy), so treat it as an infrastructure decision to confirm explicitly, not a drop-in code change.
+
 ## SEO
 
 - **SSR/prerendering:** `@angular/ssr` is installed with `outputMode: "static"` in `angular.json` (see `build.options` for the `paul-portfolio` project). This prerenders every route at build time (`app.routes.server.ts`: `RenderMode.Prerender` for `**`) and emits fully static HTML under `dist/paul-portfolio/browser/{fr,en}/index.html` — no Node server is needed or deployed at runtime, so this stays compatible with GitHub Pages. `src/server.ts`/`src/main.server.ts`/`src/app/app.config.server.ts` exist only to drive this build-time render; they are not part of the deployed artifact.

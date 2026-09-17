@@ -3,12 +3,16 @@ import { DOCUMENT } from '@angular/common';
 import { Meta, Title } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../environments/environment';
+import { Certification } from '../models';
 
 export interface PageSeo {
   lang: string;
   path: string;
   title: string;
   description: string;
+  skills?: string[];
+  certifications?: Certification[];
+  projects?: string[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +30,7 @@ export class SeoService {
     this.#document.documentElement.lang = seo.lang;
 
     this.#setName('description', seo.description);
+    this.#setName('author', 'Paul Perigault');
     this.#setProperty('og:type', 'website');
     this.#setProperty('og:site_name', 'Paul Perigault');
     this.#setProperty('og:locale', seo.lang === 'fr' ? 'fr_FR' : 'en_US');
@@ -42,6 +47,7 @@ export class SeoService {
 
     this.#setCanonical(url);
     this.#setHreflang();
+    this.#setRelMe();
     this.#setJsonLd(seo);
   }
 
@@ -66,6 +72,24 @@ export class SeoService {
     const defaultLink = this.#getOrCreateLink('alternate', 'x-default');
     defaultLink.setAttribute('hreflang', 'x-default');
     defaultLink.setAttribute('href', `${environment.canonicalDomain}/${environment.defaultLang}`);
+  }
+
+  #setRelMe(): void {
+    const hrefs = [
+      `https://github.com/${environment.githubUser}`,
+      'https://www.linkedin.com/in/paul-perigault',
+    ];
+    for (const href of hrefs) {
+      let link = this.#document.head.querySelector<HTMLLinkElement>(
+        `link[rel="me"][href="${href}"]`,
+      );
+      if (!link) {
+        link = this.#document.createElement('link');
+        link.setAttribute('rel', 'me');
+        link.setAttribute('href', href);
+        this.#document.head.appendChild(link);
+      }
+    }
   }
 
   #getOrCreateLink(rel: string, hreflang?: string): HTMLLinkElement {
@@ -107,6 +131,21 @@ export class SeoService {
             `https://github.com/${environment.githubUser}`,
             'https://www.linkedin.com/in/paul-perigault',
           ],
+          worksFor: {
+            '@type': 'Organization',
+            name: 'WeVii',
+          },
+          alumniOf: [
+            {
+              '@type': 'EducationalOrganization',
+              name: 'ESIEA Paris',
+            },
+            {
+              '@type': 'EducationalOrganization',
+              name: 'IUT Paris Rives de Seine',
+            },
+          ],
+          ...(seo.skills?.length ? { knowsAbout: seo.skills } : {}),
         },
         {
           '@type': 'WebSite',
@@ -127,6 +166,46 @@ export class SeoService {
           about: { '@id': personId },
           mainEntity: { '@id': personId },
         },
+        ...(seo.certifications?.length
+          ? [
+              {
+                '@type': 'ItemList',
+                '@id': `${pageUrl}/#certifications`,
+                name: 'Certifications',
+                itemListElement: seo.certifications.map((cert, index) => ({
+                  '@type': 'ListItem',
+                  position: index + 1,
+                  item: {
+                    '@type': 'EducationalOccupationalCredential',
+                    '@id': `${pageUrl}/#certification-${cert.id}`,
+                    name: cert.name,
+                    credentialCategory: cert.issuer,
+                    ...(cert.dateIssued ? { dateCreated: cert.dateIssued } : {}),
+                  },
+                })),
+              },
+            ]
+          : []),
+        ...(seo.projects?.length
+          ? [
+              {
+                '@type': 'ItemList',
+                '@id': `${pageUrl}/#projects`,
+                name: 'Projects',
+                itemListElement: seo.projects.map((repo, index) => ({
+                  '@type': 'ListItem',
+                  position: index + 1,
+                  item: {
+                    '@type': 'SoftwareSourceCode',
+                    '@id': `${pageUrl}/#project-${repo}`,
+                    name: repo,
+                    url: `https://github.com/${environment.githubUser}/${repo}`,
+                    codeRepository: `https://github.com/${environment.githubUser}/${repo}`,
+                  },
+                })),
+              },
+            ]
+          : []),
       ],
     });
   }

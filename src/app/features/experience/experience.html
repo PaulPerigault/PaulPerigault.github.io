@@ -9,12 +9,12 @@
         <div class="absolute -left-1.5 top-1 w-3 h-3 rounded-full bg-teal-500"></div>
         <div class="flex flex-wrap items-baseline justify-between gap-2 mb-1">
           <h3 class="font-semibold text-gray-900 dark:text-white">{{ item.role }}</h3>
-          <span class="text-xs font-mono text-gray-400">
+          <span class="text-xs font-mono text-gray-500 dark:text-gray-400">
             {{ item.dateStart | formatDate }} — {{ item.dateEnd ? (item.dateEnd | formatDate) : ('experience.present' |
             translate) }}
           </span>
         </div>
-        <p class="text-sm text-teal-600 mb-2">{{ item.company }} · {{ item.location }}</p>
+        <p class="text-sm text-teal-700 dark:text-teal-400 mb-2">{{ item.company }} · {{ item.location }}</p>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">{{ item.description }}</p>
         <div class="flex flex-wrap gap-1">
           @for (tag of item.tags; track tag) {

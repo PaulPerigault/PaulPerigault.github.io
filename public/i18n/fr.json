@@ -1,4 +1,8 @@
 {
+  "seo": {
+    "title": "Paul Perigault — Ingénieur DevOps",
+    "description": "Portfolio de Paul Perigault, ingénieur DevOps en alternance à l'ESIEA Paris chez WeVii."
+  },
   "nav": {
     "about": "À propos",
     "skills": "Stack",
@@ -34,7 +38,9 @@
     "title": "Projets",
     "view_code": "Code",
     "view_demo": "Demo",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "error": "Impossible de charger les projets pour le moment.",
+    "retry": "Réessayer"
   },
   "certifications": {
     "title": "Certifications",

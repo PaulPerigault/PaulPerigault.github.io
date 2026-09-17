@@ -1,4 +1,8 @@
 {
+  "seo": {
+    "title": "Paul Perigault — DevOps Engineer",
+    "description": "Portfolio of Paul Perigault, DevOps engineering apprentice at ESIEA Paris, working at WeVii."
+  },
   "nav": {
     "about": "About",
     "skills": "Stack",
@@ -34,7 +38,9 @@
     "title": "Projects",
     "view_code": "Code",
     "view_demo": "Demo",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "error": "Couldn't load projects right now.",
+    "retry": "Retry"
   },
   "certifications": {
     "title": "Certifications",

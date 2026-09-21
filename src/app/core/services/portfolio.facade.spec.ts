@@ -68,6 +68,11 @@ describe('PortfolioFacade', () => {
     req.flush([]);
   });
 
+  it('getProjectsConfig returns the featured repo slugs', () => {
+    facade.getProjectsConfig().subscribe((c) => expect(c).toEqual({ featured: ['cv-latex'] }));
+    http.expectOne('/data/fr/projects-config.json').flush({ featured: ['cv-latex'] });
+  });
+
   it('getCertifications returns certifications', () => {
     const mock: Certification[] = [
       {

@@ -1,0 +1,32 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import type { Lang } from '@/domain/lang';
+import { useTranslations } from '@/lib/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const t = useTranslations(Astro.props.lang);
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  data-label-to-dark={t('theme.toggle_to_dark')}
+  data-label-to-light={t('theme.toggle_to_light')}
+  aria-label={t('theme.toggle_to_dark')}
+  class="border-control hover:border-accent hover:text-accent hidden rounded-sm border p-1.5 transition-colors duration-(--pp-duration) js:inline-flex"
+>
+  <span data-shown-when="dark" hidden>
+    <Icon name="sun" />
+  </span>
+  <span data-shown-when="light">
+    <Icon name="moon" />
+  </span>
+</button>
+
+<script>
+  import { initThemeToggle } from '@/scripts/theme-toggle';
+  initThemeToggle();
+</script>

@@ -1,0 +1,26 @@
+---
+import type { Lang } from '@/domain/lang';
+import { NAV_SECTIONS } from '@/config/navigation';
+import { useTranslations } from '@/lib/i18n';
+
+interface Props {
+  lang: Lang;
+  /** Liste verticale (menu mobile). */
+  vertical?: boolean;
+}
+
+const { lang, vertical = false } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<ul
+  class:list={['flex', vertical ? 'flex-col gap-5 text-xl' : 'flex-wrap gap-x-6 gap-y-2 text-sm']}
+>
+  {NAV_SECTIONS.map((id) => (
+    <li>
+      <a href={`/${lang}/#${id}`} class="hover:text-accent underline-offset-4 hover:underline">
+        {t(`nav.${id}`)}
+      </a>
+    </li>
+  ))}
+</ul>

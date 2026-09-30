@@ -1,0 +1,33 @@
+---
+import Container from '@/components/ui/Container.astro';
+import { SITE } from '@/config/site';
+import type { Lang } from '@/domain/lang';
+import { useTranslations } from '@/lib/i18n';
+import LangSwitch from './LangSwitch.astro';
+import MobileMenu from './MobileMenu.astro';
+import NavLinks from './NavLinks.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<header id="top" class="border-line bg-bg sticky top-0 z-40 border-b">
+  <Container class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4">
+    <a href={`/${lang}/`} class="font-mono text-sm font-medium">
+      {SITE.brand}
+    </a>
+    <nav aria-label={t('nav.primary')} class="js:max-md:hidden">
+      <NavLinks lang={lang} />
+    </nav>
+    <div class="flex items-center gap-2">
+      <LangSwitch lang={lang} />
+      <ThemeToggle lang={lang} />
+      <MobileMenu lang={lang} />
+    </div>
+  </Container>
+</header>

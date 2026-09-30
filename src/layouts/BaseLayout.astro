@@ -1,0 +1,52 @@
+---
+import '@/styles/global.css';
+import Footer from '@/components/layout/Footer.astro';
+import Navbar from '@/components/layout/Navbar.astro';
+import SeoHead from '@/components/layout/SeoHead.astro';
+import SkipLink from '@/components/ui/SkipLink.astro';
+import type { Lang } from '@/domain/lang';
+import { useTranslations } from '@/lib/i18n';
+import { scriptHash } from '@/lib/csp';
+import { HEAD_INIT_SCRIPT } from '@/lib/head-init';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  /** Pages techniques (styleguide) : exclues des moteurs de recherche. */
+  noindex?: boolean;
+  jsonLd?: object | undefined;
+}
+
+const { lang, title, description, noindex = false, jsonLd } = Astro.props;
+const t = useTranslations(lang);
+
+// Le script inline du <head> est autorisé par son empreinte, pas par 'unsafe-inline'.
+Astro.csp?.insertScriptHash(scriptHash(HEAD_INIT_SCRIPT));
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline set:html={HEAD_INIT_SCRIPT} />
+    {noindex ? (
+      <>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta name="robots" content="noindex, nofollow" />
+      </>
+    ) : (
+      <SeoHead lang={lang} title={title} description={description} jsonLd={jsonLd} />
+    )}
+  </head>
+  <body class="bg-bg text-fg font-sans">
+    <SkipLink label={t('nav.skip_to_content')} target="content" />
+    <Navbar lang={lang} />
+    <main id="content" tabindex="-1">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

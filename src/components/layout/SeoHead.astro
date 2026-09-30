@@ -1,0 +1,50 @@
+---
+import { SITE } from '@/config/site';
+import type { Lang } from '@/domain/lang';
+import { serializeJsonLd } from '@/lib/build-json-ld';
+import { alternates, canonicalUrl, socialTags, verificationTags } from '@/lib/seo';
+import { THEME_COLOR } from '@/lib/theme';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  /** Graphe JSON-LD déjà construit (voir lib/build-json-ld.ts). */
+  jsonLd?: object | undefined;
+}
+
+const { lang, title, description, jsonLd } = Astro.props;
+const path = Astro.url.pathname;
+const { property, name } = socialTags({ lang, path, title, description });
+const links = [SITE.githubUrl, SITE.linkedinUrl];
+const verification = verificationTags(import.meta.env);
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="author" content={SITE.name} />
+<meta name="theme-color" content={THEME_COLOR.light} media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content={THEME_COLOR.dark} media="(prefers-color-scheme: dark)" />
+<link rel="canonical" href={canonicalUrl(path)} />
+{alternates(path, lang).map((alt) => (
+  <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
+))}
+{Object.entries(property).map(([key, content]) => (
+  <meta property={key} content={content} />
+))}
+{Object.entries(name).map(([key, content]) => (
+  <meta name={key} content={content} />
+))}
+{links.map((href) => (
+  <link rel="me" href={href} />
+))}
+<link rel="alternate" type="text/markdown" href={`${path}index.md`} />
+{verification.map((tag) => (
+  <meta name={tag.name} content={tag.content} />
+))}
+<link rel="icon" href="/favicon.ico" sizes="48x48" />
+<link rel="icon" type="image/svg+xml" href="/image/logo.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+{jsonLd && <script type="application/ld+json" set:html={serializeJsonLd(jsonLd)} />}

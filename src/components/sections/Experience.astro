@@ -1,0 +1,21 @@
+---
+import type { Experience } from '@/domain/experience';
+import type { Lang } from '@/domain/lang';
+import { useTranslations } from '@/lib/i18n';
+import { experienceEntries } from '@/lib/timeline';
+import TimelineSection from './TimelineSection.astro';
+
+interface Props {
+  lang: Lang;
+  items: readonly Experience[];
+}
+
+const { lang, items } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<TimelineSection
+  id="experience"
+  title={t('experience.title')}
+  entries={experienceEntries(items, lang, t('experience.present'))}
+/>

@@ -1,0 +1,89 @@
+{
+  "seo": {
+    "title": "Paul Perigault — DevOps Engineer",
+    "description": "Portfolio of Paul Perigault, DevOps engineering apprentice at ESIEA Paris, working at WeVii."
+  },
+  "nav": {
+    "about": "About",
+    "skills": "Stack",
+    "experience": "Experience",
+    "formation": "Education",
+    "projects": "Projects",
+    "certifications": "Certifications",
+    "contact": "Contact",
+    "skip_to_content": "Skip to main content",
+    "menu_open": "Open menu",
+    "menu_close": "Close menu",
+    "primary": "Main navigation",
+    "lang_switch": "Change language"
+  },
+  "hero": {
+    "role": "DevOps Engineer",
+    "school": "ESIEA Paris · Apprentice at WeVii",
+    "cta_cv": "Download CV",
+    "cta_contact": "Get in touch",
+    "cta_github": "GitHub",
+    "cta_linkedin": "LinkedIn",
+    "summary": "Paul Perigault is a DevOps engineer apprenticed at WeVii and a student at ESIEA Paris. He builds CI/CD pipelines, AWS and GCP infrastructure with Terraform and Kubernetes, and GitOps deployments with ArgoCD."
+  },
+  "about": {
+    "title": "About",
+    "body": "DevOps engineering student at ESIEA Paris, apprenticed at WeVii since September 2023. I build CI/CD pipelines, AWS and GCP infrastructure with Terraform and Kubernetes, and GitOps deployments with ArgoCD. I also give talks at schools and mentor student projects and hackathons.",
+    "location": "Paris, France",
+    "location_label": "Location"
+  },
+  "skills": {
+    "title": "Tech stack"
+  },
+  "experience": {
+    "title": "Experience",
+    "present": "Present"
+  },
+  "formation": {
+    "title": "Education"
+  },
+  "projects": {
+    "title": "Projects",
+    "view_code": "Code",
+    "view_demo": "Demo",
+    "updated": "Updated",
+    "fetched_at": "GitHub data —",
+    "empty": "No project to show right now."
+  },
+  "certifications": {
+    "title": "Certifications",
+    "in_progress": "In progress",
+    "expires": "Expires"
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "DevOps engineer — available for school talks, student project mentoring and hackathon supervision.",
+    "email_label": "Email",
+    "linkedin_label": "LinkedIn",
+    "github_label": "GitHub"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "toggle_to_light": "Switch to light mode",
+    "toggle_to_dark": "Switch to dark mode"
+  },
+  "lang": {
+    "fr": "Français",
+    "en": "English"
+  },
+  "a11y": {
+    "new_tab": "opens in a new tab"
+  },
+  "footer": {
+    "back_to_top": "Back to top",
+    "legal": "Legal notice and privacy"
+  },
+  "geo": {
+    "technologies": "Technologies",
+    "portfolio": "Portfolio",
+    "profile_md": "Full profile (Markdown)",
+    "full_text": "Full text FR + EN",
+    "cv": "CV (PDF)"
+  }
+}

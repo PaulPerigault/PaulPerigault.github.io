@@ -16,6 +16,28 @@ body:
     validations:
       required: true
   - type: textarea
+    id: acceptance
+    attributes:
+      label: Critères d'acceptation
+      description: Liste vérifiable (cases à cocher) de ce qui rend l'issue terminée.
+      placeholder: "- [ ] …"
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Plan de test (e2e Playwright, FR et EN si localisé)
+      description: Quel test e2e couvrira la fonctionnalité ? (voir docs/test-matrix.md)
+    validations:
+      required: true
+  - type: input
+    id: epic
+    attributes:
+      label: Épic / issue parente
+      placeholder: "#64"
+    validations:
+      required: false
+  - type: textarea
     id: alternatives
     attributes:
       label: Alternatives envisagées

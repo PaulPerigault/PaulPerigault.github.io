@@ -1,0 +1,32 @@
+---
+import Container from '@/components/ui/Container.astro';
+import { SITE } from '@/config/site';
+import type { Lang } from '@/domain/lang';
+import { useTranslations } from '@/lib/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const t = useTranslations(Astro.props.lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="border-line text-muted border-t py-8 text-sm">
+  <Container class="flex flex-wrap items-baseline justify-between gap-4">
+    <p>
+      © {year} {SITE.name}
+    </p>
+    <nav aria-label={t('footer.legal')} class="flex flex-wrap gap-x-6 gap-y-2">
+      <a
+        href={`/${Astro.props.lang}/legal/`}
+        class="hover:text-accent underline underline-offset-4"
+      >
+        {t('footer.legal')}
+      </a>
+      <a href="#top" class="hover:text-accent underline underline-offset-4">
+        {t('footer.back_to_top')}
+      </a>
+    </nav>
+  </Container>
+</footer>

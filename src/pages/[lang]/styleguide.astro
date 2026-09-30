@@ -1,0 +1,110 @@
+---
+import type { GetStaticPaths } from 'astro';
+import ButtonLink from '@/components/ui/ButtonLink.astro';
+import Card from '@/components/ui/Card.astro';
+import DescriptionList from '@/components/ui/DescriptionList.astro';
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+import Heading from '@/components/ui/Heading.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Section from '@/components/ui/Section.astro';
+import Tag from '@/components/ui/Tag.astro';
+import Timeline from '@/components/ui/Timeline.astro';
+import TimelineItem from '@/components/ui/TimelineItem.astro';
+import { LANGS, type Lang } from '@/domain/lang';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { ICONS, type IconName } from '@/lib/icons';
+import { useTranslations } from '@/lib/i18n';
+
+export const getStaticPaths = (() =>
+  LANGS.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+const icons = Object.keys(ICONS) as IconName[];
+---
+
+<BaseLayout lang={lang} title="Styleguide" description="Primitives UI du portfolio" noindex>
+  <div class="mx-auto max-w-page px-6 py-section">
+    <Heading level={1}>Styleguide</Heading>
+    <p class="text-muted mt-4 max-w-prose">Primitives réutilisables — voir docs/ui.md.</p>
+  </div>
+
+  <Section id="typography" index={1} title="Typographie">
+    <Heading level={2} size="xl">
+      h2 rendu en taille xl
+    </Heading>
+    <Heading level={3}>h3 en taille par défaut</Heading>
+  </Section>
+
+  <Section id="links" index={2} title="Liens et boutons">
+    <div class="flex flex-wrap gap-3">
+      <ButtonLink href="/fr/" variant="primary">
+        Primaire interne
+      </ButtonLink>
+      <ButtonLink
+        href="https://github.com/PaulPerigault"
+        icon="branch"
+        newTabLabel={t('a11y.new_tab')}
+      >
+        Secondaire externe
+      </ButtonLink>
+      <ButtonLink href="mailto:contact@paulperigault.fr" icon="mail">
+        E-mail
+      </ButtonLink>
+    </div>
+    <p class="mt-6">
+      Un{' '}
+      <ExternalLink href="https://effect.website" newTabLabel={t('a11y.new_tab')}>
+        lien externe
+      </ExternalLink>{' '}
+      dans un texte.
+    </p>
+  </Section>
+
+  <Section id="cards" index={3} title="Cartes, étiquettes et listes">
+    <ul class="grid gap-4 sm:grid-cols-2">
+      <Card as="li" interactive>
+        <p>Carte interactive</p>
+        <Tag>astro</Tag>
+      </Card>
+      <Card as="li">
+        <p>Carte statique</p>
+        <Tag>effect</Tag>
+      </Card>
+    </ul>
+    <div class="mt-8">
+      <DescriptionList
+        items={[
+          { term: 'Lieu', description: 'Paris' },
+          { term: 'Rôle', description: t('hero.role') },
+        ]}
+      />
+    </div>
+  </Section>
+
+  <Section id="timeline" index={4} title="Chronologie">
+    <Timeline>
+      <TimelineItem
+        title="Poste récent"
+        subtitle="Entreprise"
+        period="sept. 2023 — présent"
+        dateTime="2023-09"
+      >
+        <p>Description courte.</p>
+      </TimelineItem>
+      <TimelineItem title="Poste ancien" period="2022" dateTime="2022-01">
+        <p>Autre description.</p>
+      </TimelineItem>
+    </Timeline>
+  </Section>
+
+  <Section id="icons" index={5} title="Icônes">
+    <ul class="flex flex-wrap gap-4" data-testid="icons">
+      {icons.map((name) => (
+        <li class="text-accent">
+          <Icon name={name} />
+        </li>
+      ))}
+    </ul>
+  </Section>
+</BaseLayout>

@@ -1,0 +1,52 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getImage } from 'astro:assets';
+import photo from '@/assets/photo.jpg';
+import About from '@/components/sections/About.astro';
+import Certifications from '@/components/sections/Certifications.astro';
+import Contact from '@/components/sections/Contact.astro';
+import Experience from '@/components/sections/Experience.astro';
+import Formation from '@/components/sections/Formation.astro';
+import Hero from '@/components/sections/Hero.astro';
+import Projects from '@/components/sections/Projects.astro';
+import Skills from '@/components/sections/Skills.astro';
+import { SITE } from '@/config/site';
+import { LANGS, type Lang } from '@/domain/lang';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { useTranslations } from '@/lib/i18n';
+import { buildJsonLd } from '@/lib/build-json-ld';
+import { getSiteData } from '@/services/site-data';
+
+export const getStaticPaths = (() =>
+  LANGS.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+
+// Charge et valide tout le contenu et les projets GitHub au build (erreur typée = build rouge).
+const { portfolio, projects } = await getSiteData(lang);
+const image = await getImage({ src: photo, width: 200, height: 200, format: 'webp' });
+const jsonLd = buildJsonLd({
+  lang,
+  path: Astro.url.pathname,
+  title: t('seo.title'),
+  description: t('seo.description'),
+  jobTitle: t('hero.role'),
+  summary: t('hero.summary'),
+  imageUrl: `${SITE.domain}${image.src}`,
+  skills: portfolio.skills.flatMap((category) => category.items),
+  certifications: portfolio.certifications,
+  projectNames: projects.projects.map((project) => project.name),
+});
+---
+
+<BaseLayout lang={lang} title={t('seo.title')} description={t('seo.description')} jsonLd={jsonLd}>
+  <Hero lang={lang} />
+  <About lang={lang} />
+  <Skills lang={lang} categories={portfolio.skills} />
+  <Experience lang={lang} items={portfolio.experience} />
+  <Formation lang={lang} items={portfolio.formation} />
+  <Projects lang={lang} snapshot={projects} />
+  <Certifications lang={lang} items={portfolio.certifications} />
+  <Contact lang={lang} />
+</BaseLayout>

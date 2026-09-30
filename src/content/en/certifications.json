@@ -1,0 +1,29 @@
+[
+  {
+    "id": "gcp-cdl",
+    "name": "Cloud Digital Leader",
+    "issuer": "Google Cloud",
+    "issuerLogo": "gcp",
+    "dateIssued": "2024-11",
+    "dateExpires": "2027-11",
+    "inProgress": false
+  },
+  {
+    "id": "aws-quest",
+    "name": "AWS Cloud Quest: Cloud Practitioner",
+    "issuer": "Amazon Web Services",
+    "issuerLogo": "aws",
+    "dateIssued": "2026-03",
+    "dateExpires": null,
+    "inProgress": false
+  },
+  {
+    "id": "gcp-ace",
+    "name": "Associate Cloud Engineer",
+    "issuer": "Google Cloud",
+    "issuerLogo": "gcp",
+    "dateIssued": null,
+    "dateExpires": null,
+    "inProgress": true
+  }
+]

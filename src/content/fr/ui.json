@@ -1,0 +1,89 @@
+{
+  "seo": {
+    "title": "Paul Perigault — Ingénieur DevOps",
+    "description": "Portfolio de Paul Perigault, ingénieur DevOps en alternance à l'ESIEA Paris chez WeVii."
+  },
+  "nav": {
+    "about": "À propos",
+    "skills": "Stack",
+    "experience": "Expériences",
+    "formation": "Formation",
+    "projects": "Projets",
+    "certifications": "Certifications",
+    "contact": "Contact",
+    "skip_to_content": "Aller au contenu principal",
+    "menu_open": "Ouvrir le menu",
+    "menu_close": "Fermer le menu",
+    "primary": "Navigation principale",
+    "lang_switch": "Changer de langue"
+  },
+  "hero": {
+    "role": "Ingénieur DevOps",
+    "school": "ESIEA Paris · Alternant chez WeVii",
+    "cta_cv": "Télécharger le CV",
+    "cta_contact": "Me contacter",
+    "cta_github": "GitHub",
+    "cta_linkedin": "LinkedIn",
+    "summary": "Paul Perigault est ingénieur DevOps en alternance chez WeVii et étudiant à l'ESIEA Paris. Il conçoit des pipelines CI/CD, des infrastructures AWS et GCP avec Terraform et Kubernetes, et des déploiements GitOps avec ArgoCD."
+  },
+  "about": {
+    "title": "À propos",
+    "body": "Étudiant ingénieur DevOps à l'ESIEA Paris, en alternance chez WeVii depuis septembre 2023. J'y construis des pipelines CI/CD, des infrastructures AWS et GCP avec Terraform et Kubernetes, et des déploiements GitOps avec ArgoCD. J'interviens aussi en école, j'encadre des projets étudiants et des hackathons.",
+    "location": "Paris, France",
+    "location_label": "Lieu"
+  },
+  "skills": {
+    "title": "Stack technique"
+  },
+  "experience": {
+    "title": "Expériences",
+    "present": "Présent"
+  },
+  "formation": {
+    "title": "Formation"
+  },
+  "projects": {
+    "title": "Projets",
+    "view_code": "Code",
+    "view_demo": "Demo",
+    "updated": "Mis à jour",
+    "fetched_at": "Données GitHub —",
+    "empty": "Aucun projet à afficher pour le moment."
+  },
+  "certifications": {
+    "title": "Certifications",
+    "in_progress": "En cours",
+    "expires": "Expire"
+  },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Ingénieur DevOps en alternance, disponible pour intervenir en écoles, mentorer des projets étudiants et encadrer des hackathons.",
+    "email_label": "E-mail",
+    "linkedin_label": "LinkedIn",
+    "github_label": "GitHub"
+  },
+  "theme": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "toggle_to_light": "Passer en mode clair",
+    "toggle_to_dark": "Passer en mode sombre"
+  },
+  "lang": {
+    "fr": "Français",
+    "en": "English"
+  },
+  "a11y": {
+    "new_tab": "s'ouvre dans un nouvel onglet"
+  },
+  "footer": {
+    "back_to_top": "Retour en haut",
+    "legal": "Mentions légales et confidentialité"
+  },
+  "geo": {
+    "technologies": "Technologies",
+    "portfolio": "Portfolio",
+    "profile_md": "Profil complet (Markdown)",
+    "full_text": "Texte intégral FR + EN",
+    "cv": "CV (PDF)"
+  }
+}

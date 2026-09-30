@@ -1,0 +1,20 @@
+---
+interface Props {
+  as?: 'div' | 'li' | 'article';
+  /** Bordure d'accent au survol/focus interne, pour une carte qui contient un lien. */
+  interactive?: boolean;
+  class?: string;
+}
+
+const { as: Tag = 'div', interactive = false, class: className } = Astro.props;
+---
+
+<Tag
+  class:list={[
+    'border-line border p-6 transition-colors duration-(--pp-duration)',
+    interactive && 'hover:border-accent focus-within:border-accent',
+    className,
+  ]}
+>
+  <slot />
+</Tag>

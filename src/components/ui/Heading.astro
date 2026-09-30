@@ -1,0 +1,28 @@
+---
+type Level = 1 | 2 | 3 | 4;
+type Size = 'display' | '2xl' | 'xl' | 'lg';
+
+interface Props {
+  /** Niveau sémantique (h1–h4) : ne dépend jamais du style. */
+  level: Level;
+  /** Taille visuelle ; par défaut liée au niveau. */
+  size?: Size;
+  id?: string;
+  class?: string;
+}
+
+const SIZE_CLASS: Record<Size, string> = {
+  display: 'text-display',
+  '2xl': 'text-2xl',
+  xl: 'text-xl',
+  lg: 'text-lg',
+};
+const DEFAULT_SIZE: Record<Level, Size> = { 1: 'display', 2: '2xl', 3: 'xl', 4: 'lg' };
+
+const { level, size = DEFAULT_SIZE[level], id, class: className } = Astro.props;
+const Tag = `h${level}` as const;
+---
+
+<Tag id={id} class:list={['font-serif font-medium tracking-tight', SIZE_CLASS[size], className]}>
+  <slot />
+</Tag>

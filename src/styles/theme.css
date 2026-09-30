@@ -1,0 +1,44 @@
+/*
+ * Expose les tokens à Tailwind. Les palettes, ombres et tailles par défaut sont supprimées :
+ * seuls les tokens du projet produisent des utilitaires (`bg-bg`, `text-muted`, `font-serif`…).
+ */
+/* `js:` cible <html class="js"> (posé par HEAD_INIT_SCRIPT) : améliorations progressives. */
+@custom-variant js (:root.js &);
+
+@theme inline {
+  --color-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --shadow-*: initial;
+  --drop-shadow-*: initial;
+  --radius-*: initial;
+
+  --color-bg: var(--pp-bg);
+  --color-surface: var(--pp-surface);
+  --color-fg: var(--pp-fg);
+  --color-muted: var(--pp-muted);
+  --color-line: var(--pp-line);
+  --color-control: var(--pp-control);
+  --color-accent: var(--pp-accent);
+  --color-on-accent: var(--pp-on-accent);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-serif: var(--pp-font-serif);
+  --font-sans: var(--pp-font-sans);
+  --font-mono: var(--pp-font-mono);
+
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: clamp(1.75rem, 3vw + 1rem, 2.25rem);
+  --text-display: clamp(2.75rem, 7vw + 1rem, 5.5rem);
+
+  --radius-sm: var(--pp-radius);
+
+  --container-page: var(--pp-page);
+  --container-prose: var(--pp-measure);
+  --spacing-section: var(--pp-space-section);
+}

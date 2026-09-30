@@ -1,0 +1,18 @@
+---
+import type { GetStaticPaths } from 'astro';
+import LegalDocument from '@/components/sections/LegalDocument.astro';
+import { LANGS, type Lang } from '@/domain/lang';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { getSiteData } from '@/services/site-data';
+
+export const getStaticPaths = (() =>
+  LANGS.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+const { portfolio } = await getSiteData(lang);
+const { legal } = portfolio;
+---
+
+<BaseLayout lang={lang} title={`${legal.title} — Paul Perigault`} description={legal.description}>
+  <LegalDocument lang={lang} document={legal} />
+</BaseLayout>

@@ -1,0 +1,70 @@
+---
+import Card from '@/components/ui/Card.astro';
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+import Heading from '@/components/ui/Heading.astro';
+import Section from '@/components/ui/Section.astro';
+import Tag from '@/components/ui/Tag.astro';
+import { navIndex } from '@/config/navigation';
+import type { Lang } from '@/domain/lang';
+import type { ProjectsSnapshot } from '@/domain/project';
+import { formatYearMonth } from '@/lib/format-date';
+import { useTranslations } from '@/lib/i18n';
+import { toYearMonth, visibleTopics } from '@/lib/projects';
+
+interface Props {
+  lang: Lang;
+  snapshot: ProjectsSnapshot;
+}
+
+const { lang, snapshot } = Astro.props;
+const t = useTranslations(lang);
+const newTab = t('a11y.new_tab');
+const month = (isoDate: string) => formatYearMonth(toYearMonth(isoDate), lang);
+---
+
+<Section id="projects" index={navIndex('projects')} title={t('projects.title')}>
+  <div data-state={snapshot.projects.length > 0 ? 'ready' : 'empty'}>
+    {snapshot.projects.length === 0 ? (
+      <p class="text-muted">{t('projects.empty')}</p>
+    ) : (
+      <ul class="grid gap-4 md:grid-cols-2">
+        {snapshot.projects.map((project) => (
+          <Card as="li" interactive>
+            <div class="flex items-baseline justify-between gap-4">
+              <Heading level={3} size="xl">
+                <ExternalLink href={project.html_url} newTabLabel={newTab}>
+                  {project.name}
+                </ExternalLink>
+              </Heading>
+              {project.language && (
+                <span class="text-accent font-mono text-xs">{project.language}</span>
+              )}
+            </div>
+            {project.description && <p class="mt-3">{project.description}</p>}
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {visibleTopics(project.topics).map((topic) => (
+                <li>
+                  <Tag>{topic}</Tag>
+                </li>
+              ))}
+            </ul>
+            <p class="text-muted mt-4 font-mono text-xs">
+              {t('projects.updated')} {month(project.updated_at)}
+              {project.homepage && (
+                <span>
+                  {' · '}
+                  <ExternalLink href={project.homepage} newTabLabel={newTab}>
+                    {t('projects.view_demo')}
+                  </ExternalLink>
+                </span>
+              )}
+            </p>
+          </Card>
+        ))}
+      </ul>
+    )}
+    <p class="text-muted mt-6 font-mono text-xs">
+      {t('projects.fetched_at')} {month(snapshot.fetchedAt)}
+    </p>
+  </div>
+</Section>

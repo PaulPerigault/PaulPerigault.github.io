@@ -25,7 +25,8 @@
     "check:size": "node scripts/check-file-size.mjs",
     "check:layers": "node scripts/check-layers.mjs",
     "knip": "knip",
-    "guard": "npm run check:size && npm run check:layers && npm run knip"
+    "guard": "npm run check:size && npm run check:layers && npm run check:design && npm run knip",
+    "check:design": "node scripts/check-design.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

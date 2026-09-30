@@ -18,3 +18,9 @@ export const ProjectsConfig = Schema.Struct({
   featured: Schema.Array(Schema.NonEmptyString),
 });
 export type ProjectsConfig = typeof ProjectsConfig.Type;
+
+/** Projets tels que vus au build : liste triée + date de récupération (ISO). */
+export interface ProjectsSnapshot {
+  readonly projects: readonly Project[];
+  readonly fetchedAt: string;
+}

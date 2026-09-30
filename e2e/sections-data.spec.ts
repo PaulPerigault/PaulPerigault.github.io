@@ -34,7 +34,7 @@ for (const lang of ['fr', 'en'] as const) {
     test('Compétences : une ligne par catégorie, éléments joints, icônes décoratives', async ({
       page,
     }) => {
-      const categories = loadContent<Skill>(lang, 'skills');
+      const categories = loadContent<Skill[]>(lang, 'skills');
       const region = page.getByRole('region', { name: NAMES[lang].skills });
       await expect(region.locator('dt')).toHaveCount(categories.length);
       for (const { category, items } of categories) {
@@ -49,7 +49,7 @@ for (const lang of ['fr', 'en'] as const) {
     }) => {
       const region = page.getByRole('region', { name: NAMES[lang].experience });
       const titles = region.locator('h3');
-      const source = loadContent<Entry>(lang, 'experience');
+      const source = loadContent<Entry[]>(lang, 'experience');
       await expect(titles).toHaveCount(source.length);
       await expect(titles.first()).toHaveText(
         lang === 'fr' ? 'Apprenti DevOps Cloud' : 'DevOps Cloud Apprentice',
@@ -78,7 +78,7 @@ for (const lang of ['fr', 'en'] as const) {
       await expect(region.locator('li').first()).toContainText(
         lang === 'fr' ? 'sept. 2024 — août 2027' : 'Sep 2024 — Aug 2027',
       );
-      await expect(titles).toHaveCount(loadContent<Entry>(lang, 'formation').length);
+      await expect(titles).toHaveCount(loadContent<Entry[]>(lang, 'formation').length);
     });
 
     test('Certifications : en préparation d’abord, puis par date, avec expiration', async ({

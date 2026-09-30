@@ -8,7 +8,7 @@ import { GithubClient } from './github-client';
 
 const Infrastructure = Layer.mergeAll(NodeContext.layer, FetchHttpClient.layer, BuildConfig.Live);
 
-const AppLayer = Layer.mergeAll(ContentRepository.Live, GithubClient.Live).pipe(
+const AppLayer = Layer.mergeAll(ContentRepository.Live, GithubClient.Live, BuildConfig.Live).pipe(
   Layer.provide(Infrastructure),
 );
 

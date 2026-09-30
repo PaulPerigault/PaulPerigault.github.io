@@ -6,11 +6,13 @@ import Contact from '@/components/sections/Contact.astro';
 import Experience from '@/components/sections/Experience.astro';
 import Formation from '@/components/sections/Formation.astro';
 import Hero from '@/components/sections/Hero.astro';
+import Projects from '@/components/sections/Projects.astro';
 import Skills from '@/components/sections/Skills.astro';
 import { LANGS, type Lang } from '@/domain/lang';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { useTranslations } from '@/lib/i18n';
 import { loadPortfolio } from '@/services/portfolio';
+import { loadProjects } from '@/services/projects';
 import { runBuild } from '@/services/runtime';
 
 export const getStaticPaths = (() =>
@@ -19,8 +21,9 @@ export const getStaticPaths = (() =>
 const lang = Astro.params.lang as Lang;
 const t = useTranslations(lang);
 
-// Charge et valide tout le contenu de la langue au build (erreur typée = build rouge).
+// Charge et valide tout le contenu et les projets GitHub au build (erreur typée = build rouge).
 const portfolio = await runBuild(loadPortfolio(lang));
+const projects = await runBuild(loadProjects(lang));
 ---
 
 <BaseLayout lang={lang} title={t('seo.title')} description={t('seo.description')}>
@@ -29,6 +32,7 @@ const portfolio = await runBuild(loadPortfolio(lang));
   <Skills lang={lang} categories={portfolio.skills} />
   <Experience lang={lang} items={portfolio.experience} />
   <Formation lang={lang} items={portfolio.formation} />
+  <Projects lang={lang} snapshot={projects} />
   <Certifications lang={lang} items={portfolio.certifications} />
   <Contact lang={lang} />
 </BaseLayout>

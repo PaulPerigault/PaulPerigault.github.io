@@ -9,12 +9,15 @@ export interface FakeGithub {
 }
 
 /** Client GitHub adossé à un `HttpClient` simulé : `respond` reçoit le n° de tentative (1-based). */
-export const fakeGithub = (respond: (attempt: number) => Response, token?: string): FakeGithub => {
+export const fakeGithub = (
+  respond: (attempt: number, url: string) => Response,
+  token?: string,
+): FakeGithub => {
   const requests: Request[] = [];
   const http = HttpClient.make((request) =>
     Effect.sync(() => {
       requests.push(new Request(request.url, { headers: request.headers }));
-      return HttpClientResponse.fromWeb(request, respond(requests.length));
+      return HttpClientResponse.fromWeb(request, respond(requests.length, request.url));
     }),
   );
   const config = BuildConfig.layerTest({

@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 const NAV = { fr: 'Navigation principale', en: 'Main navigation' } as const;
 const LABEL = {
   fr: {
+    projects: 'Projets',
     about: 'À propos',
     contact: 'Contact',
     skills: 'Stack',
@@ -11,6 +12,7 @@ const LABEL = {
     certifications: 'Certifications',
   },
   en: {
+    projects: 'Projects',
     about: 'About',
     contact: 'Contact',
     skills: 'Stack',
@@ -21,14 +23,7 @@ const LABEL = {
 } as const;
 
 for (const lang of ['fr', 'en'] as const) {
-  for (const id of [
-    'about',
-    'skills',
-    'experience',
-    'formation',
-    'certifications',
-    'contact',
-  ] as const) {
+  for (const id of Object.keys(LABEL.fr) as (keyof typeof LABEL.fr)[]) {
     test(`la navigation (${lang}) mène à la section ${id}`, async ({ page }) => {
       await page.goto(`/${lang}/`);
       await page

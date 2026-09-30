@@ -7,6 +7,8 @@ export interface BuildConfigShape {
   readonly githubApiUrl: string;
   readonly githubToken: Option.Option<Redacted.Redacted>;
   readonly contentDir: string;
+  /** Vrai (CI) : un dépôt GitHub introuvable fait échouer le build ; faux (dev) : repli journalisé. */
+  readonly strictData: boolean;
 }
 
 /** Configuration d'exécution du build (variables d'environnement), jamais lue ailleurs. */
@@ -21,6 +23,10 @@ export class BuildConfig extends Context.Tag('BuildConfig')<BuildConfig, BuildCo
         ),
         githubToken: yield* Config.option(Config.redacted('GITHUB_TOKEN')),
         contentDir: yield* Config.string('CONTENT_DIR').pipe(Config.withDefault('src/content')),
+        strictData: yield* Config.boolean('STRICT_DATA').pipe(
+          Config.orElse(() => Config.boolean('CI')),
+          Config.withDefault(false),
+        ),
       };
     }),
   );
@@ -31,6 +37,7 @@ export class BuildConfig extends Context.Tag('BuildConfig')<BuildConfig, BuildCo
       githubApiUrl: SITE.githubApiUrl,
       githubToken: Option.none(),
       contentDir: 'content',
+      strictData: false,
       ...overrides,
     });
   }

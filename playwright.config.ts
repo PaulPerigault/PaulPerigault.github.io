@@ -28,5 +28,12 @@ export default defineConfig({
         launchOptions: { executablePath: process.env['PW_CHROMIUM_PATH'] },
       },
     },
+    // Navigateurs supplémentaires : exécutés par le workflow planifié (PW_ALL_BROWSERS=1).
+    ...(process.env['PW_ALL_BROWSERS'] === '1'
+      ? [
+          { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+          { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+        ]
+      : []),
   ],
 });

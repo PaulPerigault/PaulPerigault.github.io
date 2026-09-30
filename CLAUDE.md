@@ -18,7 +18,8 @@ npm run lint           # eslint .
 npm run format:check   # prettier --check (src, e2e, scripts)
 npm test               # vitest run (unit)
 npm run e2e            # Playwright against dist/ served by scripts/serve-dist.mjs (build first)
-npm run verify         # lint + format:check + check + test + build (also run by the pre-push hook)
+npm run guard          # check:size + check:layers + knip (architecture guardrails)
+npm run verify         # guard + lint + format:check + check + test + build (also run by the pre-push hook)
 ```
 
 Node 24 (`.nvmrc`) and npm 11 are required; CI uses `npm ci` everywhere. `astro preview` self-daemonizes when an AI agent is detected (`AI_AGENT`), so e2e serves `dist/` with `scripts/serve-dist.mjs` (mimics GitHub Pages: directory index, `404.html`, no SPA fallback). To run e2e with a preinstalled Chromium set `PW_CHROMIUM_PATH`.
@@ -39,7 +40,11 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 - Strict TypeScript: no `any`, `import type` for types.
 - Prettier: single quotes, semicolons, 100 cols, trailing commas.
 - Tests: **every feature ships at least one Playwright e2e test** (FR and EN when applicable); logic gets Vitest unit tests.
-- Quality guardrails (files ≤ 120 lines, function size/complexity, layer rules, dead code) _(planned #66)_.
+- **Guardrails (enforced by `verify`, pre-commit and CI):**
+  - `scripts/check-file-size.mjs`: no `.ts/.astro/.css/.mjs` file under `src/`, `e2e/`, `scripts/` exceeds **120 lines** (`MAX_FILE_LINES`). Split the file instead of raising the limit.
+  - ESLint design rules (`eslint.config.mjs`): function ≤ 40 lines, complexity ≤ 8, depth ≤ 3, ≤ 4 params, ≤ 3 nested callbacks, no magic numbers (tests, scripts and config files excepted), no `any`, no `console`.
+  - `scripts/check-layers.mjs` + `scripts/lib/layers.mjs`: each layer lists the layers it may import (`domain` → nothing, `services` → `lib`/`domain`, `components/ui` → `lib` only, …); it reads `.ts` and `.astro` because dependency-cruiser cannot parse `.astro`. Add a layer there when you create a folder.
+  - `knip` (`knip.json`): unused files, exports and dependencies fail the build.
 - Design: distinctive, non-generic art direction _(planned #78)_.
 
 ## Git workflow

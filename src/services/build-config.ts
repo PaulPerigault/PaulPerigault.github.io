@@ -1,4 +1,5 @@
 import type { Redacted } from 'effect';
+import { SITE } from '@/config/site';
 import { Config, Context, Effect, Layer, Option } from 'effect';
 
 export interface BuildConfigShape {
@@ -14,9 +15,9 @@ export class BuildConfig extends Context.Tag('BuildConfig')<BuildConfig, BuildCo
     BuildConfig,
     Effect.gen(function* () {
       return {
-        githubUser: yield* Config.string('GITHUB_USER').pipe(Config.withDefault('PaulPerigault')),
+        githubUser: yield* Config.string('GITHUB_USER').pipe(Config.withDefault(SITE.githubUser)),
         githubApiUrl: yield* Config.string('GITHUB_API_URL').pipe(
-          Config.withDefault('https://api.github.com'),
+          Config.withDefault(SITE.githubApiUrl),
         ),
         githubToken: yield* Config.option(Config.redacted('GITHUB_TOKEN')),
         contentDir: yield* Config.string('CONTENT_DIR').pipe(Config.withDefault('src/content')),
@@ -27,7 +28,7 @@ export class BuildConfig extends Context.Tag('BuildConfig')<BuildConfig, BuildCo
   static layerTest(overrides: Partial<BuildConfigShape> = {}) {
     return Layer.succeed(BuildConfig, {
       githubUser: 'tester',
-      githubApiUrl: 'https://api.test',
+      githubApiUrl: SITE.githubApiUrl,
       githubToken: Option.none(),
       contentDir: 'content',
       ...overrides,

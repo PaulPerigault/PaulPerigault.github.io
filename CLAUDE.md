@@ -51,6 +51,12 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 - Root `/` (`pages/index.astro`) redirects with `ROOT_REDIRECT_SCRIPT` (stored choice → browser language → FR) and a `meta refresh` to `/fr/` without JS.
 - `vite.build.assetsInlineLimit: 0` keeps every client script an external file (CSP #76 will only allow `'self'` plus the hashed head script).
 
+### Sections and site config
+- `src/config/site.ts` (`SITE`) is the **only** place for identity, URLs and contact details (name, domain, e-mail, GitHub/LinkedIn/CV, GitHub API URL). `src/config/site.test.ts` fails on any literal hostname/e-mail elsewhere in `src/` (allow-list: `site.ts`, styleguide, root page, tests).
+- `src/components/sections/` — one composed component per page section (`Hero`, `About`, `Contact`, …), built only from `ui` primitives + `useTranslations(lang)`; a section's number comes from `navIndex(id)` (`config/navigation.ts`), so nav order = numbering. `pages/[lang]/index.astro` just lists the sections.
+- Hero photo lives in `src/assets/photo.jpg` and goes through `astro:assets` (`<Image>` → WebP, explicit `width/height`, `loading=eager` + `fetchpriority=high` only on this LCP image). Sections may import `src/assets`.
+- Copy rule: factual, concrete sentences (roles, employers, technologies taken from the content data); no filler.
+
 ### UI primitives
 `src/components/ui/` holds logic-free, typed Astro primitives (`Container`, `Section`, `Heading`, `Card`, `Tag`, `ButtonLink`, `ExternalLink`, `Icon`, `DescriptionList`, `Timeline(Item)`, `VisuallyHidden`, `SkipLink`) — catalogue and rules in `docs/ui.md`, live showcase at `/{fr,en}/styleguide/` (`noindex`, must stay out of the sitemap). Repeated markup becomes a primitive; primitives receive already-translated strings and import only `lib/`. Link attributes come from `lib/links.ts`, icons from `lib/icons.ts`. Component tests use `src/test/render.ts` (Astro Container API, Vitest via `getViteConfig`).
 

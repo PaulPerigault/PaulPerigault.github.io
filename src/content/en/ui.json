@@ -21,12 +21,15 @@
     "role": "DevOps Engineer",
     "school": "ESIEA Paris · Apprentice at WeVii",
     "cta_cv": "Download CV",
-    "cta_contact": "Get in touch"
+    "cta_contact": "Get in touch",
+    "cta_github": "GitHub",
+    "cta_linkedin": "LinkedIn"
   },
   "about": {
     "title": "About",
-    "body": "DevOps engineering student at ESIEA Paris, apprentice at WeVii working on multicloud and CI/CD. Passionate about knowledge sharing, I look to mentor and support students on technical projects and hackathons.",
-    "location": "Paris, France"
+    "body": "DevOps engineering student at ESIEA Paris, apprenticed at WeVii since September 2023. I build CI/CD pipelines, AWS and GCP infrastructure with Terraform and Kubernetes, and GitOps deployments with ArgoCD. I also give talks at schools and mentor student projects and hackathons.",
+    "location": "Paris, France",
+    "location_label": "Location"
   },
   "skills": {
     "title": "Tech stack"
@@ -49,7 +52,10 @@
   },
   "contact": {
     "title": "Contact",
-    "subtitle": "DevOps engineer — available for school talks, student project mentoring and hackathon supervision."
+    "subtitle": "DevOps engineer — available for school talks, student project mentoring and hackathon supervision.",
+    "email_label": "Email",
+    "linkedin_label": "LinkedIn",
+    "github_label": "GitHub"
   },
   "theme": {
     "light": "Light",

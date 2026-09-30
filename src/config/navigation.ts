@@ -8,3 +8,6 @@ export const NAV_SECTIONS = [
   'certifications',
   'contact',
 ] as const;
+
+/** Numéro (à partir de 1) d'une section dans l'ordre de la page. */
+export const navIndex = (id: (typeof NAV_SECTIONS)[number]): number => NAV_SECTIONS.indexOf(id) + 1;

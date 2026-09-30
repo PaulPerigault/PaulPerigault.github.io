@@ -1,0 +1,53 @@
+---
+import { Image } from 'astro:assets';
+import photo from '@/assets/photo.jpg';
+import ButtonLink from '@/components/ui/ButtonLink.astro';
+import Container from '@/components/ui/Container.astro';
+import Heading from '@/components/ui/Heading.astro';
+import { SITE } from '@/config/site';
+import type { Lang } from '@/domain/lang';
+import { useTranslations } from '@/lib/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const t = useTranslations(Astro.props.lang);
+const newTab = t('a11y.new_tab');
+---
+
+<section aria-labelledby="hero-title" class="py-section">
+  <Container class="grid items-end gap-10 md:grid-cols-[1fr_auto]">
+    <div>
+      <p class="text-muted font-mono text-sm">{t('hero.school')}</p>
+      <Heading level={1} id="hero-title" class="mt-4">
+        {SITE.name}
+      </Heading>
+      <p class="mt-6 max-w-prose font-serif text-xl">{t('hero.role')}</p>
+      <div class="mt-10 flex flex-wrap gap-3">
+        <ButtonLink href={SITE.cvUrl} variant="primary" icon="download" newTabLabel={newTab}>
+          {t('hero.cta_cv')}
+        </ButtonLink>
+        <ButtonLink href={`mailto:${SITE.email}`} icon="mail">
+          {t('hero.cta_contact')}
+        </ButtonLink>
+        <ButtonLink href={SITE.githubUrl} icon="branch" newTabLabel={newTab}>
+          {t('hero.cta_github')}
+        </ButtonLink>
+        <ButtonLink href={SITE.linkedinUrl} icon="link" newTabLabel={newTab}>
+          {t('hero.cta_linkedin')}
+        </ButtonLink>
+      </div>
+    </div>
+    <Image
+      src={photo}
+      alt={SITE.name}
+      width={200}
+      height={200}
+      format="webp"
+      loading="eager"
+      fetchpriority="high"
+      class="border-line size-40 border object-cover md:size-52"
+    />
+  </Container>
+</section>

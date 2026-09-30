@@ -16,6 +16,7 @@ const LAYERS = {
     'src/config',
   ],
   'src/components/sections': [
+    'src/assets',
     'src/components/sections',
     'src/components/ui',
     'src/lib',

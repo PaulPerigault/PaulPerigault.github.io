@@ -35,10 +35,10 @@ test.describe('robots et fichiers pour les IA', () => {
     const text = await (await request.get('/llms.txt')).text();
     expect(text.startsWith('# Paul Perigault')).toBe(true);
     const urls = [...text.matchAll(/\]\((https:\/\/[^)]+)\)/g)].map((match) => match[1] as string);
-    const internal = urls.filter((url) => url.startsWith(ORIGIN));
+    const internal = urls.filter((url) => new URL(url).origin === ORIGIN);
     expect(internal.length).toBeGreaterThanOrEqual(5);
     for (const url of internal) {
-      expect((await request.get(url.replace(ORIGIN, ''))).status(), url).toBe(200);
+      expect((await request.get(new URL(url).pathname)).status(), url).toBe(200);
     }
   });
 

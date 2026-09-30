@@ -1,0 +1,29 @@
+---
+import type { Lang } from '@/domain/lang';
+import { useTranslations } from '@/lib/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const other: Lang = lang === 'fr' ? 'en' : 'fr';
+const t = useTranslations(lang);
+const href = Astro.url.pathname.replace(`/${lang}/`, `/${other}/`);
+---
+
+<a
+  href={href}
+  hreflang={other}
+  lang={other}
+  data-lang-switch={other}
+  aria-label={t(`lang.${other}`)}
+  class="border-control hover:border-accent hover:text-accent rounded-sm border px-2 py-1 font-mono text-xs uppercase transition-colors duration-(--pp-duration)"
+>
+  {other}
+</a>
+
+<script>
+  import { initLangSwitch } from '@/scripts/lang-switch';
+  initLangSwitch();
+</script>

@@ -2,6 +2,9 @@
  * Expose les tokens à Tailwind. Les palettes, ombres et tailles par défaut sont supprimées :
  * seuls les tokens du projet produisent des utilitaires (`bg-bg`, `text-muted`, `font-serif`…).
  */
+/* `js:` cible <html class="js"> (posé par HEAD_INIT_SCRIPT) : améliorations progressives. */
+@custom-variant js (:root.js &);
+
 @theme inline {
   --color-*: initial;
   --font-*: initial;

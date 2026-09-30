@@ -1,9 +1,11 @@
 ---
 import '@/styles/global.css';
+import Footer from '@/components/layout/Footer.astro';
+import Navbar from '@/components/layout/Navbar.astro';
 import SkipLink from '@/components/ui/SkipLink.astro';
 import type { Lang } from '@/domain/lang';
 import { useTranslations } from '@/lib/i18n';
-import { THEME_INIT_SCRIPT } from '@/lib/theme-init';
+import { HEAD_INIT_SCRIPT } from '@/lib/head-init';
 
 interface Props {
   lang: Lang;
@@ -22,15 +24,17 @@ const t = useTranslations(lang);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline set:html={THEME_INIT_SCRIPT} />
+    <script is:inline set:html={HEAD_INIT_SCRIPT} />
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
   </head>
   <body class="bg-bg text-fg font-sans">
     <SkipLink label={t('nav.skip_to_content')} target="content" />
+    <Navbar lang={lang} />
     <main id="content" tabindex="-1">
       <slot />
     </main>
+    <Footer lang={lang} />
   </body>
 </html>

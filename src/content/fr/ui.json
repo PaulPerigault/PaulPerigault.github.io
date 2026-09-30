@@ -58,5 +58,8 @@
   "lang": {
     "fr": "Français",
     "en": "English"
+  },
+  "a11y": {
+    "new_tab": "s'ouvre dans un nouvel onglet"
   }
 }

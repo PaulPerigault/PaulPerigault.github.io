@@ -1,0 +1,22 @@
+---
+import VisuallyHidden from './VisuallyHidden.astro';
+import { linkAttributes } from '@/lib/links';
+
+interface Props {
+  href: string;
+  /** Texte lu par les lecteurs d'écran (« s'ouvre dans un nouvel onglet »). */
+  newTabLabel?: string;
+  class?: string;
+}
+
+const { href, newTabLabel, class: className } = Astro.props;
+---
+
+<a
+  href={href}
+  {...linkAttributes(href)}
+  class:list={['underline decoration-line underline-offset-4 hover:decoration-accent', className]}
+>
+  <slot />
+  {newTabLabel && <VisuallyHidden>({newTabLabel})</VisuallyHidden>}
+</a>

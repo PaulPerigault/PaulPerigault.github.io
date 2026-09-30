@@ -30,11 +30,15 @@ const AI_CRAWLERS = [
 const group = (comment: string, agents: readonly string[]): string =>
   [`# ${comment}`, ...agents.map((agent) => `User-agent: ${agent}`), 'Allow: /'].join('\n');
 
-/** `robots.txt` : tout est autorisé, y compris IA ; signaux de contenu explicites ; sitemap. */
+/**
+ * `robots.txt` : tout est autorisé, y compris les robots d'IA ; sitemap.
+ * Pas de directive non standard (ex. `Content-Signal`) : Lighthouse et les validateurs jugeraient le
+ * fichier invalide, et l'autorisation explicite de chaque robot dit déjà tout.
+ */
 export const buildRobots = (sitemapUrl: string): string =>
   [
     group('Moteurs de recherche', SEARCH_CRAWLERS),
     group("Assistants et moteurs d'IA : autorisés", AI_CRAWLERS),
-    '# Tous les autres robots\nUser-agent: *\nAllow: /\nContent-Signal: search=yes, ai-input=yes, ai-train=yes',
+    '# Tous les autres robots\nUser-agent: *\nAllow: /',
     `Sitemap: ${sitemapUrl}`,
   ].join('\n\n') + '\n';

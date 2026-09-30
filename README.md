@@ -40,13 +40,14 @@ Détails et conventions : voir `CLAUDE.md`.
 
 ## CI/CD
 
+Le site est construit **une seule fois** (`build.yml`) ; cet artefact est testé (e2e, Lighthouse) puis déployé tel quel.
+
 | Workflow | Déclencheur | Action |
 |---|---|---|
-| ci.yml | PR | lint + types + test + build |
-| e2e.yml | PR | Playwright e2e |
-| deploy.yml | push main | GitHub Pages |
+| ci.yml | PR | commitlint, guard/lint/types/tests, build, e2e, Lighthouse strict, image Docker ; check requis `ci` |
+| deploy.yml | push main + chaque lundi | build → e2e → GitHub Pages → IndexNow |
+| browsers.yml | chaque dimanche | e2e Chromium + Firefox + WebKit |
 | security.yml | PR + hebdo | npm audit + CodeQL + SBOM |
-| lighthouse.yml | PR | Perf >= 90, A11y = 100 |
 | release.yml | push main | CHANGELOG + tag semver |
 
 ## Déploiement alternatif

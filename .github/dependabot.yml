@@ -9,12 +9,47 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - dependencies
+    # Les paquets qui évoluent ensemble arrivent dans une seule PR (moins de bruit, versions alignées).
+    groups:
+      astro:
+        patterns: ["astro", "@astrojs/*"]
+      effect:
+        patterns: ["effect", "@effect/*"]
+      tailwind:
+        patterns: ["tailwindcss", "@tailwindcss/*"]
+      tooling:
+        patterns:
+          - "eslint*"
+          - "@eslint/*"
+          - "typescript*"
+          - "prettier*"
+          - "vitest"
+          - "@vitest/*"
+          - "@playwright/*"
+          - "@axe-core/*"
+          - "@commitlint/*"
+          - "husky"
+          - "lint-staged"
+          - "knip"
     ignore:
       - dependency-name: "*"
         update-types:
           - version-update:semver-major
 
   - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+    labels:
+      - dependencies
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # Images de base du Dockerfile (node, nginx-unprivileged).
+  - package-ecosystem: docker
     directory: /
     schedule:
       interval: weekly

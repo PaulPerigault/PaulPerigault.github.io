@@ -32,7 +32,7 @@ test.describe('politique CSP', () => {
     const policy = await policyOf(page);
     for (const directive of [
       "default-src 'none'",
-      "connect-src 'none'",
+      "connect-src 'self'",
       "base-uri 'none'",
       "form-action 'none'",
       "object-src 'none'",

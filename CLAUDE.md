@@ -97,23 +97,26 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 
 `release-please` (`release.yml`, push to `main`) opens/updates a release PR (`package.json`, `.release-please-manifest.json`, `CHANGELOG.md`); merging it creates the tag/release. Keep `.release-please-manifest.json` in sync with the latest tag; never edit generated changelog entries by hand.
 
-## CI/CD
+## CI/CD (GitOps)
 
-| Workflow | Trigger | Action |
+Everything is code in `.github/workflows/`; the site is **built once** and the **same artifact** is tested and deployed.
+
+| Workflow | Trigger | What it does |
 |---|---|---|
-| ci.yml | PR (main, develop, feat/**) | commitlint + guard + lint + format + check + test + build + Docker image check (`container` job) |
-| e2e.yml | PR | Playwright e2e on the built site |
-| deploy.yml | push main | build → GitHub Pages (`dist/`) |
-| security.yml | PR + weekly | npm audit + CodeQL + SBOM |
-| lighthouse.yml | PR | Lighthouse CI on `dist/` (`.lighthouserc.json`) |
-| release.yml | push main | release-please |
-| dependabot-auto-merge.yml | Dependabot PRs | auto-merge patch/minor once checks pass |
+| `build.yml` | reusable | The only `npm run build` (strict GitHub data, `GITHUB_TOKEN`) → artifact `site` (`dist/`). `ref` input |
+| `e2e.yml` | reusable | Downloads `site`, dry-runs IndexNow, installs Playwright browsers, runs `npm run e2e`; uploads report/traces. `all-browsers` input adds Firefox + WebKit |
+| `ci.yml` | PR (main, develop, feat/**), push develop | `commitlint`, `verify` (guard, lint, format, astro check, unit tests), `build` → `e2e` and `lighthouse` on the artifact, `container` (Docker image + headers); final aggregate job **`ci`** (the required check) is green only if all others are |
+| `deploy.yml` | push `main`, **weekly cron**, manual | `build` → `e2e` → publish the same artifact to GitHub Pages → IndexNow ping. The scheduled run rebuilds `main` without any commit (fresh GitHub data, sitemap `lastmod`, `security.txt`) |
+| `browsers.yml` | weekly cron, manual | e2e on Chromium + Firefox + WebKit |
+| `security.yml` | PR + push + weekly | `npm audit`, CodeQL, SBOM |
+| `release.yml` | push `main` | release-please |
+| `dependabot-auto-merge.yml` | Dependabot PRs | auto-merge patch/minor once checks pass |
 
-`.github/dependabot.yml` opens weekly PRs for `npm` and `github-actions`; npm majors are ignored. A multi-stage `Dockerfile` + `nginx.conf` allow deploying `dist/` elsewhere (see `docker-compose.yml`). Actions are SHA-pinned with least-privilege permissions (see Security); a single shared build artifact and a scheduled rebuild are _(planned #77)_.
+Required checks on protected branches stay `ci` and `commitlint` (names are stable; `scripts/workflows.test.mjs` asserts them, the single build, pinned actions, permissions, weekly redeploy…). Lighthouse budgets (`.lighthouserc.json`): performance ≥ 0.95, accessibility = 1, best-practices ≥ 0.95, SEO = 1, JS ≤ 10 KB, total weight ≤ 250 KB, LCP ≤ 2 s, TBT ≤ 200 ms, CLS ≤ 0.05. Dependabot (`.github/dependabot.yml`) groups npm updates (astro, effect, tailwind, tooling), github-actions and the Docker base images; npm majors are ignored. A multi-stage `Dockerfile` + `nginx.conf` deploy `dist/` elsewhere (see `docker-compose.yml`). Schedules run from the **default branch** (`develop`), hence `ref: main` in `deploy.yml`.
 
 ## Security
 
-- **CSP (Astro `security.csp`, `astro.config.mjs`)**: every page carries a `<meta http-equiv="content-security-policy">` generated at build with SHA-256 hashes for scripts/styles: `default-src 'none'`, `connect-src 'none'`, `base-uri/form-action/object-src 'none'`, `img-src/font-src/manifest-src 'self'`, no `unsafe-inline`/`unsafe-eval`. The only inline scripts (`HEAD_INIT_SCRIPT` in `BaseLayout`, `ROOT_REDIRECT_SCRIPT` in `pages/index.astro`) are allowed by `Astro.csp.insertScriptHash(scriptHash(...))` (`lib/csp.ts`) — **if you change either string, the hash follows automatically; never add `'unsafe-inline'`**. Client scripts stay external files (`assetsInlineLimit: 0`). `e2e/csp.spec.ts` checks the policy, that each inline script's exact hash is present, that an injected script is really blocked (canary) and that full journeys (theme, anchors, language, mobile menu, styleguide, 404, root) produce **zero violations**.
+- **CSP (Astro `security.csp`, `astro.config.mjs`)**: every page carries a `<meta http-equiv="content-security-policy">` generated at build with SHA-256 hashes for scripts/styles: `default-src 'none'`, `connect-src 'self'`, `base-uri/form-action/object-src 'none'`, `img-src/font-src/manifest-src 'self'` (`connect-src 'self'` is same-origin only: Lighthouse reads `robots.txt` with a page `fetch`), no `unsafe-inline`/`unsafe-eval`. The only inline scripts (`HEAD_INIT_SCRIPT` in `BaseLayout`, `ROOT_REDIRECT_SCRIPT` in `pages/index.astro`) are allowed by `Astro.csp.insertScriptHash(scriptHash(...))` (`lib/csp.ts`) — **if you change either string, the hash follows automatically; never add `'unsafe-inline'`**. Client scripts stay external files (`assetsInlineLimit: 0`). `e2e/csp.spec.ts` checks the policy, that each inline script's exact hash is present, that an injected script is really blocked (canary) and that full journeys (theme, anchors, language, mobile menu, styleguide, 404, root) produce **zero violations**.
 - **GitHub Pages cannot set response headers**, so header-only protections (`frame-ancestors`, HSTS, COOP/CORP, `X-Frame-Options`…) exist only in the Docker/nginx deployment (`nginx.conf`, unprivileged image, non-root, read-only-friendly). nginx does **not** repeat script/style hashes (they change every build and are in the meta tag; browsers intersect both policies) and uses `expires` rather than `add_header` inside locations, because a location-level `add_header` would drop the server-level security headers. `scripts/check-container.sh` (CI job `container`) builds the image and verifies headers, 404, Markdown MIME, cache headers and non-root user. To get headers on the real site, put a proxy such as Cloudflare Transform Rules in front of GitHub Pages (infra decision for the owner).
 - **Supply chain / CI** (`scripts/workflows.test.mjs` enforces it): every action pinned by commit SHA with a `# vN` comment (Dependabot keeps them fresh), explicit least-privilege `permissions`, `timeout-minutes`, `persist-credentials: false`, `npm ci` only. `npm audit`, CodeQL and SBOM run in `security.yml`.
 - Secrets: `GITHUB_TOKEN` is read through Effect `Config.redacted`; never log it.
@@ -128,10 +131,10 @@ Priority: search engines **and AI assistants must know Paul Perigault** — neve
 - **OG image:** `public/image/og-cover.png` is generated by `scripts/generate-og-image.mjs` (re-run and commit the PNG if the design changes; don't hand-edit). `public/image/logo.svg` is the single source of truth for branding; regenerate derived assets with the `update-favicon` skill.
 
 ### GEO — being known by AI assistants
-- **`robots.txt` is generated** (`pages/robots.txt.ts` ← `lib/robots.ts`): search engines and a maintained list of AI crawlers (GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, PerplexityBot, Google-Extended, Applebot-Extended, CCBot, Meta-ExternalAgent, …) are explicitly allowed, **no `Disallow` anywhere**, plus `Content-Signal: search=yes, ai-input=yes, ai-train=yes` and the sitemap. To welcome another crawler add it to `AI_CRAWLERS`.
+- **`robots.txt` is generated** (`pages/robots.txt.ts` ← `lib/robots.ts`): search engines and a maintained list of AI crawlers (GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, PerplexityBot, Google-Extended, Applebot-Extended, CCBot, Meta-ExternalAgent, …) are explicitly allowed, **no `Disallow` anywhere**, plus the sitemap, and **only standard directives** (a non-standard `Content-Signal` line makes Lighthouse flag robots.txt as invalid). To welcome another crawler add it to `AI_CRAWLERS`.
 - **`llms.txt`, `llms-full.txt` and `/<lang>/index.md` are generated from the content** (`lib/llms.ts`, `lib/profile-markdown.ts`), never hand-written; `services/site-data.ts` (`getSiteData(lang)`) loads content + GitHub data once per build for pages and these files. Pages advertise `<link rel="alternate" type="text/markdown">`.
 - **Facts live in static HTML** (hero `hero.summary` states name, role, employer, school, specialities in one entity sentence) and the JSON-LD `Person` (`description`, `hasOccupation`, `knowsLanguage`, `email`, `mainEntityOfPage`, `worksFor`, `alumniOf`, `sameAs`, `knowsAbout`) repeats **only** what the page says — `e2e/geo-entity.spec.ts` (JS disabled) enforces it. Keep name/role/employer/school identical everywhere (site, JSON-LD, llms, Markdown, OG).
-- **IndexNow**: key file `public/indexnow-key.txt`; `scripts/indexnow.mjs` submits the sitemap URLs (`--dry-run` in CI, real ping after `deploy-pages`, non-blocking). Search Console / Bing verification via `PUBLIC_GOOGLE_SITE_VERIFICATION` / `PUBLIC_BING_SITE_VERIFICATION`. `/.well-known/security.txt` (Expires recomputed each build) and `/humans.txt` are generated too.
+- **IndexNow**: key file `public/indexnow-key.txt`; `scripts/indexnow.mjs` submits the sitemap URLs (`--dry-run` in CI, real ping after `deploy-pages`, non-blocking). Search Console / Bing verification via `PUBLIC_GOOGLE_SITE_VERIFICATION` / `PUBLIC_BING_SITE_VERIFICATION`. `/.well-known/security.txt` (Expires recomputed each build) **and a copy at `/security.txt`** (RFC 9116 fallback: `actions/upload-pages-artifact` drops hidden folders, so `.well-known` may not reach GitHub Pages) and `/humans.txt` are generated too. The CI artifact is uploaded with `include-hidden-files: true`.
 - Manual, out-of-repo actions (submit sitemap, align LinkedIn/GitHub bios, AI knowledge checks): `docs/geo-checklist.md`.
 
 ## Maintenance

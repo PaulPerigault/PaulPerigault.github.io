@@ -28,14 +28,19 @@
     "guard": "npm run check:size && npm run check:layers && npm run knip"
   },
   "dependencies": {
+    "@effect/platform": "^0.97.2",
+    "@effect/platform-node": "^0.108.2",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.5",
+    "effect": "^3.22.2",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
+    "@effect/language-service": "^0.87.3",
+    "@effect/vitest": "^0.30.0",
     "@eslint/js": "^10.0.0",
     "@playwright/test": "^1.59.1",
     "@types/node": "^24.0.0",
@@ -59,5 +64,10 @@
     "*.{css,json}": [
       "prettier --write"
     ]
+  },
+  "overrides": {
+    "@effect/vitest": {
+      "vitest": "$vitest"
+    }
   }
 }

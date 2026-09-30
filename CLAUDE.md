@@ -32,7 +32,16 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 - `src/layouts/` — `BaseLayout.astro` (document shell). `src/styles/global.css` — Tailwind entry.
 - `astro.config.mjs` — `site`, `trailingSlash: 'always'`, `i18n` (prefix default locale), Tailwind via `@tailwindcss/vite`.
 - Alias `@/*` → `src/*`.
-- _(planned)_ layers `domain/` (Effect Schemas) ← `services/` (Effect services/Layers) ← `lib/` (pure helpers) ← `components/{ui,sections,layout}` ← `pages/` (#67, #68, #70); design tokens (#69); SEO/JSON-LD (#75); GEO/AI visibility (#82); CSP (#76).
+- Layers (see `scripts/lib/layers.mjs`): `domain/` ← `services/` ← `lib/` ← `components/{ui,sections,layout}` ← `layouts/` ← `pages/`.
+- `src/domain/` — pure Effect `Schema`s (`Skill`, `Experience`, `Formation`, `Certification`, `Project`, `Lang`, `YearMonth`) and `Schema.TaggedError`s (`ContentNotFound`, `ContentInvalid`, `GithubUnavailable`). No I/O.
+- `src/services/` — Effect services as `Context.Tag` + `Layer`: `BuildConfig` (env via `Config`, `Redacted` token), `ContentRepository` (reads `<CONTENT_DIR>/<lang>/*.json` through `@effect/platform` `FileSystem`, decodes with `Schema.parseJson`), `GithubClient` (`HttpClient`, exponential retry on network/5xx only, 5 s timeout, `GithubUnavailable`). `runtime.ts` builds the single `ManagedRuntime`; `runBuild(effect)` is **the only Effect → Promise bridge**, called from Astro frontmatter.
+- _(planned)_ content in `src/content` (#68), design tokens (#69), UI primitives (#70), SEO/JSON-LD (#75), GEO/AI visibility (#82), CSP (#76).
+
+### Effect rules
+- Build time only: no Effect code may reach the browser (`e2e/bundle-budget.spec.ts` enforces < 5 KB gzip JS and no Effect signature).
+- `Effect.gen`, typed errors in the error channel, no `try/catch`/`throw` outside `runBuild`; schemas are the single source of truth for both types and validation.
+- Tests use `@effect/vitest` (`it.effect`, `TestClock` for retries) with in-memory `Layer`s from `src/test/`. `@effect/vitest` declares a `vitest@^3` peer; `package.json#overrides` maps it to the installed Vitest 4.
+- `@effect/language-service` is enabled in `tsconfig.json`.
 
 ## Conventions
 
@@ -43,7 +52,7 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 - **Guardrails (enforced by `verify`, pre-commit and CI):**
   - `scripts/check-file-size.mjs`: no `.ts/.astro/.css/.mjs` file under `src/`, `e2e/`, `scripts/` exceeds **120 lines** (`MAX_FILE_LINES`). Split the file instead of raising the limit.
   - ESLint design rules (`eslint.config.mjs`): function ≤ 40 lines, complexity ≤ 8, depth ≤ 3, ≤ 4 params, ≤ 3 nested callbacks, no magic numbers (tests, scripts and config files excepted), no `any`, no `console`.
-  - `scripts/check-layers.mjs` + `scripts/lib/layers.mjs`: each layer lists the layers it may import (`domain` → nothing, `services` → `lib`/`domain`, `components/ui` → `lib` only, …); it reads `.ts` and `.astro` because dependency-cruiser cannot parse `.astro`. Add a layer there when you create a folder.
+  - `scripts/check-layers.mjs` + `scripts/lib/layers.mjs`: each layer lists the layers it may import (`domain` → nothing, `services` → `lib`/`domain`, `components/ui` → `lib` only, …); test files (`*.test.*`) are exempt; it reads `.ts` and `.astro` because dependency-cruiser cannot parse `.astro`. Add a layer there when you create a folder.
   - `knip` (`knip.json`): unused files, exports and dependencies fail the build.
 - Design: distinctive, non-generic art direction _(planned #78)_.
 

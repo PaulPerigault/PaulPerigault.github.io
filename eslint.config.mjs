@@ -44,7 +44,7 @@ export default tseslint.config(
   },
   {
     // Les tests décrivent des cas : blocs `describe` longs et valeurs littérales assumés.
-    files: ['**/*.test.{ts,mjs}', 'e2e/**/*.ts'],
+    files: ['**/*.test.{ts,mjs}', 'e2e/**/*.ts', 'src/test/**/*.ts'],
     rules: {
       'max-lines-per-function': 'off',
       'max-nested-callbacks': 'off',

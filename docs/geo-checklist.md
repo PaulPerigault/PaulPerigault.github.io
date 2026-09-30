@@ -19,7 +19,7 @@ Poser les mêmes questions aux assistants (ChatGPT, Claude, Gemini, Perplexity, 
 3. « Quelles sont les compétences et certifications de Paul Perigault ? »
 
 | Date | Assistant | Question | Résultat (correct / partiel / inconnu) | Source citée |
-|---|---|---|---|---|
-| | | | | |
+| ---- | --------- | -------- | -------------------------------------- | ------------ |
+|      |           |          |                                        |              |
 
 Si une information est fausse ou absente : corriger d'abord le contenu (`src/content`), vérifier que le profil Markdown (`/fr/index.md`) et le JSON-LD la portent, puis relancer un déploiement (IndexNow notifie les moteurs).

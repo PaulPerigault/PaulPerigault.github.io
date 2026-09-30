@@ -25,8 +25,9 @@
     "check:size": "node scripts/check-file-size.mjs",
     "check:layers": "node scripts/check-layers.mjs",
     "knip": "knip",
-    "guard": "npm run check:size && npm run check:layers && npm run check:design && npm run knip",
-    "check:design": "node scripts/check-design.mjs"
+    "guard": "npm run check:size && npm run check:layers && npm run check:design && npm run check:matrix && npm run knip",
+    "check:design": "node scripts/check-design.mjs",
+    "check:matrix": "node scripts/check-test-matrix.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@axe-core/playwright": "^4.13.0",
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
     "@effect/language-service": "^0.87.3",

@@ -18,7 +18,7 @@ npm run lint           # eslint .
 npm run format:check   # prettier --check (src, e2e, scripts)
 npm test               # vitest run (unit)
 npm run e2e            # Playwright against dist/ served by scripts/serve-dist.mjs (build first)
-npm run guard          # check:size + check:layers + check:design + knip (architecture guardrails)
+npm run guard          # check:size + check:layers + check:design + check:matrix + knip (architecture guardrails)
 npm run verify         # guard + lint + format:check + check + test + build (also run by the pre-push hook)
 ```
 
@@ -75,7 +75,8 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 - Component names `PascalCase.astro`, typed `interface Props`, no business logic in templates.
 - Strict TypeScript: no `any`, `import type` for types.
 - Prettier: single quotes, semicolons, 100 cols, trailing commas.
-- Tests: **every feature ships at least one Playwright e2e test** (FR and EN when applicable); logic gets Vitest unit tests.
+- Tests: **every feature ships at least one Playwright e2e test** (FR and EN when applicable); logic gets Vitest unit tests. `docs/test-matrix.md` maps each feature/issue to its `e2e/*.spec.ts` and `scripts/check-test-matrix.mjs` (in `guard`) fails on an unlisted spec, a listed-but-missing file, or a row with neither a spec nor an `n/a` justification — **add your spec to the matrix**.
+- **Accessibility**: `e2e/accessibility.spec.ts` runs axe (`@axe-core/playwright`, WCAG 2.0/2.1/2.2 A+AA) on `/fr/`, `/en/`, both styleguides and the 404 × light/dark × desktop/mobile, plus the open mobile menu, a toggled theme and an anchor target; **zero violations required**, and a canary test proves the audit does detect a real violation. Selectors are by role/accessible name (never by DOM position); `data-*` only for behaviour hooks. Firefox/WebKit projects exist behind `PW_ALL_BROWSERS=1` (scheduled workflow).
 - **Guardrails (enforced by `verify`, pre-commit and CI):**
   - `scripts/check-file-size.mjs`: no `.ts/.astro/.css/.mjs` file under `src/`, `e2e/`, `scripts/` exceeds **120 lines** (`MAX_FILE_LINES`). Split the file instead of raising the limit.
   - ESLint design rules (`eslint.config.mjs`): function ≤ 40 lines, complexity ≤ 8, depth ≤ 3, ≤ 4 params, ≤ 3 nested callbacks, no magic numbers (tests, scripts and config files excepted), no `any`, no `console`.

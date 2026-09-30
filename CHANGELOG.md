@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.1.0](https://github.com/PaulPerigault/PaulPerigault.github.io/compare/v2.0.0...v2.1.0) (2026-09-30)
+
+
+### Features
+
+* **content:** intitulé alternant devops cloud et cv hébergé sur le site ([#113](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/113)) ([640dabe](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/640dabef990b48dda0da9226d9ffc6b1661ab633))
+* **design:** identité cv d'abord, police auto-hébergée et impression ([#115](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/115)) ([99bedb0](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/99bedb09772649c1db8ccad8fe3cdcd32b13e9a8))
+* livrer l'identité cv d'abord, l'intitulé exact et le cv sur le site ([fcccd99](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/fcccd99d5f175034fa7d894cf4674048b5f1a79a))
+* livrer l'identité cv d'abord, l'intitulé exact et le cv sur le site ([#117](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/117)) ([fcccd99](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/fcccd99d5f175034fa7d894cf4674048b5f1a79a))
+
+
+### Bug Fixes
+
+* **seo:** dater le sitemap par le contenu et ajouter l'audit du site ([#111](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/111)) ([6bec50a](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/6bec50aeac889be6bd98e740e59066a38cb5434c))
+
 ## [2.0.0](https://github.com/PaulPerigault/PaulPerigault.github.io/compare/v1.1.1...v2.0.0) (2026-09-30)
 
 

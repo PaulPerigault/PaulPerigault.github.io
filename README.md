@@ -29,14 +29,22 @@ Portfolio personnel — Paul Perigault, Apprenti Ingénieur DevOps.
 ## Architecture
 
     src/
-      pages/{fr,en}/   # une page prérendue par langue
-      layouts/         # BaseLayout
-      styles/          # global.css (Tailwind)
-    e2e/               # tests Playwright
-    scripts/           # serve-dist, génération de l'image OG
-    public/            # assets statiques
+      domain/          # modèles Effect Schema + erreurs typées (pur)
+      services/        # services Effect : contenu, GitHub, projets, runtime
+      lib/             # fonctions pures : i18n, dates, SEO, JSON-LD, llms, robots…
+      components/
+        ui/            # primitives réutilisables (docs/ui.md)
+        layout/        # navbar, menu mobile, footer, SeoHead
+        sections/      # hero, à propos, compétences, projets…
+      layouts/ pages/  # BaseLayout ; /fr/, /en/, .md, robots, llms, 404
+      content/{fr,en}/ # contenu bilingue validé au build
+      scripts/         # scripts client minuscules (menu, thème, langue)
+      styles/          # tokens de design + Tailwind
+    e2e/               # tests Playwright (matrice : docs/test-matrix.md)
+    scripts/           # garde-fous, serveur e2e, IndexNow, génération OG
+    docs/              # ui, charte de design, matrice de tests, GEO, ADR
 
-Détails et conventions : voir `CLAUDE.md`.
+Détails, conventions et règles : `CLAUDE.md`. Décisions : `docs/adr/`.
 
 ## CI/CD
 

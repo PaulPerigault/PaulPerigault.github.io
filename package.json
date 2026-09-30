@@ -28,7 +28,8 @@
     "guard": "npm run check:size && npm run check:layers && npm run check:design && npm run check:matrix && npm run check:docs && npm run knip",
     "check:design": "node scripts/check-design.mjs",
     "check:matrix": "node scripts/check-test-matrix.mjs",
-    "check:docs": "node scripts/check-docs.mjs"
+    "check:docs": "node scripts/check-docs.mjs",
+    "check:live": "node scripts/check-live.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

@@ -25,7 +25,7 @@ Le site n'a **aucun cookie, aucune mesure d'audience, aucun formulaire, aucune r
 | `paulperigault.fr`  | domaine **canonique** (canonical, hreflang, sitemap, Open Graph) | Réglages du dépôt → Pages → Custom domain ; « Enforce HTTPS » activé             |
 | `paulperigault.dev` | doit **rediriger** vers le `.fr`                                 | Chez le registrar/DNS (GitHub Pages ne gère qu'un domaine personnalisé par site) |
 
-Redirection attendue pour le `.dev` : **301 permanent**, HTTPS, chemin et paramètres conservés (`https://paulperigault.dev/fr/` → `https://paulperigault.fr/fr/`), y compris pour `www.`. À vérifier :
+Procédure complète et contrôle automatisé : `docs/infra.md` (`npm run check:live`). Redirection attendue pour le `.dev` : **301 permanent**, HTTPS, chemin et paramètres conservés (`https://paulperigault.dev/fr/` → `https://paulperigault.fr/fr/`), y compris pour `www.`. À vérifier :
 
 ```
 curl -sI https://paulperigault.dev/en/ | grep -i -E "^(HTTP|location)"

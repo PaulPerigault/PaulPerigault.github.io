@@ -18,6 +18,7 @@ npm run lint           # eslint .
 npm run format:check   # prettier --check (src, e2e, scripts)
 npm test               # vitest run (unit)
 npm run e2e            # Playwright against dist/ served by scripts/serve-dist.mjs (build first)
+npm run check:live     # contrôle le site EN PRODUCTION (redirections, en-têtes, robots, bots IA) — voir docs/infra.md
 npm run guard          # check:size + check:layers + check:design + check:matrix + knip (architecture guardrails)
 npm run verify         # guard + lint + format:check + check + test + build (also run by the pre-push hook)
 ```
@@ -117,7 +118,7 @@ Everything is code in `.github/workflows/`; the site is **built once** and the *
 | `release.yml` | push `main` | release-please |
 | `dependabot-auto-merge.yml` | Dependabot PRs | auto-merge patch/minor once checks pass |
 
-Required checks on protected branches stay `ci` and `commitlint` (names are stable; `scripts/workflows.test.mjs` asserts them, the single build, pinned actions, permissions, weekly redeploy…). Lighthouse budgets (`.lighthouserc.json`): performance ≥ 0.95, accessibility = 1, best-practices ≥ 0.95, SEO = 1, JS ≤ 10 KB, total weight ≤ 250 KB, LCP ≤ 2 s, TBT ≤ 200 ms, CLS ≤ 0.05. Dependabot (`.github/dependabot.yml`) groups npm updates (astro, effect, tailwind, tooling), github-actions and the Docker base images; npm majors are ignored. A multi-stage `Dockerfile` + `nginx.conf` deploy `dist/` elsewhere (see `docker-compose.yml`). Schedules run from the **default branch** (`develop`), hence `ref: main` in `deploy.yml`.
+Required checks on protected branches stay `ci` and `commitlint` (names are stable; `scripts/workflows.test.mjs` asserts them, the single build, pinned actions, permissions, weekly redeploy…). Lighthouse budgets (`.lighthouserc.json`): performance ≥ 0.95, accessibility = 1, best-practices ≥ 0.95, SEO = 1, JS ≤ 10 KB, total weight ≤ 250 KB, LCP ≤ 2 s, TBT ≤ 200 ms, CLS ≤ 0.05. Dependabot (`.github/dependabot.yml`) groups npm updates (astro, effect, tailwind, tooling), github-actions and the Docker base images; npm majors and the Docker `node` major are ignored (the build stage follows `.nvmrc`). A multi-stage `Dockerfile` + `nginx.conf` deploy `dist/` elsewhere (see `docker-compose.yml`). Schedules run from the **default branch** (`develop`), hence `ref: main` in `deploy.yml`.
 
 ## Security
 
@@ -143,12 +144,12 @@ Priority: search engines **and AI assistants must know Paul Perigault** — neve
 - **`robots.txt` is generated** (`pages/robots.txt.ts` ← `lib/robots.ts`): search engines and a maintained list of AI crawlers (GPTBot, OAI-SearchBot, ChatGPT-User, ClaudeBot, Claude-SearchBot, PerplexityBot, Google-Extended, Applebot-Extended, CCBot, Meta-ExternalAgent, …) are explicitly allowed, **no `Disallow` anywhere**, plus the sitemap, and **only standard directives** (a non-standard `Content-Signal` line makes Lighthouse flag robots.txt as invalid). To welcome another crawler add it to `AI_CRAWLERS`.
 - **`llms.txt`, `llms-full.txt` and `/<lang>/index.md` are generated from the content** (`lib/llms.ts`, `lib/profile-markdown.ts`), never hand-written; `services/site-data.ts` (`getSiteData(lang)`) loads content + GitHub data once per build for pages and these files. Pages advertise `<link rel="alternate" type="text/markdown">`.
 - **Facts live in static HTML** (hero `hero.summary` states name, role, employer, school, specialities in one entity sentence) and the JSON-LD `Person` (`description`, `hasOccupation`, `knowsLanguage`, `email`, `mainEntityOfPage`, `worksFor`, `alumniOf`, `sameAs`, `knowsAbout`) repeats **only** what the page says — `e2e/geo-entity.spec.ts` (JS disabled) enforces it. Keep name/role/employer/school identical everywhere (site, JSON-LD, llms, Markdown, OG).
-- **IndexNow**: key file `public/indexnow-key.txt`; `scripts/indexnow.mjs` submits the sitemap URLs (`--dry-run` in CI, real ping after `deploy-pages`, non-blocking). Search Console / Bing verification via `PUBLIC_GOOGLE_SITE_VERIFICATION` / `PUBLIC_BING_SITE_VERIFICATION`. `/.well-known/security.txt` (Expires recomputed each build) **and a copy at `/security.txt`** (RFC 9116 fallback: `actions/upload-pages-artifact` drops hidden folders, so `.well-known` may not reach GitHub Pages) and `/humans.txt` are generated too. The CI artifact is uploaded with `include-hidden-files: true`.
+- **IndexNow**: key file `public/indexnow-key.txt`; `scripts/indexnow.mjs` submits the sitemap URLs (`--dry-run` in CI, real ping after `deploy-pages`, non-blocking). Search Console / Bing verification via the `PUBLIC_GOOGLE_SITE_VERIFICATION` / `PUBLIC_BING_SITE_VERIFICATION` **repository variables** (`build.yml` passes them to the build; empty = no tag; a DNS `TXT` domain property needs no code). `/.well-known/security.txt` (Expires recomputed each build) **and a copy at `/security.txt`** (RFC 9116 fallback: `actions/upload-pages-artifact` drops hidden folders, so `.well-known` may not reach GitHub Pages) and `/humans.txt` are generated too. The CI artifact is uploaded with `include-hidden-files: true`.
 - Manual, out-of-repo actions (submit sitemap, align LinkedIn/GitHub bios, AI knowledge checks): `docs/geo-checklist.md`.
 
 ## Documentation map
 
-`docs/ui.md` (primitives) · `docs/design-charter.md` (design rules) · `docs/test-matrix.md` (feature → e2e spec) · `docs/geo-checklist.md` (manual AI-visibility actions) · `docs/compliance.md` (GDPR register, domains) · `docs/adr/` (decisions) · `ROADMAP.md` (pending). `scripts/check-docs.mjs` (in `guard`) fails when a documented `npm run` script or repo path no longer exists.
+`docs/ui.md` (primitives) · `docs/design-charter.md` (design rules) · `docs/test-matrix.md` (feature → e2e spec) · `docs/geo-checklist.md` (manual AI-visibility actions) · `docs/compliance.md` (GDPR register, domains) · `docs/infra.md` (DNS, HTTPS, `.dev` → `.fr`, Cloudflare headers, search consoles, `check:live`) · `docs/adr/` (decisions) · `ROADMAP.md` (pending). `scripts/check-docs.mjs` (in `guard`) fails when a documented `npm run` script or repo path no longer exists.
 
 ## Maintenance
 

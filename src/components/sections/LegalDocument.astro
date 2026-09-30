@@ -1,0 +1,40 @@
+---
+import Container from '@/components/ui/Container.astro';
+import Heading from '@/components/ui/Heading.astro';
+import type { Lang } from '@/domain/lang';
+import type { LegalDocument } from '@/domain/legal';
+import { fillPlaceholders } from '@/lib/placeholders';
+import { SITE } from '@/config/site';
+import { useTranslations } from '@/lib/i18n';
+
+interface Props {
+  lang: Lang;
+  document: LegalDocument;
+}
+
+const { lang, document } = Astro.props;
+const t = useTranslations(lang);
+const values = { email: SITE.email, domain: SITE.domain };
+---
+
+<article class="py-section">
+  <Container>
+    <p class="text-accent font-mono text-sm">{t('footer.legal')}</p>
+    <Heading level={1} size="2xl" class="mt-4">
+      {document.title}
+    </Heading>
+    <p class="text-muted mt-3 font-mono text-sm">{document.updated}</p>
+    <div class="mt-12 max-w-prose space-y-12">
+      {document.sections.map((section) => (
+        <section aria-labelledby={`${section.id}-title`}>
+          <Heading level={2} size="xl" id={`${section.id}-title`}>
+            {section.title}
+          </Heading>
+          {section.paragraphs.map((paragraph) => (
+            <p class="mt-4">{fillPlaceholders(paragraph, values)}</p>
+          ))}
+        </section>
+      ))}
+    </div>
+  </Container>
+</article>

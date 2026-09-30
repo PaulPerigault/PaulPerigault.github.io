@@ -1,0 +1,61 @@
+{
+  "title": "Mentions légales et confidentialité",
+  "description": "Éditeur, hébergeur, données personnelles et droits des visiteurs de paulperigault.fr.",
+  "updated": "30 septembre 2026",
+  "sections": [
+    {
+      "id": "editeur",
+      "title": "Éditeur du site",
+      "paragraphs": [
+        "Le site {domain} est édité par Paul Perigault, à titre personnel et professionnel.",
+        "Directeur de la publication : Paul Perigault.",
+        "Contact : {email}."
+      ]
+    },
+    {
+      "id": "hebergement",
+      "title": "Hébergement et domaines",
+      "paragraphs": [
+        "Le site est un site statique hébergé par GitHub Pages : GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.",
+        "Le domaine principal est {domain} ; l'adresse paulperigault.dev redirige vers celui-ci."
+      ]
+    },
+    {
+      "id": "donnees",
+      "title": "Données personnelles",
+      "paragraphs": [
+        "Ce site ne dépose aucun cookie, n'utilise aucun outil de mesure d'audience ni de publicité, ne comporte aucun formulaire et ne charge aucune ressource d'un tiers (polices, scripts, images, vidéos). Il ne collecte donc aucune donnée personnelle de sa propre initiative.",
+        "Comme tout hébergeur web, GitHub peut enregistrer des données techniques de connexion (adresse IP, date et heure, pages demandées) pour assurer la sécurité et le bon fonctionnement du service. Ces traitements relèvent de GitHub, qui les décrit dans sa déclaration de confidentialité, y compris pour les transferts de données hors de l'Union européenne."
+      ]
+    },
+    {
+      "id": "stockage",
+      "title": "Stockage local du navigateur",
+      "paragraphs": [
+        "Deux préférences d'affichage sont mémorisées dans le stockage local de votre navigateur lorsque vous les modifiez : « theme » (clair ou sombre) et « lang » (français ou anglais). Elles restent sur votre appareil, ne sont jamais envoyées à un serveur et servent uniquement à personnaliser l'affichage à votre demande ; elles ne nécessitent donc pas de consentement. Vous pouvez les effacer à tout moment depuis les réglages de votre navigateur."
+      ]
+    },
+    {
+      "id": "liens",
+      "title": "Liens externes",
+      "paragraphs": [
+        "Le site renvoie vers GitHub, LinkedIn et vers un CV au format PDF hébergé sur raw.githubusercontent.com. Ces services appliquent leurs propres règles de confidentialité dès que vous cliquez sur un lien ; ils ne reçoivent aucune donnée de ce site tant que vous ne le faites pas."
+      ]
+    },
+    {
+      "id": "droits",
+      "title": "Vos droits",
+      "paragraphs": [
+        "Si vous écrivez à {email}, votre adresse et votre message sont utilisés uniquement pour vous répondre et conservés le temps nécessaire à cet échange (base légale : intérêt légitime à répondre aux sollicitations).",
+        "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité sur les données vous concernant, que vous pouvez exercer à la même adresse. En cas de désaccord, vous pouvez saisir la CNIL (cnil.fr)."
+      ]
+    },
+    {
+      "id": "propriete",
+      "title": "Propriété intellectuelle",
+      "paragraphs": [
+        "Les textes et visuels de ce site sont la propriété de Paul Perigault, sauf mention contraire. Le code source du site est public sur GitHub."
+      ]
+    }
+  ]
+}

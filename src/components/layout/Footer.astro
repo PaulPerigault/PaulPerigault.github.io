@@ -17,8 +17,16 @@ const year = new Date().getFullYear();
     <p>
       © {year} {SITE.name}
     </p>
-    <a href="#top" class="hover:text-accent underline underline-offset-4">
-      {t('footer.back_to_top')}
-    </a>
+    <nav aria-label={t('footer.legal')} class="flex flex-wrap gap-x-6 gap-y-2">
+      <a
+        href={`/${Astro.props.lang}/legal/`}
+        class="hover:text-accent underline underline-offset-4"
+      >
+        {t('footer.legal')}
+      </a>
+      <a href="#top" class="hover:text-accent underline underline-offset-4">
+        {t('footer.back_to_top')}
+      </a>
+    </nav>
   </Container>
 </footer>

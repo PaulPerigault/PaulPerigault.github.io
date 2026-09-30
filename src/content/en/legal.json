@@ -1,0 +1,61 @@
+{
+  "title": "Legal notice and privacy",
+  "description": "Publisher, host, personal data and visitor rights for paulperigault.fr.",
+  "updated": "30 September 2026",
+  "sections": [
+    {
+      "id": "editeur",
+      "title": "Site publisher",
+      "paragraphs": [
+        "The site {domain} is published by Paul Perigault, in a personal and professional capacity.",
+        "Publication director: Paul Perigault.",
+        "Contact: {email}."
+      ]
+    },
+    {
+      "id": "hebergement",
+      "title": "Hosting and domains",
+      "paragraphs": [
+        "The site is a static site hosted by GitHub Pages: GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, United States.",
+        "The main domain is {domain}; the address paulperigault.dev redirects to it."
+      ]
+    },
+    {
+      "id": "donnees",
+      "title": "Personal data",
+      "paragraphs": [
+        "This site sets no cookies, uses no analytics or advertising tools, has no forms and loads no third-party resources (fonts, scripts, images, videos). It therefore collects no personal data on its own initiative.",
+        "Like any web host, GitHub may record technical connection data (IP address, date and time, requested pages) to keep the service secure and running. This processing is GitHub's responsibility and is described in its privacy statement, including transfers of data outside the European Union."
+      ]
+    },
+    {
+      "id": "stockage",
+      "title": "Browser local storage",
+      "paragraphs": [
+        "Two display preferences are saved in your browser's local storage when you change them: “theme” (light or dark) and “lang” (French or English). They stay on your device, are never sent to a server and only personalise the display at your request; they therefore do not require consent. You can delete them at any time from your browser settings."
+      ]
+    },
+    {
+      "id": "liens",
+      "title": "External links",
+      "paragraphs": [
+        "The site links to GitHub, LinkedIn and to a CV in PDF format hosted on raw.githubusercontent.com. These services apply their own privacy rules as soon as you click a link; they receive no data from this site until you do."
+      ]
+    },
+    {
+      "id": "droits",
+      "title": "Your rights",
+      "paragraphs": [
+        "If you write to {email}, your address and message are used only to reply to you and kept as long as needed for that exchange (legal basis: legitimate interest in answering enquiries).",
+        "Under the GDPR you have the right of access, rectification, erasure, restriction, objection and portability regarding data about you, which you can exercise at the same address. If you disagree, you may lodge a complaint with the CNIL (cnil.fr)."
+      ]
+    },
+    {
+      "id": "propriete",
+      "title": "Intellectual property",
+      "paragraphs": [
+        "The texts and visuals of this site belong to Paul Perigault unless stated otherwise. The site's source code is public on GitHub."
+      ]
+    }
+  ]
+}

@@ -13,6 +13,7 @@ const LABELS = {
   fr: ['À propos', 'Stack', 'Expériences', 'Formation', 'Projets', 'Certifications', 'Contact'],
   en: ['About', 'Stack', 'Experience', 'Education', 'Projects', 'Certifications', 'Contact'],
 } as const;
+const BACK_TO_TOP = { fr: 'Retour en haut', en: 'Back to top' } as const;
 const NAV_NAME = { fr: 'Navigation principale', en: 'Main navigation' } as const;
 
 for (const lang of ['fr', 'en'] as const) {
@@ -46,7 +47,7 @@ for (const lang of ['fr', 'en'] as const) {
     test('le pied de page signe le site et ramène en haut', async ({ page }) => {
       const footer = page.getByRole('contentinfo');
       await expect(footer).toContainText(/©\s*\d{4}\s*Paul Perigault/);
-      await footer.getByRole('link').click();
+      await footer.getByRole('link', { name: BACK_TO_TOP[lang] }).click();
       await expect(page).toHaveURL(/#top$/);
     });
   });

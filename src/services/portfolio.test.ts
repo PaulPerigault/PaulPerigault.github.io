@@ -33,6 +33,12 @@ describe('contenu réel FR/EN', () => {
     expect(en.projectsConfig).toEqual(fr.projectsConfig);
   });
 
+  it('garde les mêmes sections légales (ids, nombre de paragraphes) dans les deux langues', () => {
+    const shape = (doc: typeof fr.legal) => doc.sections.map((s) => [s.id, s.paragraphs.length]);
+    expect(shape(en.legal)).toEqual(shape(fr.legal));
+    expect(en.legal.title).not.toBe(fr.legal.title);
+  });
+
   it('traduit réellement les textes (descriptions différentes)', () => {
     fr.experience.forEach((e, i) => expect(en.experience[i]?.description).not.toBe(e.description));
     fr.formation.forEach((f, i) => expect(en.formation[i]?.description).not.toBe(f.description));
@@ -43,6 +49,7 @@ describe('contenu réel FR/EN', () => {
       ...en.skills.flatMap((c) => [c.category, ...c.items]),
       ...en.experience.flatMap((e) => [e.role, e.location, e.description, ...e.tags]),
       ...en.formation.flatMap((f) => [f.degree, f.speciality, f.description]),
+      ...en.legal.sections.flatMap((s) => [s.title, ...s.paragraphs]),
     ].map((text) => text.replace(PROPER_NOUNS, ''));
     expect(texts.filter((text) => FRENCH_ACCENTS.test(text))).toEqual([]);
   });

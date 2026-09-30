@@ -1,10 +1,5 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": [
-    "scripts/check-*.mjs",
-    "scripts/serve-dist.mjs",
-    "scripts/generate-og-image.mjs",
-    "src/services/runtime.ts"
-  ],
+  "entry": ["scripts/check-*.mjs", "scripts/serve-dist.mjs", "scripts/generate-og-image.mjs"],
   "project": ["src/**/*.{ts,astro}", "e2e/**/*.ts", "scripts/**/*.mjs", "src/**/*.css"]
 }

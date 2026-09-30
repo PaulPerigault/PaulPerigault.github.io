@@ -1,0 +1,24 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { LANGS, type Lang } from '@/domain/lang';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { useTranslations } from '@/lib/i18n';
+import { loadPortfolio } from '@/services/portfolio';
+import { runBuild } from '@/services/runtime';
+
+export const getStaticPaths = (() =>
+  LANGS.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
+
+const lang = Astro.params.lang as Lang;
+const t = useTranslations(lang);
+
+// Valide tout le contenu de la langue au build (erreur typée = build rouge).
+await runBuild(loadPortfolio(lang));
+---
+
+<BaseLayout lang={lang} title={t('seo.title')} description={t('seo.description')}>
+  <main>
+    <h1>Paul Perigault</h1>
+    <p>{t('hero.role')}</p>
+  </main>
+</BaseLayout>

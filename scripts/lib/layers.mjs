@@ -3,7 +3,7 @@
 const LAYERS = {
   'src/domain': ['src/domain'],
   'src/config': ['src/config', 'src/domain'],
-  'src/lib': ['src/lib', 'src/domain', 'src/config'],
+  'src/lib': ['src/lib', 'src/domain', 'src/config', 'src/content'],
   'src/services': ['src/services', 'src/lib', 'src/domain', 'src/config'],
   'src/scripts': ['src/scripts', 'src/lib', 'src/config'],
   'src/components/ui': ['src/components/ui', 'src/lib', 'src/styles'],

@@ -19,8 +19,7 @@
     "role": "Ingénieur DevOps",
     "school": "ESIEA Paris · Alternant chez WeVii",
     "cta_cv": "Télécharger le CV",
-    "cta_contact": "Me contacter",
-    "available": ""
+    "cta_contact": "Me contacter"
   },
   "about": {
     "title": "À propos",
@@ -40,10 +39,7 @@
   "projects": {
     "title": "Projets",
     "view_code": "Code",
-    "view_demo": "Demo",
-    "loading": "Chargement...",
-    "error": "Impossible de charger les projets pour le moment.",
-    "retry": "Réessayer"
+    "view_demo": "Demo"
   },
   "certifications": {
     "title": "Certifications",
@@ -51,10 +47,7 @@
   },
   "contact": {
     "title": "Contact",
-    "subtitle": "Ingénieur DevOps en alternance, disponible pour intervenir en écoles, mentorer des projets étudiants et encadrer des hackathons.",
-    "email": "contact@paulperigault.fr",
-    "linkedin": "paul-perigault",
-    "github": "PaulPerigault"
+    "subtitle": "Ingénieur DevOps en alternance, disponible pour intervenir en écoles, mentorer des projets étudiants et encadrer des hackathons."
   },
   "theme": {
     "light": "Clair",

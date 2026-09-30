@@ -19,8 +19,7 @@
     "role": "DevOps Engineer",
     "school": "ESIEA Paris · Apprentice at WeVii",
     "cta_cv": "Download CV",
-    "cta_contact": "Get in touch",
-    "available": ""
+    "cta_contact": "Get in touch"
   },
   "about": {
     "title": "About",
@@ -40,10 +39,7 @@
   "projects": {
     "title": "Projects",
     "view_code": "Code",
-    "view_demo": "Demo",
-    "loading": "Loading...",
-    "error": "Couldn't load projects right now.",
-    "retry": "Retry"
+    "view_demo": "Demo"
   },
   "certifications": {
     "title": "Certifications",
@@ -51,10 +47,7 @@
   },
   "contact": {
     "title": "Contact",
-    "subtitle": "DevOps engineer — available for school talks, student project mentoring and hackathon supervision.",
-    "email": "contact@paulperigault.fr",
-    "linkedin": "paul-perigault",
-    "github": "PaulPerigault"
+    "subtitle": "DevOps engineer — available for school talks, student project mentoring and hackathon supervision."
   },
   "theme": {
     "light": "Light",

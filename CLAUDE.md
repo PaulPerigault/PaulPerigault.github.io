@@ -38,7 +38,7 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 - `src/content/{fr,en}/` — **all** content, bilingual: `skills|experience|formation|certifications|projects-config.json` (validated by the `domain/` Schemas at build) and `ui.json` (UI strings). FR and EN must keep the same ids/dates/keys/list sizes (enforced by `portfolio.test.ts`, `i18n.test.ts`, and `scripts/build-content-guard.test.mjs`, which runs real builds on broken content). English text must be genuinely translated (no French accents outside proper nouns like « École 42»).
 - `src/lib/i18n.ts` — `useTranslations(lang)` returns `t(key)`; keys are dotted paths derived from `fr/ui.json` so an unknown key does not compile, and EN must have the exact shape of FR (`satisfies`). `services/portfolio.ts` — `loadPortfolio(lang)` loads and validates everything for a language.
 - Adding a UI string: add the key to **both** `ui.json` files. Adding a content item: same `id` in both languages. Never fetch content in the browser.
-- _(planned)_ GEO/AI visibility (#82), CSP (#76). SEO head, JSON-LD and sitemap: see « SEO and AI visibility ».
+- SEO head, JSON-LD, sitemap and GEO: see « SEO and AI visibility »; CSP: see « Security ».
 
 ### Design system (tokens)
 - **Tokens live only in `src/styles/tokens.css`** as `--pp-*` custom properties; light/dark are defined once with `light-dark()` (`color-scheme: light dark` follows the system with no JS; `data-theme="light|dark"` on `<html>` forces a choice). `theme.css` exposes them to Tailwind (`bg-bg`, `text-fg`, `text-muted`, `border-line`, `text-accent`, `font-serif|sans|mono`, `text-display`, `py-section`, `max-w-page|prose`) and **removes Tailwind's default palette, sizes, radii and shadows**: use tokens, never raw hex/px and no `dark:` classes.
@@ -100,7 +100,7 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 
 | Workflow | Trigger | Action |
 |---|---|---|
-| ci.yml | PR (main, develop, feat/**) | commitlint + lint + format + check + test + build |
+| ci.yml | PR (main, develop, feat/**) | commitlint + guard + lint + format + check + test + build + Docker image check (`container` job) |
 | e2e.yml | PR | Playwright e2e on the built site |
 | deploy.yml | push main | build → GitHub Pages (`dist/`) |
 | security.yml | PR + weekly | npm audit + CodeQL + SBOM |
@@ -108,12 +108,14 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 | release.yml | push main | release-please |
 | dependabot-auto-merge.yml | Dependabot PRs | auto-merge patch/minor once checks pass |
 
-`.github/dependabot.yml` opens weekly PRs for `npm` and `github-actions`; npm majors are ignored. A multi-stage `Dockerfile` + `nginx.conf` allow deploying `dist/` elsewhere (see `docker-compose.yml`). Pipeline hardening: SHA-pinned actions, single build artifact, scheduled rebuild _(planned #77)_.
+`.github/dependabot.yml` opens weekly PRs for `npm` and `github-actions`; npm majors are ignored. A multi-stage `Dockerfile` + `nginx.conf` allow deploying `dist/` elsewhere (see `docker-compose.yml`). Actions are SHA-pinned with least-privilege permissions (see Security); a single shared build artifact and a scheduled rebuild are _(planned #77)_.
 
 ## Security
 
-- GitHub Pages cannot set response headers, so `nginx.conf` headers only apply to the Docker deployment; do not infer production header coverage from it. A strict CSP generated at build time _(planned #76)_; the recommended header fix for Pages is a proxy such as Cloudflare Transform Rules (an infra decision for the owner).
-- `npm audit`, CodeQL and SBOM run in `security.yml`.
+- **CSP (Astro `security.csp`, `astro.config.mjs`)**: every page carries a `<meta http-equiv="content-security-policy">` generated at build with SHA-256 hashes for scripts/styles: `default-src 'none'`, `connect-src 'none'`, `base-uri/form-action/object-src 'none'`, `img-src/font-src/manifest-src 'self'`, no `unsafe-inline`/`unsafe-eval`. The only inline scripts (`HEAD_INIT_SCRIPT` in `BaseLayout`, `ROOT_REDIRECT_SCRIPT` in `pages/index.astro`) are allowed by `Astro.csp.insertScriptHash(scriptHash(...))` (`lib/csp.ts`) — **if you change either string, the hash follows automatically; never add `'unsafe-inline'`**. Client scripts stay external files (`assetsInlineLimit: 0`). `e2e/csp.spec.ts` checks the policy, that each inline script's exact hash is present, that an injected script is really blocked (canary) and that full journeys (theme, anchors, language, mobile menu, styleguide, 404, root) produce **zero violations**.
+- **GitHub Pages cannot set response headers**, so header-only protections (`frame-ancestors`, HSTS, COOP/CORP, `X-Frame-Options`…) exist only in the Docker/nginx deployment (`nginx.conf`, unprivileged image, non-root, read-only-friendly). nginx does **not** repeat script/style hashes (they change every build and are in the meta tag; browsers intersect both policies) and uses `expires` rather than `add_header` inside locations, because a location-level `add_header` would drop the server-level security headers. `scripts/check-container.sh` (CI job `container`) builds the image and verifies headers, 404, Markdown MIME, cache headers and non-root user. To get headers on the real site, put a proxy such as Cloudflare Transform Rules in front of GitHub Pages (infra decision for the owner).
+- **Supply chain / CI** (`scripts/workflows.test.mjs` enforces it): every action pinned by commit SHA with a `# vN` comment (Dependabot keeps them fresh), explicit least-privilege `permissions`, `timeout-minutes`, `persist-credentials: false`, `npm ci` only. `npm audit`, CodeQL and SBOM run in `security.yml`.
+- Secrets: `GITHUB_TOKEN` is read through Effect `Config.redacted`; never log it.
 
 ## SEO and AI visibility
 

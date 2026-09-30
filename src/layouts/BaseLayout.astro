@@ -6,6 +6,7 @@ import SeoHead from '@/components/layout/SeoHead.astro';
 import SkipLink from '@/components/ui/SkipLink.astro';
 import type { Lang } from '@/domain/lang';
 import { useTranslations } from '@/lib/i18n';
+import { scriptHash } from '@/lib/csp';
 import { HEAD_INIT_SCRIPT } from '@/lib/head-init';
 
 interface Props {
@@ -19,6 +20,9 @@ interface Props {
 
 const { lang, title, description, noindex = false, jsonLd } = Astro.props;
 const t = useTranslations(lang);
+
+// Le script inline du <head> est autorisé par son empreinte, pas par 'unsafe-inline'.
+Astro.csp?.insertScriptHash(scriptHash(HEAD_INIT_SCRIPT));
 ---
 
 <!doctype html>

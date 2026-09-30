@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.1](https://github.com/PaulPerigault/PaulPerigault.github.io/compare/v1.1.0...v1.1.1) (2026-09-17)
+
+
+### Bug Fixes
+
+* **ci:** ignore github squash-merge subjects in commitlint ([#44](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/44)) ([cd34035](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/cd34035927fa44c883e861537f92db429ba0fbb9))
+* **ci:** use the repo's token secret for release-please ([713fbe3](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/713fbe3783afc014c7f6578a730b519aa569ae01))
+* **ci:** use the repo's token secret for release-please ([1f17e21](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/1f17e21782397f648607f6ee797b6644b8c5f011))
+* **perf-a11y:** resolve issues found in pre-main production validation ([8a78ad1](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/8a78ad15585111852322e903ee25e61db27e13b1))
+* **perf-a11y:** resolve issues found in pre-main production validation ([c6d3610](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/c6d3610ad908137edbcd517c4a8cc178ea576e3d))
+
 ## [1.1.0](https://github.com/PaulPerigault/PaulPerigault.github.io/compare/v1.0.0...v1.1.0) (2026-09-17)
 
 

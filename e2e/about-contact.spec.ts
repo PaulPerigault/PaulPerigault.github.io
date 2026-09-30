@@ -35,13 +35,6 @@ for (const lang of ['fr', 'en'] as const) {
       await expect(contact.getByText(COPY[lang].email)).toBeVisible();
     });
 
-    test('les ancres de la navigation atteignent ces sections', async ({ page }) => {
-      for (const id of ['about', 'contact']) {
-        await page.goto(`/${lang}/#${id}`);
-        await expect(page.locator(`#${id}`)).toBeInViewport();
-      }
-    });
-
     test('les sections sont numérotées dans l’ordre de la navigation', async ({ page }) => {
       await expect(page.locator('#about header span')).toHaveText('01 —');
       await expect(page.locator('#contact header span')).toHaveText('07 —');

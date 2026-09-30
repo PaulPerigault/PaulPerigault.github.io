@@ -48,7 +48,8 @@
   },
   "certifications": {
     "title": "Certifications",
-    "in_progress": "In progress"
+    "in_progress": "In progress",
+    "expires": "Expires"
   },
   "contact": {
     "title": "Contact",

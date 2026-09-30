@@ -1,0 +1,21 @@
+---
+import type { Formation } from '@/domain/formation';
+import type { Lang } from '@/domain/lang';
+import { useTranslations } from '@/lib/i18n';
+import { formationEntries } from '@/lib/timeline';
+import TimelineSection from './TimelineSection.astro';
+
+interface Props {
+  lang: Lang;
+  items: readonly Formation[];
+}
+
+const { lang, items } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<TimelineSection
+  id="formation"
+  title={t('formation.title')}
+  entries={formationEntries(items, lang, t('experience.present'))}
+/>

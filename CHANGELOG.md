@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.1](https://github.com/PaulPerigault/PaulPerigault.github.io/compare/v2.1.0...v2.1.1) (2026-09-30)
+
+
+### Bug Fixes
+
+* **content:** textes à la première personne, majeure esiea et retour en haut ([#123](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/123)) ([7280ac4](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/7280ac4b9a2846878891307aca68b9657028c355))
+* textes à la première personne, majeure esiea et retour en haut ([5e38a10](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/5e38a104078553be705a1e3a3247a39d60ad7b63))
+
 ## [2.1.0](https://github.com/PaulPerigault/PaulPerigault.github.io/compare/v2.0.0...v2.1.0) (2026-09-30)
 
 

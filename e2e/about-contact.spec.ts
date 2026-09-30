@@ -34,10 +34,5 @@ for (const lang of ['fr', 'en'] as const) {
       }
       await expect(contact.getByText(COPY[lang].email)).toBeVisible();
     });
-
-    test('les sections sont numérotées dans l’ordre de la navigation', async ({ page }) => {
-      await expect(page.locator('#about header span')).toHaveText('01 —');
-      await expect(page.locator('#contact header span')).toHaveText('07 —');
-    });
   });
 }

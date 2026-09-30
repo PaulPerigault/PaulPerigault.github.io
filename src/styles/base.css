@@ -21,9 +21,12 @@
   h1,
   h2,
   h3 {
-    font-family: var(--pp-font-serif);
-    line-height: 1.1;
+    line-height: 1.15;
     text-wrap: balance;
+  }
+
+  time {
+    font-variant-numeric: tabular-nums;
   }
 
   p {
@@ -42,5 +45,32 @@
 
   main:focus {
     outline: none;
+  }
+}
+
+/*
+ * Impression : le CV papier est la page elle-même (mêmes contenus, même ordre), sans navigation
+ * ni boutons, en noir sur blanc, avec l'adresse des liens externes.
+ */
+@media print {
+  :root,
+  :root[data-theme='light'],
+  :root[data-theme='dark'] {
+    color-scheme: light;
+  }
+
+  header,
+  footer {
+    display: none !important;
+  }
+
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.85em;
+  }
+
+  li,
+  section > div > * {
+    break-inside: avoid;
   }
 }

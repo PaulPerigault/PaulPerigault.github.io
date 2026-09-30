@@ -6,32 +6,18 @@ interface Props {
   /** Ancre de la section ; le titre reçoit `${id}-title`. */
   id: string;
   title: string;
-  /** Numéro affiché devant le titre (« 03 »). */
-  index?: number;
 }
 
-const INDEX_WIDTH = 2;
-
-const { id, title, index } = Astro.props;
-const label = index === undefined ? undefined : String(index).padStart(INDEX_WIDTH, '0');
+const { id, title } = Astro.props;
 ---
 
-<section
-  id={id}
-  aria-labelledby={`${id}-title`}
-  class="border-line py-section scroll-mt-16 border-t"
->
-  <Container>
-    <header class="mb-12 flex items-baseline gap-4">
-      {label && (
-        <span class="text-accent font-mono text-sm" aria-hidden="true">
-          {label} —
-        </span>
-      )}
-      <Heading level={2} id={`${id}-title`}>
-        {title}
-      </Heading>
-    </header>
-    <slot />
+<section id={id} aria-labelledby={`${id}-title`} class="scroll-mt-16">
+  <Container class="border-line py-section grid gap-6 border-t md:grid-cols-[13rem_1fr] md:gap-12">
+    <Heading level={2} id={`${id}-title`} class="md:sticky md:top-24 md:self-start">
+      {title}
+    </Heading>
+    <div>
+      <slot />
+    </div>
   </Container>
 </section>

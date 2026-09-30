@@ -16,15 +16,15 @@ const t = useTranslations(Astro.props.lang);
 const newTab = t('a11y.new_tab');
 ---
 
-<section aria-labelledby="hero-title" class="py-section">
+<section aria-labelledby="hero-title" class="pt-section pb-section">
   <Container class="grid items-end gap-10 md:grid-cols-[1fr_auto]">
     <div>
-      <p class="text-muted font-mono text-sm">{t('hero.school')}</p>
-      <Heading level={1} id="hero-title" class="mt-4">
+      <Heading level={1} id="hero-title">
         {SITE.name}
       </Heading>
-      <p class="mt-6 max-w-prose font-serif text-xl">{t('hero.role')}</p>
-      <p class="text-muted mt-4 max-w-prose">{t('hero.summary')}</p>
+      <p class="text-accent mt-5 text-2xl font-bold tracking-tight">{t('hero.role')}</p>
+      <p class="text-muted mt-1">{t('hero.school')}</p>
+      <p class="mt-6 max-w-prose">{t('hero.summary')}</p>
       <div class="mt-10 flex flex-wrap gap-3">
         <ButtonLink
           href={SITE.cvPath}
@@ -34,13 +34,11 @@ const newTab = t('a11y.new_tab');
         >
           {t('hero.cta_cv')}
         </ButtonLink>
-        <ButtonLink href={`mailto:${SITE.email}`} icon="mail">
-          {t('hero.cta_contact')}
-        </ButtonLink>
-        <ButtonLink href={SITE.githubUrl} icon="branch" newTabLabel={newTab}>
+        <ButtonLink href={`mailto:${SITE.email}`}>{t('hero.cta_contact')}</ButtonLink>
+        <ButtonLink href={SITE.githubUrl} newTabLabel={newTab}>
           {t('hero.cta_github')}
         </ButtonLink>
-        <ButtonLink href={SITE.linkedinUrl} icon="link" newTabLabel={newTab}>
+        <ButtonLink href={SITE.linkedinUrl} newTabLabel={newTab}>
           {t('hero.cta_linkedin')}
         </ButtonLink>
       </div>

@@ -14,7 +14,7 @@ const { items } = Astro.props;
 <dl class="grid gap-x-8 gap-y-3 sm:grid-cols-[max-content_1fr]">
   {items.map(({ term, description }) => (
     <>
-      <dt class="text-muted font-mono text-sm">{term}</dt>
+      <dt class="text-muted">{term}</dt>
       <dd>{description}</dd>
     </>
   ))}

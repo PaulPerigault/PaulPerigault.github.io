@@ -18,6 +18,7 @@ Chaque fonctionnalité est couverte par au moins un test **e2e Playwright** (FR 
 | CSP stricte, zéro violation                                            | #76   | `csp.spec.ts`                                                                                                       |
 | Pipeline CI/CD GitOps                                                  | #77   | n/a : la CI est son propre test (chaque PR exécute verify, e2e, Lighthouse, conteneur)                              |
 | Charte de design anti-IA                                               | #78   | `design-charter.spec.ts`                                                                                            |
+| Impression : le CV papier est la page                                  | #114  | `print.spec.ts`                                                                                                     |
 | Accessibilité WCAG 2.2 AA (axe) sur toute la matrice                   | #79   | `accessibility.spec.ts`                                                                                             |
 | Documentation                                                          | #80   | n/a : vérifiée par `scripts/check-docs.mjs` (commandes et liens)                                                    |
 | Mentions légales, confidentialité et absence de traceurs (RGPD)        | #102  | `legal.spec.ts`, `privacy.spec.ts`                                                                                  |

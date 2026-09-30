@@ -1,7 +1,6 @@
 [
   {
     "category": "Cloud & DevOps",
-    "icon": "cloud",
     "items": [
       "AWS (EC2, S3, Lambda)",
       "GCP (GKE, Cloud Run)",
@@ -19,7 +18,6 @@
   },
   {
     "category": "Development",
-    "icon": "code",
     "items": [
       "Go / Golang",
       "Python",
@@ -35,7 +33,6 @@
   },
   {
     "category": "Security",
-    "icon": "shield",
     "items": [
       "Nmap",
       "Wireshark",
@@ -49,17 +46,14 @@
   },
   {
     "category": "Monitoring",
-    "icon": "chart",
     "items": ["Prometheus", "Grafana", "ELK Stack", "Alerting"]
   },
   {
     "category": "Databases",
-    "icon": "database",
     "items": ["PostgreSQL", "MySQL", "MongoDB"]
   },
   {
     "category": "Systems",
-    "icon": "terminal",
     "items": [
       "Linux / Unix",
       "LFS (Linux From Scratch)",

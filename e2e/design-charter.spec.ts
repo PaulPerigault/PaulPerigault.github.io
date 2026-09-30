@@ -69,19 +69,31 @@ for (const lang of ['fr', 'en'] as const) {
         expect(foreign).toEqual([]);
       });
 
-      test('applique la typographie : serif pour les titres, mono pour les métadonnées', async ({
+      test('une seule famille typographique, auto-hébergée et réellement chargée', async ({
         page,
       }) => {
-        const families = await page.evaluate(() => ({
-          heading: getComputedStyle(document.querySelector('h1') as Element).fontFamily,
-          section: getComputedStyle(document.querySelector('h2') as Element).fontFamily,
-          meta: getComputedStyle(document.querySelector('.font-mono') as Element).fontFamily,
-          body: getComputedStyle(document.body).fontFamily,
-        }));
-        expect(families.heading).toContain('Iowan Old Style');
-        expect(families.section).toContain('Iowan Old Style');
-        expect(families.meta).toContain('ui-monospace');
-        expect(families.body).toContain('ui-sans-serif');
+        const state = await page.evaluate(async () => {
+          await document.fonts.ready;
+          const faces = [...document.fonts].filter((face) => face.status === 'loaded');
+          const families = ['h1', 'h2', 'h3', 'body'].map(
+            (selector) => getComputedStyle(document.querySelector(selector) as Element).fontFamily,
+          );
+          return { families, loaded: faces.map((face) => face.family) };
+        });
+        for (const family of state.families) {
+          expect(family).toContain('Atkinson Hyperlegible Next Variable');
+        }
+        expect(state.loaded).toContain('Atkinson Hyperlegible Next Variable');
+        expect(
+          await page.locator('main [class*="font-mono"], main [class*="font-serif"]').count(),
+        ).toBe(0);
+      });
+
+      test('pas de numérotation ni d’étiquette décorative devant les titres', async ({ page }) => {
+        for (const title of await page.locator('h2').allTextContents()) {
+          expect(title.trim()).not.toMatch(/^\d+\s*[—–-]/);
+        }
+        await expect(page.locator('[class*="uppercase"][class*="tracking"]')).toHaveCount(0);
       });
 
       test('n’affiche aucun emoji', async ({ page }) => {

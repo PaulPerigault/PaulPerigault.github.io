@@ -1,5 +1,6 @@
 ---
 import '@/styles/global.css';
+import latinFont from '@fontsource-variable/atkinson-hyperlegible-next/files/atkinson-hyperlegible-next-latin-wght-normal.woff2?url';
 import Footer from '@/components/layout/Footer.astro';
 import Navbar from '@/components/layout/Navbar.astro';
 import SeoHead from '@/components/layout/SeoHead.astro';
@@ -31,6 +32,7 @@ Astro.csp?.insertScriptHash(scriptHash(HEAD_INIT_SCRIPT));
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script is:inline set:html={HEAD_INIT_SCRIPT} />
+    <link rel="preload" href={latinFont} as="font" type="font/woff2" crossorigin />
     {noindex ? (
       <>
         <title>{title}</title>

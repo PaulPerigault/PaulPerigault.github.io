@@ -8,8 +8,13 @@ const VIEWPORTS = {
 } as const;
 const PAGES = ['/fr/', '/en/', '/fr/styleguide/', '/en/styleguide/', '/introuvable/'] as const;
 
-/** Rapport lisible : règle, impact, éléments fautifs. */
+/**
+ * Rapport lisible : règle, impact, éléments fautifs. On attend d'abord la fin des transitions de
+ * couleur (basculement de thème) : axe lirait sinon une couleur intermédiaire, ce qui rend le
+ * contraste aléatoire (constaté dans Firefox).
+ */
 const audit = async (page: Page) => {
+  await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
   const { violations } = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
   return violations.map(
     (violation) =>

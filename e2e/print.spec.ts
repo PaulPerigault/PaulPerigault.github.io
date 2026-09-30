@@ -19,6 +19,8 @@ test.describe('impression (le CV papier est la page)', () => {
         getComputedStyle(document.querySelector('main a[href^="http"]') as Element, '::after')
           .content,
     );
-    expect(link).toMatch(/^"\s\(https:\/\//);
+    // Chromium sérialise `" (https://…)"`, Firefox et WebKit la liste de jetons : on vérifie le fond.
+    expect(link).toContain('(');
+    expect(link).toContain('https://');
   });
 });

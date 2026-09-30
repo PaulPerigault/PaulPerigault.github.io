@@ -17,7 +17,7 @@ jobs:
   commitlint:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -26,10 +26,11 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version-file: .nvmrc
+          cache: npm
       - run: npm ci
       - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
-  ci:
+  verify:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -39,6 +40,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
           node-version-file: .nvmrc
+          cache: npm
       - run: npm ci
       - run: npm run guard
       - run: npm run lint
@@ -47,11 +49,32 @@ jobs:
       - run: npm test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: npm run build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Vérifier la charge utile IndexNow (simulation)
-        run: node scripts/indexnow.mjs --dry-run
+
+  build:
+    uses: ./.github/workflows/build.yml
+
+  e2e:
+    needs: build
+    uses: ./.github/workflows/e2e.yml
+
+  lighthouse:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: site
+          path: dist
+      - name: Lighthouse CI (budgets stricts, .lighthouserc.json)
+        uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12
+        with:
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          configPath: .lighthouserc.json
 
   container:
     runs-on: ubuntu-latest
@@ -62,3 +85,15 @@ jobs:
           persist-credentials: false
       - name: Construire l'image et vérifier en-têtes, pages et utilisateur non-root
         run: scripts/check-container.sh
+
+  # Point de contrôle unique (check requis `ci`) : vert seulement si TOUT le reste est vert.
+  ci:
+    if: ${{ always() }}
+    needs: [verify, build, e2e, lighthouse, container]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Échouer si un job requis a échoué ou a été annulé
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: exit 1
+      - run: echo "Tous les jobs sont verts."

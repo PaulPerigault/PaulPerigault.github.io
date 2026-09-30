@@ -25,7 +25,6 @@ test.describe('robots et fichiers pour les IA', () => {
     const robots = await (await request.get('/robots.txt')).text();
     for (const agent of WELCOMED) expect(robots).toContain(`User-agent: ${agent}\n`);
     expect(robots).not.toMatch(/^Disallow:\s*\S/m);
-    expect(robots).toContain('Content-Signal: search=yes, ai-input=yes, ai-train=yes');
     expect(robots).toContain(`Sitemap: ${ORIGIN}/sitemap-index.xml`);
   });
 

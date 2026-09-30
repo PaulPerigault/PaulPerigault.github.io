@@ -32,8 +32,9 @@ describe('buildRobots', () => {
     expect(agents.at(-1)).toBe('*');
   });
 
-  it('déclare les signaux de contenu et le sitemap', () => {
-    expect(robots).toContain('Content-Signal: search=yes, ai-input=yes, ai-train=yes');
+  it('ne contient que des directives standard, puis le sitemap', () => {
+    const directives = [...robots.matchAll(/^([A-Za-z-]+):/gm)].map((match) => match[1]);
+    expect(new Set(directives)).toEqual(new Set(['User-agent', 'Allow', 'Sitemap']));
     expect(robots).toContain('Sitemap: https://paulperigault.fr/sitemap-index.xml');
   });
 

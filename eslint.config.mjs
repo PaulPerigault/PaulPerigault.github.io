@@ -19,6 +19,7 @@ const designRules = {
       ignore: [0, 1, -1],
       ignoreArrayIndexes: true,
       ignoreEnums: true,
+      ignoreNumericLiteralTypes: true,
       ignoreReadonlyClassProperties: true,
     },
   ],

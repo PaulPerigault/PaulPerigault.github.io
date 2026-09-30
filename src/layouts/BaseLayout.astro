@@ -9,9 +9,11 @@ interface Props {
   lang: Lang;
   title: string;
   description: string;
+  /** Pages techniques (styleguide) : exclues des moteurs de recherche. */
+  noindex?: boolean;
 }
 
-const { lang, title, description } = Astro.props;
+const { lang, title, description, noindex = false } = Astro.props;
 const t = useTranslations(lang);
 ---
 
@@ -23,6 +25,7 @@ const t = useTranslations(lang);
     <script is:inline set:html={THEME_INIT_SCRIPT} />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
   </head>
   <body class="bg-bg text-fg font-sans">
     <SkipLink label={t('nav.skip_to_content')} target="content" />

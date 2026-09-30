@@ -1,5 +1,8 @@
 ---
 import type { GetStaticPaths } from 'astro';
+import About from '@/components/sections/About.astro';
+import Contact from '@/components/sections/Contact.astro';
+import Hero from '@/components/sections/Hero.astro';
 import { LANGS, type Lang } from '@/domain/lang';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { useTranslations } from '@/lib/i18n';
@@ -17,6 +20,7 @@ await runBuild(loadPortfolio(lang));
 ---
 
 <BaseLayout lang={lang} title={t('seo.title')} description={t('seo.description')}>
-  <h1 class="font-serif text-display">Paul Perigault</h1>
-  <p class="text-muted">{t('hero.role')}</p>
+  <Hero lang={lang} />
+  <About lang={lang} />
+  <Contact lang={lang} />
 </BaseLayout>

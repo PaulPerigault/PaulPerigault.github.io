@@ -18,6 +18,7 @@ export const fakeGithub = (respond: (attempt: number) => Response, token?: strin
     }),
   );
   const config = BuildConfig.layerTest({
+    githubApiUrl: 'https://api.test',
     githubToken: token === undefined ? Option.none() : Option.some(Redacted.make(token)),
   });
   const layer = GithubClient.Live.pipe(

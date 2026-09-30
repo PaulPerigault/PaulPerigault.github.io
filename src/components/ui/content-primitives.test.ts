@@ -19,6 +19,17 @@ describe('ExternalLink', () => {
   });
 });
 
+describe('ExternalLink (adresses non http)', () => {
+  it("n'annonce pas de nouvel onglet pour un mailto", async () => {
+    const html = await render(ExternalLink, {
+      props: { href: 'mailto:a@b.c', newTabLabel: 'nouvel onglet' },
+      slot: 'a@b.c',
+    });
+    expect(html).not.toContain('target=');
+    expect(html).not.toContain('nouvel onglet');
+  });
+});
+
 describe('ButtonLink', () => {
   it('ne cible pas un nouvel onglet pour un lien interne ou mailto', async () => {
     for (const href of ['/fr/', 'mailto:a@b.c']) {

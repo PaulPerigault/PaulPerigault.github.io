@@ -21,12 +21,15 @@
     "role": "Ingénieur DevOps",
     "school": "ESIEA Paris · Alternant chez WeVii",
     "cta_cv": "Télécharger le CV",
-    "cta_contact": "Me contacter"
+    "cta_contact": "Me contacter",
+    "cta_github": "GitHub",
+    "cta_linkedin": "LinkedIn"
   },
   "about": {
     "title": "À propos",
-    "body": "Étudiant ingénieur DevOps à l'ESIEA Paris, en alternance chez WeVii sur des sujets cloud multicloud et CI/CD. Passionné par la transmission, je cherche à mentorer et accompagner des étudiants sur des projets techniques et hackathons.",
-    "location": "Paris, France"
+    "body": "Étudiant ingénieur DevOps à l'ESIEA Paris, en alternance chez WeVii depuis septembre 2023. J'y construis des pipelines CI/CD, des infrastructures AWS et GCP avec Terraform et Kubernetes, et des déploiements GitOps avec ArgoCD. J'interviens aussi en école, j'encadre des projets étudiants et des hackathons.",
+    "location": "Paris, France",
+    "location_label": "Lieu"
   },
   "skills": {
     "title": "Stack technique"
@@ -49,7 +52,10 @@
   },
   "contact": {
     "title": "Contact",
-    "subtitle": "Ingénieur DevOps en alternance, disponible pour intervenir en écoles, mentorer des projets étudiants et encadrer des hackathons."
+    "subtitle": "Ingénieur DevOps en alternance, disponible pour intervenir en écoles, mentorer des projets étudiants et encadrer des hackathons.",
+    "email_label": "E-mail",
+    "linkedin_label": "LinkedIn",
+    "github_label": "GitHub"
   },
   "theme": {
     "light": "Clair",

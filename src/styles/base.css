@@ -1,0 +1,46 @@
+@layer base {
+  html {
+    background-color: var(--pp-bg);
+    color: var(--pp-fg);
+    font-family: var(--pp-font-sans);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    min-height: 100vh;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--pp-font-serif);
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--pp-accent);
+    color: var(--pp-on-accent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--pp-accent);
+    outline-offset: 3px;
+  }
+
+  main:focus {
+    outline: none;
+  }
+}

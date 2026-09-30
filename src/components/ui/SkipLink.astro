@@ -1,0 +1,17 @@
+---
+interface Props {
+  /** Libellé traduit du lien. */
+  label: string;
+  /** Identifiant de la cible (sans #). */
+  target: string;
+}
+
+const { label, target } = Astro.props;
+---
+
+<a
+  href={`#${target}`}
+  class="bg-fg text-bg focus:outline-accent absolute top-2 left-2 z-50 -translate-y-16 px-4 py-2 text-sm font-medium focus:translate-y-0"
+>
+  {label}
+</a>

@@ -1,6 +1,11 @@
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
+import { lastCommitDate } from './scripts/lib/git-date.mjs';
+
+// `lastmod` = dernier changement réel du site (pas la date du build : le redéploiement hebdomadaire
+// la ferait changer sans contenu nouveau, et les moteurs finissent par ignorer un lastmod peu fiable).
+const CONTENT_PATHS = ['src', 'public', ':(exclude,glob)src/**/*.test.ts'];
 
 export default defineConfig({
   site: 'https://paulperigault.fr',
@@ -17,7 +22,7 @@ export default defineConfig({
       i18n: { defaultLocale: 'fr', locales: { fr: 'fr', en: 'en' } },
       // Ni la racine (redirection) ni les pages techniques ne sont listées.
       filter: (page) => new URL(page).pathname !== '/' && !page.includes('/styleguide/'),
-      lastmod: new Date(),
+      lastmod: lastCommitDate(CONTENT_PATHS),
     }),
   ],
   security: {

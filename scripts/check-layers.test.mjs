@@ -24,6 +24,10 @@ describe('couches', () => {
     expect(isAllowed('src/components/ui/Card.astro', 'src/services/github.ts')).toBe(false);
   });
 
+  it('laisse les tests importer leurs aides', () => {
+    expect(isAllowed('src/services/a.test.ts', 'src/test/fixtures.ts')).toBe(true);
+  });
+
   it('ignore les imports externes', () => {
     expect(isAllowed('src/domain/skill.ts', 'effect')).toBe(true);
   });

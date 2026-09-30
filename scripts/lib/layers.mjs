@@ -39,6 +39,6 @@ function layerOf(path) {
 
 export function isAllowed(fromPath, toPath) {
   const layer = layerOf(fromPath);
-  if (!layer || !toPath.startsWith('src/')) return true;
+  if (fromPath.includes('.test.') || !layer || !toPath.startsWith('src/')) return true;
   return LAYERS[layer].some((allowed) => isInside(toPath, allowed));
 }

@@ -1,6 +1,9 @@
 ---
 import '@/styles/global.css';
+import SkipLink from '@/components/ui/SkipLink.astro';
 import type { Lang } from '@/domain/lang';
+import { useTranslations } from '@/lib/i18n';
+import { THEME_INIT_SCRIPT } from '@/lib/theme-init';
 
 interface Props {
   lang: Lang;
@@ -9,6 +12,7 @@ interface Props {
 }
 
 const { lang, title, description } = Astro.props;
+const t = useTranslations(lang);
 ---
 
 <!doctype html>
@@ -16,10 +20,14 @@ const { lang, title, description } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline set:html={THEME_INIT_SCRIPT} />
     <title>{title}</title>
     <meta name="description" content={description} />
   </head>
-  <body>
-    <slot />
+  <body class="bg-bg text-fg font-sans">
+    <SkipLink label={t('nav.skip_to_content')} target="content" />
+    <main id="content" tabindex="-1">
+      <slot />
+    </main>
   </body>
 </html>

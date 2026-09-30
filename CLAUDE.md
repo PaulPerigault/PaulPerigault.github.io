@@ -38,7 +38,12 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 - `src/content/{fr,en}/` — **all** content, bilingual: `skills|experience|formation|certifications|projects-config.json` (validated by the `domain/` Schemas at build) and `ui.json` (UI strings). FR and EN must keep the same ids/dates/keys/list sizes (enforced by `portfolio.test.ts`, `i18n.test.ts`, and `scripts/build-content-guard.test.mjs`, which runs real builds on broken content). English text must be genuinely translated (no French accents outside proper nouns like « École 42»).
 - `src/lib/i18n.ts` — `useTranslations(lang)` returns `t(key)`; keys are dotted paths derived from `fr/ui.json` so an unknown key does not compile, and EN must have the exact shape of FR (`satisfies`). `services/portfolio.ts` — `loadPortfolio(lang)` loads and validates everything for a language.
 - Adding a UI string: add the key to **both** `ui.json` files. Adding a content item: same `id` in both languages. Never fetch content in the browser.
-- _(planned)_ design tokens (#69), UI primitives (#70), SEO/JSON-LD (#75), GEO/AI visibility (#82), CSP (#76).
+- _(planned)_ UI primitives (#70), SEO/JSON-LD (#75), GEO/AI visibility (#82), CSP (#76).
+
+### Design system (tokens)
+- **Tokens live only in `src/styles/tokens.css`** as `--pp-*` custom properties; light/dark are defined once with `light-dark()` (`color-scheme: light dark` follows the system with no JS; `data-theme="light|dark"` on `<html>` forces a choice). `theme.css` exposes them to Tailwind (`bg-bg`, `text-fg`, `text-muted`, `border-line`, `text-accent`, `font-serif|sans|mono`, `text-display`, `py-section`, `max-w-page|prose`) and **removes Tailwind's default palette, sizes, radii and shadows**: use tokens, never raw hex/px and no `dark:` classes.
+- `base.css` sets element defaults (focus ring, `prefers-reduced-motion`, selection). Add a token (both modes) before using a new colour; `src/lib/contrast.test.ts` fails if any pair drops below WCAG AA (4.5:1 text, 3:1 controls). The UI accent (`#0e7069` light) is slightly darker than the logo teal (`#0f766e`) to reach AA on the surface colour.
+- Theme flash prevention: `THEME_INIT_SCRIPT` (`src/lib/theme-init.ts`) is inlined in `<head>` before the stylesheet, reads `localStorage.theme` and sets `data-theme`; invalid values are ignored. `BaseLayout.astro` provides the skip link (`SkipLink.astro`) and `<main id="content" tabindex="-1">`.
 
 ### Effect rules
 - Build time only: no Effect code may reach the browser (`e2e/bundle-budget.spec.ts` enforces < 5 KB gzip JS and no Effect signature).

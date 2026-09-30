@@ -28,6 +28,7 @@ jobs:
         with:
           node-version-file: .nvmrc
       - run: npm ci
+      - run: npm run guard
       - run: npm run lint
       - run: npm run format:check
       - run: npm run check

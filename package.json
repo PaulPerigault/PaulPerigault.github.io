@@ -20,8 +20,12 @@
     "test": "vitest run --passWithNoTests",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
-    "verify": "npm run lint && npm run format:check && npm run check && npm test && npm run build",
-    "prepare": "husky"
+    "verify": "npm run guard && npm run lint && npm run format:check && npm run check && npm test && npm run build",
+    "prepare": "husky",
+    "check:size": "node scripts/check-file-size.mjs",
+    "check:layers": "node scripts/check-layers.mjs",
+    "knip": "knip",
+    "guard": "npm run check:size && npm run check:layers && npm run knip"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
@@ -39,6 +43,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-astro": "^3.2.1",
     "husky": "^9.1.7",
+    "knip": "^6.38.0",
     "lint-staged": "^16.4.0",
     "prettier": "^3.9.9",
     "prettier-plugin-astro": "^1.1.0",

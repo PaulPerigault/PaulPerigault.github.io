@@ -72,8 +72,12 @@ test.describe('robots et fichiers pour les IA', () => {
     const key = readFileSync('public/indexnow-key.txt', 'utf8');
     expect(await (await request.get('/indexnow-key.txt')).text()).toBe(key);
 
-    const security = await (await request.get('/.well-known/security.txt')).text();
-    expect(security).toContain('Contact: mailto:contact@paulperigault.fr');
+    // `.well-known` (norme) + copie à la racine : upload-pages-artifact exclut les dossiers cachés.
+    for (const path of ['/.well-known/security.txt', '/security.txt']) {
+      const security = await (await request.get(path)).text();
+      expect(security, path).toContain('Contact: mailto:contact@paulperigault.fr');
+    }
+    const security = await (await request.get('/security.txt')).text();
     const expires = /^Expires: (.+)$/m.exec(security)?.[1] ?? '';
     expect(new Date(expires).getTime()).toBeGreaterThan(Date.now());
   });

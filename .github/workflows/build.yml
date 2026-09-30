@@ -36,3 +36,5 @@ jobs:
           path: dist
           retention-days: 7
           if-no-files-found: error
+          # `dist/.well-known/security.txt` : les fichiers cachés sont exclus par défaut.
+          include-hidden-files: true

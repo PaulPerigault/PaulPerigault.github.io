@@ -53,3 +53,8 @@ node_modules/
 
 # Lighthouse CI
 /.lighthouseci/
+
+# Astro / tests
+/.astro
+/playwright-report
+/test-results

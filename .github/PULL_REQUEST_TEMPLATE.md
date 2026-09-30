@@ -18,6 +18,8 @@ Closes #
 ## Checklist
 
 - [ ] Les tests unitaires passent (`npm test`)
+- [ ] Au moins un test e2e couvre la fonctionnalité (`npm run e2e`)
+- [ ] `npm run verify` est vert
 - [ ] Le lint passe (`npm run lint`)
 - [ ] Le build passe (`npm run build`)
 - [ ] La documentation (CLAUDE.md, README) est à jour si nécessaire

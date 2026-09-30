@@ -1,0 +1,41 @@
+---
+import Section from '@/components/ui/Section.astro';
+import Tag from '@/components/ui/Tag.astro';
+import Timeline from '@/components/ui/Timeline.astro';
+import TimelineItem from '@/components/ui/TimelineItem.astro';
+import type { NavSectionId } from '@/config/navigation';
+import { navIndex } from '@/config/navigation';
+import type { TimelineEntryData } from '@/lib/timeline';
+
+interface Props {
+  id: NavSectionId;
+  title: string;
+  entries: readonly TimelineEntryData[];
+}
+
+const { id, title, entries } = Astro.props;
+---
+
+<Section id={id} index={navIndex(id)} title={title}>
+  <Timeline>
+    {entries.map((entry) => (
+      <TimelineItem
+        title={entry.title}
+        subtitle={entry.subtitle}
+        period={entry.period}
+        dateTime={entry.dateTime}
+      >
+        <p>{entry.description}</p>
+        {entry.tags.length > 0 && (
+          <ul class="mt-4 flex flex-wrap gap-2">
+            {entry.tags.map((tag) => (
+              <li>
+                <Tag>{tag}</Tag>
+              </li>
+            ))}
+          </ul>
+        )}
+      </TimelineItem>
+    ))}
+  </Timeline>
+</Section>

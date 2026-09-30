@@ -9,5 +9,7 @@ export const NAV_SECTIONS = [
   'contact',
 ] as const;
 
+export type NavSectionId = (typeof NAV_SECTIONS)[number];
+
 /** Numéro (à partir de 1) d'une section dans l'ordre de la page. */
-export const navIndex = (id: (typeof NAV_SECTIONS)[number]): number => NAV_SECTIONS.indexOf(id) + 1;
+export const navIndex = (id: NavSectionId): number => NAV_SECTIONS.indexOf(id) + 1;

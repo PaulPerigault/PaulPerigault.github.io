@@ -1,5 +1,8 @@
 ---
+import { scriptHash } from '@/lib/csp';
 import { ROOT_REDIRECT_SCRIPT } from '@/lib/root-redirect';
+
+Astro.csp?.insertScriptHash(scriptHash(ROOT_REDIRECT_SCRIPT));
 ---
 
 <!doctype html>

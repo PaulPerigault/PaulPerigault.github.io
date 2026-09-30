@@ -11,6 +11,8 @@ interface Props {
   variant?: Variant;
   icon?: IconName;
   newTabLabel?: string;
+  /** Nom du fichier proposé au téléchargement (lien vers un fichier du même site). */
+  download?: string;
   class?: string;
 }
 
@@ -19,11 +21,12 @@ const VARIANT_CLASS: Record<Variant, string> = {
   secondary: 'border-control text-fg hover:border-accent hover:text-accent',
 };
 
-const { href, variant = 'secondary', icon, newTabLabel, class: className } = Astro.props;
+const { href, variant = 'secondary', icon, newTabLabel, download, class: className } = Astro.props;
 ---
 
 <a
   href={href}
+  download={download}
   {...linkAttributes(href)}
   class:list={[
     'inline-flex items-center gap-2 rounded-sm border px-5 py-2.5 text-sm font-medium transition-colors duration-(--pp-duration)',

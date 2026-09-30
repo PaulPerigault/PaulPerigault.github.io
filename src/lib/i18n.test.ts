@@ -16,8 +16,8 @@ describe('i18n', () => {
   });
 
   it('traduit selon la langue', () => {
-    expect(useTranslations('fr')('hero.role')).toBe('Ingénieur DevOps');
-    expect(useTranslations('en')('hero.role')).toBe('DevOps Engineer');
+    expect(useTranslations('fr')('hero.role')).toBe('Alternant DevOps Cloud');
+    expect(useTranslations('en')('hero.role')).toBe('Cloud DevOps Apprentice');
   });
 
   it('refuse une clé inconnue à la compilation', () => {

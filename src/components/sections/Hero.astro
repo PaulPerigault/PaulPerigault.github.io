@@ -26,7 +26,12 @@ const newTab = t('a11y.new_tab');
       <p class="mt-6 max-w-prose font-serif text-xl">{t('hero.role')}</p>
       <p class="text-muted mt-4 max-w-prose">{t('hero.summary')}</p>
       <div class="mt-10 flex flex-wrap gap-3">
-        <ButtonLink href={SITE.cvUrl} variant="primary" icon="download" newTabLabel={newTab}>
+        <ButtonLink
+          href={SITE.cvPath}
+          variant="primary"
+          icon="download"
+          download="cv-paul-perigault.pdf"
+        >
           {t('hero.cta_cv')}
         </ButtonLink>
         <ButtonLink href={`mailto:${SITE.email}`} icon="mail">

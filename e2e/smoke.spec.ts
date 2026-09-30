@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 const PAGES = [
-  { path: '/fr/', lang: 'fr', title: /Ingénieur DevOps/ },
-  { path: '/en/', lang: 'en', title: /DevOps Engineer/ },
+  { path: '/fr/', lang: 'fr', title: /Alternant DevOps Cloud/ },
+  { path: '/en/', lang: 'en', title: /Cloud DevOps Apprentice/ },
 ] as const;
 
 for (const { path, lang, title } of PAGES) {

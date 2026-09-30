@@ -38,8 +38,8 @@ beforeAll(async () => {
 
 describe('profileMarkdown', () => {
   it("énonce l'entité en tête : nom, métier, employeur, école", () => {
-    expect(fr.split('\n')[0]).toBe('# Paul Perigault — Ingénieur DevOps');
-    expect(fr).toContain('> Paul Perigault est ingénieur DevOps en alternance chez WeVii');
+    expect(fr.split('\n')[0]).toBe('# Paul Perigault — Alternant DevOps Cloud');
+    expect(fr).toContain('> Paul Perigault est alternant DevOps Cloud chez WeVii');
     expect(fr).toContain('ESIEA Paris');
   });
 
@@ -85,7 +85,7 @@ describe('llms', () => {
 
   it('llms-full contient les deux profils', async () => {
     const both = llmsFull([content, await profile('en', [])]);
-    expect(both).toContain('# Paul Perigault — Ingénieur DevOps');
-    expect(both).toContain('# Paul Perigault — DevOps Engineer');
+    expect(both).toContain('# Paul Perigault — Alternant DevOps Cloud');
+    expect(both).toContain('# Paul Perigault — Cloud DevOps Apprentice');
   });
 });

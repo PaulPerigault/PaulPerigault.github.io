@@ -30,6 +30,13 @@ test.describe('fichiers destinés aux robots', () => {
     }
   });
 
+  test('le CV est servi par le site lui-même, en vrai PDF', async ({ request }) => {
+    const cv = await request.get('/cv-paul-perigault.pdf');
+    expect(cv.status()).toBe(200);
+    expect(cv.headers()['content-type']).toContain('application/pdf');
+    expect((await cv.body()).subarray(0, 5).toString('latin1')).toBe('%PDF-');
+  });
+
   test('robots.txt pointe vers le sitemap généré', async ({ request }) => {
     const robots = await (await request.get('/robots.txt')).text();
     expect(robots).toContain('Sitemap: https://paulperigault.fr/sitemap-index.xml');

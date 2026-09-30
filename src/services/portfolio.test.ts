@@ -22,10 +22,8 @@ describe('contenu réel FR/EN', () => {
     expect(en.skills.length).toBe(fr.skills.length);
   });
 
-  it('garde la même structure (ids, dates, icônes, tailles de listes)', () => {
-    expect(en.skills.map((c) => [c.icon, c.items.length])).toEqual(
-      fr.skills.map((c) => [c.icon, c.items.length]),
-    );
+  it('garde la même structure (ids, dates, tailles de listes)', () => {
+    expect(en.skills.map((c) => c.items.length)).toEqual(fr.skills.map((c) => c.items.length));
     const key = (e: { id: string; dateStart: string }) => [e.id, e.dateStart];
     expect(en.experience.map(key)).toEqual(fr.experience.map(key));
     expect(en.formation.map(key)).toEqual(fr.formation.map(key));

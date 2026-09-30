@@ -41,7 +41,7 @@ describe('ButtonLink', () => {
 
   it('distingue les variantes et affiche une icône décorative', async () => {
     const primary = await render(ButtonLink, {
-      props: { href: '/', variant: 'primary', icon: 'mail' },
+      props: { href: '/', variant: 'primary', icon: 'download' },
       slot: 'Go',
     });
     expect(primary).toContain('bg-accent');

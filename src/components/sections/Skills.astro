@@ -1,7 +1,5 @@
 ---
-import Icon from '@/components/ui/Icon.astro';
 import Section from '@/components/ui/Section.astro';
-import { navIndex } from '@/config/navigation';
 import type { Lang } from '@/domain/lang';
 import type { SkillCategory } from '@/domain/skill';
 import { useTranslations } from '@/lib/i18n';
@@ -11,19 +9,19 @@ interface Props {
   categories: readonly SkillCategory[];
 }
 
+// Espace insécable avant le séparateur : une ligne ne commence jamais par « · ».
+const SEPARATOR = ' · ';
+
 const { lang, categories } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<Section id="skills" index={navIndex('skills')} title={t('skills.title')}>
-  <dl>
-    {categories.map(({ category, icon, items }) => (
-      <div class="border-line grid gap-3 border-t py-5 sm:grid-cols-[14rem_1fr]">
-        <dt class="text-accent flex items-center gap-3 font-mono text-sm">
-          <Icon name={icon} />
-          {category}
-        </dt>
-        <dd>{items.join(' · ')}</dd>
+<Section id="skills" title={t('skills.title')}>
+  <dl class="divide-line divide-y">
+    {categories.map(({ category, items }) => (
+      <div class="grid gap-1 py-4 first:pt-0 last:pb-0 sm:grid-cols-[11rem_1fr] sm:gap-6">
+        <dt class="font-semibold">{category}</dt>
+        <dd>{items.join(SEPARATOR)}</dd>
       </div>
     ))}
   </dl>

@@ -73,6 +73,19 @@ export const RULES = [
     only: CODE,
   },
   {
+    name: 'famille-typographique',
+    message: 'Une seule famille typographique (font-sans) : pas de mono ni de serif décoratifs.',
+    pattern: /\bfont-(?:mono|serif)\b/,
+    only: CODE,
+  },
+  {
+    name: 'etiquette-majuscules',
+    message:
+      'Pas d’étiquette en majuscules espacées (uppercase + tracking) : un titre est un titre.',
+    pattern: /uppercase[^"'`\n]*\btracking-|\btracking-[^"'`\n]*uppercase/,
+    only: ['.astro', '.ts'],
+  },
+  {
     name: 'emoji',
     message: 'Pas d’emoji : icônes SVG décoratives (lib/icons.ts).',
     pattern: /\p{Emoji_Presentation}/u,

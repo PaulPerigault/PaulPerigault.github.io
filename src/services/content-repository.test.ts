@@ -3,7 +3,7 @@ import { Effect, Either } from 'effect';
 import { contentRepositoryWith } from '@/test/content-fixtures';
 import { ContentRepository } from './content-repository';
 
-const skills = JSON.stringify([{ category: 'Cloud', icon: 'cloud', items: ['Docker'] }]);
+const skills = JSON.stringify([{ category: 'Cloud', items: ['Docker'] }]);
 const badExperience = JSON.stringify([
   {
     id: 'a',
@@ -22,7 +22,7 @@ describe('ContentRepository', () => {
     Effect.gen(function* () {
       const repo = yield* ContentRepository;
       const result = yield* repo.skills('fr');
-      expect(result).toEqual([{ category: 'Cloud', icon: 'cloud', items: ['Docker'] }]);
+      expect(result).toEqual([{ category: 'Cloud', items: ['Docker'] }]);
     }).pipe(Effect.provide(contentRepositoryWith({ 'content/fr/skills.json': skills }))),
   );
 

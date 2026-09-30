@@ -30,17 +30,18 @@ describe('Heading', () => {
 });
 
 describe('Section', () => {
-  it('relie la section à son titre et numérote sur deux chiffres', async () => {
-    const html = await render(Section, { props: { id: 'skills', title: 'Stack', index: 3 } });
+  it('relie la section à son titre et le place dans la colonne de gauche', async () => {
+    const html = await render(Section, { props: { id: 'skills', title: 'Stack' }, slot: 'Corps' });
     expect(html).toContain('id="skills"');
     expect(html).toContain('aria-labelledby="skills-title"');
-    expect(html).toContain('id="skills-title"');
-    expect(html).toContain('03 —');
+    expect(html).toMatch(/<h2[^>]*id="skills-title"[^>]*>\s*Stack\s*<\/h2>/);
+    expect(html).toContain('md:grid-cols-[13rem_1fr]');
+    expect(html).toContain('Corps');
   });
 
-  it("n'affiche pas de numéro sans index", async () => {
+  it("n'affiche aucune numérotation décorative", async () => {
     const html = await render(Section, { props: { id: 'a', title: 'A' } });
-    expect(html).not.toContain('—');
+    expect(html).not.toMatch(/\d\d —/);
   });
 });
 

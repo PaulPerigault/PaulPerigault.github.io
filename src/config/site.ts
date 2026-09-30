@@ -5,7 +5,6 @@ const CV_PATH = '/cv-paul-perigault.pdf';
 
 export const SITE = {
   name: 'Paul Perigault',
-  brand: 'paul@perigault',
   domain: DOMAIN,
   email: 'contact@paulperigault.fr',
   githubUser: GITHUB_USER,

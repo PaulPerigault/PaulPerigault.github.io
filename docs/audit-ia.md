@@ -10,6 +10,13 @@
 4. **SEO : la base technique est complète, le reste ne se règle pas dans le code.** Trois vrais défauts corrigeables (titre trop générique, `lastmod` du sitemap faux, CV hébergé de façon non indexable) ; le reste est éditorial et externe (contenu, liens entrants, profils).
 5. **« Tout parfait » n'existe pas** ; ce qui existe : des défauts connus, classés, avec leur propriétaire. C'est le plan plus bas.
 
+## Suivi
+
+Ce rapport décrit le site **avant** les correctifs. État au 2026-09-30, après les décisions du propriétaire (design « CV d'abord », intitulé « Alternant DevOps Cloud », CV hébergé sur le site) :
+
+- fait : intitulé, titre et description, textes sans répétition, CV sur le site (#113) ; `lastmod` du sitemap fondé sur le contenu (#111) ; identité visuelle refaite (#114, ADR-0006) ; runbook et contrôle de production (#109) ;
+- reste à toi : `docs/infra.md` (DNS, `.dev`, Cloudflare, consoles), les faits manquants (chiffres, études de cas, école d'intervention), le tri des compétences, l'alignement du CV source (`cv-latex`, qui dit encore « Ingénieur DevOps »), la relecture d'un locuteur natif pour l'anglais.
+
 ## Partie A : les défauts typiques d'un site généré par IA
 
 Pour chaque famille : le symptôme, comment le repérer, et l'état de ce site (✔ sain, ⚠ à améliorer, ✘ défaut).

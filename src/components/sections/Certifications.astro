@@ -1,7 +1,5 @@
 ---
 import Section from '@/components/ui/Section.astro';
-import Tag from '@/components/ui/Tag.astro';
-import { navIndex } from '@/config/navigation';
 import type { Certification } from '@/domain/certification';
 import type { Lang } from '@/domain/lang';
 import { certificationsNewestFirst } from '@/lib/chronology';
@@ -17,30 +15,32 @@ const { lang, items } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<Section id="certifications" index={navIndex('certifications')} title={t('certifications.title')}>
-  <ul>
+<Section id="certifications" title={t('certifications.title')}>
+  <ul class="divide-line divide-y">
     {certificationsNewestFirst(items).map((cert) => (
-      <li class="border-line flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-t py-5">
+      <li class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-4 first:pt-0 last:pb-0">
         <div>
-          <p class="font-serif text-xl">{cert.name}</p>
-          <p class="text-muted font-mono text-sm">{cert.issuer}</p>
+          <p class="font-semibold">{cert.name}</p>
+          <p class="text-muted">{cert.issuer}</p>
         </div>
-        {cert.inProgress ? (
-          <Tag>{t('certifications.in_progress')}</Tag>
-        ) : (
-          <p class="text-muted font-mono text-sm">
-            {cert.dateIssued && (
-              <time datetime={cert.dateIssued}>{formatYearMonth(cert.dateIssued, lang)}</time>
-            )}
-            {cert.dateExpires && (
-              <span>
-                {' · '}
-                {t('certifications.expires')}{' '}
-                <time datetime={cert.dateExpires}>{formatYearMonth(cert.dateExpires, lang)}</time>
-              </span>
-            )}
-          </p>
-        )}
+        <p class="text-muted text-sm">
+          {cert.inProgress ? (
+            t('certifications.in_progress')
+          ) : (
+            <>
+              {cert.dateIssued && (
+                <time datetime={cert.dateIssued}>{formatYearMonth(cert.dateIssued, lang)}</time>
+              )}
+              {cert.dateExpires && (
+                <span>
+                  {' · '}
+                  {t('certifications.expires')}{' '}
+                  <time datetime={cert.dateExpires}>{formatYearMonth(cert.dateExpires, lang)}</time>
+                </span>
+              )}
+            </>
+          )}
+        </p>
       </li>
     ))}
   </ul>

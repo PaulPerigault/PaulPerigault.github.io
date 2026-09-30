@@ -14,6 +14,13 @@ describe('check-design : ce qui doit échouer', () => {
     ['couleur-en-dur', 'src/styles/a.css', 'color: rgb(1, 2, 3);'],
     ['palette-tailwind', 'src/components/Btn.astro', '<a class="bg-teal-500 text-white">'],
     ['valeur-arbitraire', 'src/components/Box.astro', '<div class="w-[13px] mt-[#fff]">'],
+    ['famille-typographique', 'src/components/Meta.astro', '<p class="font-mono text-xs">'],
+    ['famille-typographique', 'src/components/Title.astro', '<h1 class="font-serif">'],
+    [
+      'etiquette-majuscules',
+      'src/components/Kicker.astro',
+      '<p class="text-xs uppercase tracking-widest">',
+    ],
     ['emoji', 'src/components/Nav.astro', '<span>🚀 Projets</span>'],
     ['emoji', 'src/content/fr/ui.json', '{"title": "Bienvenue ✨"}'],
     ['phrase-generique', 'src/content/fr/ui.json', '{"body": "Passionné par la technologie"}'],
@@ -40,6 +47,7 @@ describe('check-design : ce qui doit passer', () => {
     ['src/components/Grid.astro', '<dl class="sm:grid-cols-[14rem_1fr]">'],
     ['src/content/fr/ui.json', '{"copyright": "© 2026 — Paul Perigault"}'],
     ['src/components/A.astro', '<a class="ring-accent">'],
+    ['src/components/B.astro', '<a class="px-2 text-sm font-semibold uppercase">'],
   ])('accepte %s', (file, text) => {
     expect(checkFile(file, text)).toEqual([]);
   });

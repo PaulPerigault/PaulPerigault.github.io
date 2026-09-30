@@ -1,7 +1,6 @@
 ---
 import DescriptionList from '@/components/ui/DescriptionList.astro';
 import Section from '@/components/ui/Section.astro';
-import { navIndex } from '@/config/navigation';
 import type { Lang } from '@/domain/lang';
 import { useTranslations } from '@/lib/i18n';
 
@@ -12,7 +11,7 @@ interface Props {
 const t = useTranslations(Astro.props.lang);
 ---
 
-<Section id="about" index={navIndex('about')} title={t('about.title')}>
+<Section id="about" title={t('about.title')}>
   <p class="max-w-prose text-lg">{t('about.body')}</p>
   <div class="mt-8">
     <DescriptionList

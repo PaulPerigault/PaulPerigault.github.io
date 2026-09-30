@@ -13,15 +13,14 @@ interface Props {
 const { title, subtitle, period, dateTime } = Astro.props;
 ---
 
-<li class="relative pb-10 pl-8 last:pb-0">
-  <span class="bg-accent absolute top-2 left-0 size-2 -translate-x-1/2" aria-hidden="true"></span>
-  <p class="text-muted font-mono text-xs">
-    <time datetime={dateTime}>{period}</time>
-  </p>
-  <Heading level={3} size="xl" class="mt-1">
-    {title}
-  </Heading>
-  {subtitle && <p class="text-muted mt-1 text-sm">{subtitle}</p>}
+<li class="py-6 first:pt-0 last:pb-0">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+    <Heading level={3}>{title}</Heading>
+    <p class="text-muted text-sm">
+      <time datetime={dateTime}>{period}</time>
+    </p>
+  </div>
+  {subtitle && <p class="text-muted mt-1">{subtitle}</p>}
   <div class="mt-3 max-w-prose">
     <slot />
   </div>

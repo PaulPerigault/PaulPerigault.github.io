@@ -13,7 +13,9 @@
     "contact": "Contact",
     "skip_to_content": "Skip to main content",
     "menu_open": "Open menu",
-    "menu_close": "Close menu"
+    "menu_close": "Close menu",
+    "primary": "Main navigation",
+    "lang_switch": "Change language"
   },
   "hero": {
     "role": "DevOps Engineer",
@@ -61,5 +63,8 @@
   },
   "a11y": {
     "new_tab": "opens in a new tab"
+  },
+  "footer": {
+    "back_to_top": "Back to top"
   }
 }

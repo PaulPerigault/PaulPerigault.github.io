@@ -17,7 +17,11 @@ for (const { path, lang, title } of PAGES) {
   });
 }
 
-test('la racine redirige vers /fr/', async ({ page }) => {
-  await page.goto('/');
-  await expect(page).toHaveURL(/\/fr\/$/);
+test.describe('racine', () => {
+  test.use({ locale: 'fr-FR' });
+
+  test('redirige vers /fr/ pour un navigateur français', async ({ page }) => {
+    await page.goto('/');
+    await expect(page).toHaveURL(/\/fr\/$/);
+  });
 });

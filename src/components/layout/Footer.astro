@@ -1,0 +1,24 @@
+---
+import Container from '@/components/ui/Container.astro';
+import { SITE } from '@/config/site';
+import type { Lang } from '@/domain/lang';
+import { useTranslations } from '@/lib/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const t = useTranslations(Astro.props.lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="border-line text-muted border-t py-8 text-sm">
+  <Container class="flex flex-wrap items-baseline justify-between gap-4">
+    <p>
+      © {year} {SITE.name}
+    </p>
+    <a href="#top" class="hover:text-accent underline underline-offset-4">
+      {t('footer.back_to_top')}
+    </a>
+  </Container>
+</footer>

@@ -44,10 +44,10 @@ for (const lang of ['fr', 'en'] as const) {
       }
     });
 
-    test('la navigation clavier parcourt les liens dans l’ordre avec un focus visible', async ({
+    test('la navigation clavier parcourt tous les éléments interactifs avec un focus visible', async ({
       page,
     }) => {
-      const links = await page.locator('a').count();
+      const links = await page.locator('a:visible, button:visible').count();
       for (let index = 0; index < links; index += 1) {
         await page.keyboard.press('Tab');
         const outline = await page.evaluate(() => {

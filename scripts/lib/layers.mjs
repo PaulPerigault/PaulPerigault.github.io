@@ -10,6 +10,7 @@ const LAYERS = {
   'src/components/layout': [
     'src/components/layout',
     'src/components/ui',
+    'src/scripts',
     'src/lib',
     'src/domain',
     'src/config',

@@ -1,3 +1,20 @@
 ---
-return Astro.redirect('/fr/');
+import { ROOT_REDIRECT_SCRIPT } from '@/lib/root-redirect';
 ---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Paul Perigault</title>
+    <meta http-equiv="refresh" content="0; url=/fr/" />
+    <link rel="canonical" href="https://paulperigault.fr/fr/" />
+    <meta name="robots" content="noindex" />
+    <script is:inline set:html={ROOT_REDIRECT_SCRIPT} />
+  </head>
+  <body>
+    <p>
+      <a href="/fr/">Français</a> · <a href="/en/">English</a>
+    </p>
+  </body>
+</html>

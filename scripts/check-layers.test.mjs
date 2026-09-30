@@ -13,6 +13,11 @@ describe('couches', () => {
     expect(isAllowed('src/pages/fr/index.astro', 'src/services/content.ts')).toBe(true);
   });
 
+  it('autorise les composants de layout à charger leurs scripts client, pas les sections', () => {
+    expect(isAllowed('src/components/layout/Navbar.astro', 'src/scripts/menu.ts')).toBe(true);
+    expect(isAllowed('src/components/sections/Hero.astro', 'src/scripts/menu.ts')).toBe(false);
+  });
+
   it('interdit le domaine vers les services', () => {
     expect(isAllowed('src/domain/skill.ts', 'src/services/content.ts')).toBe(false);
   });

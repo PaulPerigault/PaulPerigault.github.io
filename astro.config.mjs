@@ -11,5 +11,9 @@ export default defineConfig({
     locales: ['fr', 'en'],
     routing: { prefixDefaultLocale: true, redirectToDefaultLocale: false },
   },
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    plugins: [tailwindcss()],
+    // Jamais de script inliné par le bundler : la CSP (#76) n'autorise que des fichiers 'self'.
+    build: { assetsInlineLimit: 0 },
+  },
 });

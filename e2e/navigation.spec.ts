@@ -52,9 +52,13 @@ for (const lang of ['fr', 'en'] as const) {
 
     test('le pied de page signe le site et ramène en haut', async ({ page }) => {
       const footer = page.getByRole('contentinfo');
+      await footer.scrollIntoViewIfNeeded();
+      expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
       await expect(footer).toContainText(/©\s*\d{4}\s*Paul Perigault/);
       await footer.getByRole('link', { name: BACK_TO_TOP[lang] }).click();
       await expect(page).toHaveURL(/#top$/);
+      // Le lien doit réellement remonter : l'en-tête collant ne peut pas servir de cible.
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
     });
   });
 }

@@ -1,7 +1,7 @@
 {
   "seo": {
     "title": "Paul Perigault — Alternant DevOps Cloud, ESIEA Paris",
-    "description": "Paul Perigault, alternant DevOps Cloud chez WeVii et étudiant à l'ESIEA Paris : pipelines CI/CD, Terraform, Kubernetes, GitOps avec ArgoCD, AWS et GCP."
+    "description": "Paul Perigault, alternant DevOps Cloud chez WeVii, étudiant ingénieur (Software Engineering) à l'ESIEA Paris. CI/CD, Terraform, Kubernetes, ArgoCD, AWS, GCP."
   },
   "nav": {
     "about": "À propos",
@@ -19,16 +19,16 @@
   },
   "hero": {
     "role": "Alternant DevOps Cloud",
-    "school": "Cycle ingénieur ESIEA Paris · WeVii",
+    "school": "ESIEA Paris (majeure Software Engineering) · WeVii",
     "cta_cv": "Télécharger le CV",
     "cta_contact": "Me contacter",
     "cta_github": "GitHub",
     "cta_linkedin": "LinkedIn",
-    "summary": "Paul Perigault est alternant DevOps Cloud chez WeVii et étudiant en cycle ingénieur à l'ESIEA Paris. Il conçoit des pipelines CI/CD, des infrastructures AWS et GCP avec Terraform et Kubernetes, et des déploiements GitOps avec ArgoCD."
+    "summary": "Je suis Paul Perigault, alternant DevOps Cloud chez WeVii et étudiant en cycle ingénieur à l'ESIEA Paris, majeure Software Engineering. Je développe des applications RH en Java et Angular, je fais de la R&D multicloud en Go et je travaille sur les pipelines CI/CD et les déploiements AWS et GCP."
   },
   "about": {
     "title": "À propos",
-    "body": "En alternance chez WeVii depuis septembre 2023, en parallèle du cycle ingénieur à l'ESIEA Paris. J'interviens aussi en école, où j'encadre des projets étudiants et des hackathons.",
+    "body": "En alternance chez WeVii depuis septembre 2023, en parallèle du cycle ingénieur à l'ESIEA Paris. Je n'interviens pas encore en école, mais je suis disponible pour encadrer des projets étudiants et des hackathons.",
     "location": "Paris, France",
     "location_label": "Lieu"
   },
@@ -57,7 +57,7 @@
   },
   "contact": {
     "title": "Contact",
-    "subtitle": "Disponible pour intervenir en école, encadrer des projets étudiants et des hackathons.",
+    "subtitle": "Je suis disponible pour intervenir en école, encadrer des projets étudiants et des hackathons.",
     "email_label": "E-mail",
     "linkedin_label": "LinkedIn",
     "github_label": "GitHub"

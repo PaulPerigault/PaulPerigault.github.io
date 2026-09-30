@@ -1,7 +1,7 @@
 {
   "ci": {
     "collect": {
-      "staticDistDir": "./dist/paul-portfolio/browser",
+      "staticDistDir": "./dist",
       "url": ["/fr/", "/en/"],
       "numberOfRuns": 3,
       "settings": {

@@ -1,28 +1,26 @@
-import tseslint from "typescript-eslint";
-import angular from "angular-eslint";
-import eslintConfigPrettier from "eslint-config-prettier";
+import js from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import astro from 'eslint-plugin-astro';
+import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    files: ["**/*.ts"],
-    extends: [...tseslint.configs.recommended, ...angular.configs.tsRecommended],
-    languageOptions: {
-      parserOptions: {
-        ecmaVersion: "latest",
-        sourceType: "module",
-      },
-    },
+    ignores: ['dist/**', '.astro/**', 'node_modules/**', 'playwright-report/**', 'test-results/**'],
+  },
+  js.configs.recommended,
+  ...tseslint.configs.strict,
+  ...astro.configs.recommended,
+  {
     rules: {
-      "@angular-eslint/component-selector": ["error", { type: "element", prefix: ["pp", "app"], style: "kebab-case" }],
-      "@angular-eslint/directive-selector": ["error", { type: "attribute", prefix: "pp", style: "camelCase" }],
-      "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": "warn",
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/consistent-type-imports': 'error',
+      eqeqeq: 'error',
+      'no-console': 'error',
     },
   },
   {
-    files: ["**/*.html"],
-    extends: [...angular.configs.templateRecommended],
-    rules: {},
+    files: ['scripts/**/*.mjs'],
+    rules: { 'no-console': 'off', 'no-undef': 'off' },
   },
   eslintConfigPrettier,
 );

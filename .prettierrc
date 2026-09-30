@@ -6,7 +6,6 @@
   "trailingComma": "all",
   "bracketSpacing": true,
   "arrowParens": "always",
-  "overrides": [
-    { "files": "*.html", "options": { "parser": "html", "printWidth": 120 } }
-  ]
+  "plugins": ["prettier-plugin-astro"],
+  "overrides": [{ "files": "*.astro", "options": { "parser": "astro" } }]
 }

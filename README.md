@@ -4,25 +4,23 @@ Portfolio personnel — Paul Perigault, Apprenti Ingénieur DevOps.
 
 ## Stack
 
-- Angular 21 · Zoneless · Signals
+- Astro 7 (site statique, zéro JS par défaut) · TypeScript strictest
 - Tailwind CSS v4
-- ngx-translate (FR/EN)
-- Vitest · 33 tests
+- Effect (logique de données au build)
+- Vitest · Playwright (e2e)
 - GitHub Actions · Lighthouse CI · CodeQL · Dependabot
 - Docker · Nginx · GitHub Pages
 
 ## Lancer en local
 
-    npm install
-    npm start
+    nvm use        # Node 24
+    npm ci
+    npm run dev
 
-## Tests
+## Qualité et tests
 
-    npm test
-
-## Build production
-
-    npm run build
+    npm run verify   # lint + format + types + unitaires + build
+    npm run build && npm run e2e
 
 ## Docker
 
@@ -31,24 +29,21 @@ Portfolio personnel — Paul Perigault, Apprenti Ingénieur DevOps.
 ## Architecture
 
     src/
-    app/
-        core/
-            models/        # Interfaces TypeScript
-            services/      # ContentService, GithubService, ThemeService
-        features/          # Composants sections (hero, about, skills...)
-        layout/            # Navbar, Footer
-        shared/
-            pipes/         # FormatDatePipe
-    environments/          # Config dev/prod
-    public/
-        data/fr/           # Données JSON
-        i18n/              # Traductions FR/EN
+      pages/{fr,en}/   # une page prérendue par langue
+      layouts/         # BaseLayout
+      styles/          # global.css (Tailwind)
+    e2e/               # tests Playwright
+    scripts/           # serve-dist, génération de l'image OG
+    public/            # assets statiques
+
+Détails et conventions : voir `CLAUDE.md`.
 
 ## CI/CD
 
 | Workflow | Déclencheur | Action |
 |---|---|---|
-| ci.yml | PR | lint + test + build |
+| ci.yml | PR | lint + types + test + build |
+| e2e.yml | PR | Playwright e2e |
 | deploy.yml | push main | GitHub Pages |
 | security.yml | PR + hebdo | npm audit + CodeQL + SBOM |
 | lighthouse.yml | PR | Perf >= 90, A11y = 100 |

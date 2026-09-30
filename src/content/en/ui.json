@@ -76,7 +76,8 @@
     "new_tab": "opens in a new tab"
   },
   "footer": {
-    "back_to_top": "Back to top"
+    "back_to_top": "Back to top",
+    "legal": "Legal notice and privacy"
   },
   "geo": {
     "technologies": "Technologies",

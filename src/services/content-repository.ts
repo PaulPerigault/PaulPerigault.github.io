@@ -4,6 +4,7 @@ import { Certification } from '@/domain/certification';
 import { ContentInvalid, ContentNotFound, type ContentError } from '@/domain/errors';
 import { Experience } from '@/domain/experience';
 import { Formation } from '@/domain/formation';
+import { LegalDocument } from '@/domain/legal';
 import type { Lang } from '@/domain/lang';
 import { ProjectsConfig } from '@/domain/project';
 import { SkillCategory } from '@/domain/skill';
@@ -17,6 +18,7 @@ export interface ContentRepositoryShape {
   readonly formation: Read<ReadonlyArray<Formation>>;
   readonly certifications: Read<ReadonlyArray<Certification>>;
   readonly projectsConfig: Read<ProjectsConfig>;
+  readonly legal: Read<LegalDocument>;
 }
 
 /** Accès au contenu bilingue : lecture + validation par Schema, erreurs typées. */
@@ -54,6 +56,7 @@ export class ContentRepository extends Context.Tag('ContentRepository')<
         formation: read('formation', Schema.Array(Formation)),
         certifications: read('certifications', Schema.Array(Certification)),
         projectsConfig: read('projects-config', ProjectsConfig),
+        legal: read('legal', LegalDocument),
       };
     }),
   );

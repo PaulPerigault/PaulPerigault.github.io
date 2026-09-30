@@ -13,6 +13,7 @@ export const loadPortfolio = (lang: Lang) =>
         formation: content.formation(lang),
         certifications: content.certifications(lang),
         projectsConfig: content.projectsConfig(lang),
+        legal: content.legal(lang),
       },
       { concurrency: 'unbounded' },
     );

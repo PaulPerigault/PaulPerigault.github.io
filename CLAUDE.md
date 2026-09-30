@@ -126,6 +126,10 @@ Required checks on protected branches stay `ci` and `commitlint` (names are stab
 - **Supply chain / CI** (`scripts/workflows.test.mjs` enforces it): every action pinned by commit SHA with a `# vN` comment (Dependabot keeps them fresh), explicit least-privilege `permissions`, `timeout-minutes`, `persist-credentials: false`, `npm ci` only. `npm audit`, CodeQL and SBOM run in `security.yml`.
 - Secrets: `GITHUB_TOKEN` is read through Effect `Config.redacted`; never log it.
 
+## Privacy / GDPR
+
+The site sets **no cookie, no analytics, no form and loads nothing from a third party** (CSP `default-src 'none'`). The only client-side traces are the `theme` and `lang` preferences in `localStorage`, written on user action. `src/content/{fr,en}/legal.json` (Schema `domain/legal.ts`, rendered by `LegalDocument.astro` on `/<lang>/legal/`, linked from the footer, `{email}`/`{domain}` filled from `SITE` by `lib/placeholders.ts`) carries the legal notice and privacy text; FR and EN must keep the same section ids. `e2e/privacy.spec.ts` proves the claims (no third-party request, no `Set-Cookie`, zero cookies, storage limited to `theme`/`lang`, nothing written without interaction) — **adding any tracker, form or third-party resource must update `legal.json`, the CSP and `docs/compliance.md` first**. Domain policy (`.fr` canonical, `.dev` must 301 to it at the registrar) and the processing register live in `docs/compliance.md`.
+
 ## SEO and AI visibility
 
 Priority: search engines **and AI assistants must know Paul Perigault** — never block AI crawlers.
@@ -144,7 +148,7 @@ Priority: search engines **and AI assistants must know Paul Perigault** — neve
 
 ## Documentation map
 
-`docs/ui.md` (primitives) · `docs/design-charter.md` (design rules) · `docs/test-matrix.md` (feature → e2e spec) · `docs/geo-checklist.md` (manual AI-visibility actions) · `docs/adr/` (decisions) · `ROADMAP.md` (pending). `scripts/check-docs.mjs` (in `guard`) fails when a documented `npm run` script or repo path no longer exists.
+`docs/ui.md` (primitives) · `docs/design-charter.md` (design rules) · `docs/test-matrix.md` (feature → e2e spec) · `docs/geo-checklist.md` (manual AI-visibility actions) · `docs/compliance.md` (GDPR register, domains) · `docs/adr/` (decisions) · `ROADMAP.md` (pending). `scripts/check-docs.mjs` (in `guard`) fails when a documented `npm run` script or repo path no longer exists.
 
 ## Maintenance
 

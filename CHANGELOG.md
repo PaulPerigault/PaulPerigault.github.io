@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/PaulPerigault/PaulPerigault.github.io/compare/v1.1.1...v2.0.0) (2026-09-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* le site passe d'Angular à Astro ; les URLs de langue ont désormais un slash final (/fr/, /en/).
+
+### Features
+
+* livrer la migration astro 7 et effect en production ([#105](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/105)) ([edbbf46](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/edbbf467a0b1e99905a3f4dde3b8747ab5ed7ce3))
+
 ## [1.1.1](https://github.com/PaulPerigault/PaulPerigault.github.io/compare/v1.1.0...v1.1.1) (2026-09-17)
 
 

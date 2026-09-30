@@ -70,7 +70,9 @@ for (const lang of ['fr', 'en'] as const) {
         lang === 'fr' ? 'Cycle ingénieur' : 'Engineering programme',
       );
       await expect(region.locator('li').first()).toContainText(
-        'ESIEA Paris · DevOps & Cloud Computing',
+        lang === 'fr'
+          ? 'ESIEA Paris · Majeure Software Engineering'
+          : 'ESIEA Paris · Software Engineering major',
       );
       await expect(region.locator('li').first()).toContainText(
         lang === 'fr' ? 'sept. 2024 — août 2027' : 'Sep 2024 — Aug 2027',

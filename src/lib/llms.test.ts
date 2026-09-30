@@ -39,7 +39,7 @@ beforeAll(async () => {
 describe('profileMarkdown', () => {
   it("énonce l'entité en tête : nom, métier, employeur, école", () => {
     expect(fr.split('\n')[0]).toBe('# Paul Perigault — Alternant DevOps Cloud');
-    expect(fr).toContain('> Paul Perigault est alternant DevOps Cloud chez WeVii');
+    expect(fr).toContain('> Je suis Paul Perigault, alternant DevOps Cloud chez WeVii');
     expect(fr).toContain('ESIEA Paris');
   });
 

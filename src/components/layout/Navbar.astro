@@ -16,7 +16,7 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 ---
 
-<header id="top" class="border-line bg-bg sticky top-0 z-40 border-b">
+<header class="border-line bg-bg sticky top-0 z-40 border-b">
   <Container class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-4">
     <a href={`/${lang}/`} class="font-semibold tracking-tight">
       {SITE.name}

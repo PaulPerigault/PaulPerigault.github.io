@@ -6,7 +6,7 @@ Guidance for Claude Code (claude.ai/code) in this repository.
 
 Personal portfolio for Paul Perigault (paulperigault.fr): **Astro 7** static site (`output: 'static'`, zero JS by default), Tailwind CSS v4, TypeScript `strictest`, FR/EN routes (`/fr/`, `/en/`), deployed to GitHub Pages. Data logic runs **at build time only** with [Effect](https://effect.website) (no Effect in the browser).
 
-The project was migrated from Angular 22 (epic [#64](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/64)); sections of this file marked _(planned #n)_ describe the target defined in the corresponding issue and are updated by that issue's PR.
+The project was migrated from Angular 22 to Astro (epic [#64](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/64)); the reasoning is in `docs/adr/` (ADR-0001 to 0005), measured before/after.
 
 ## Commands
 
@@ -41,17 +41,20 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 - SEO head, JSON-LD, sitemap and GEO: see « SEO and AI visibility »; CSP: see « Security ».
 
 ### Design system (tokens)
+
 - **Tokens live only in `src/styles/tokens.css`** as `--pp-*` custom properties; light/dark are defined once with `light-dark()` (`color-scheme: light dark` follows the system with no JS; `data-theme="light|dark"` on `<html>` forces a choice). `theme.css` exposes them to Tailwind (`bg-bg`, `text-fg`, `text-muted`, `border-line`, `text-accent`, `font-serif|sans|mono`, `text-display`, `py-section`, `max-w-page|prose`) and **removes Tailwind's default palette, sizes, radii and shadows**: use tokens, never raw hex/px and no `dark:` classes.
 - `base.css` sets element defaults (focus ring, `prefers-reduced-motion`, selection). Add a token (both modes) before using a new colour; `src/lib/contrast.test.ts` fails if any pair drops below WCAG AA (4.5:1 text, 3:1 controls). The UI accent (`#0e7069` light) is slightly darker than the logo teal (`#0f766e`) to reach AA on the surface colour.
 - Theme flash prevention + progressive enhancement: `HEAD_INIT_SCRIPT` (`src/lib/head-init.ts`) is inlined in `<head>` before the stylesheet, adds `class="js"` on `<html>` (Tailwind variant `js:` = JS available), reads `localStorage.theme` and sets `data-theme`; invalid values are ignored. `BaseLayout.astro` provides the skip link (`SkipLink.astro`) and `<main id="content" tabindex="-1">`.
 
 ### Layout, navigation and progressive enhancement
+
 - `BaseLayout.astro` = skip link + `Navbar` + `<main id="content">` + `Footer`. `components/layout/`: `Navbar`, `NavLinks` (sections from `config/navigation.ts`, hrefs `/<lang>/#<id>`), `LangSwitch` (real link to the same path in the other language), `ThemeToggle`, `MobileMenu` (native modal `<dialog>`: focus trap, Escape and focus return come from the browser), `Footer`. `config/site.ts` holds identity constants.
 - **Everything must work without JavaScript**: nav links stay inline on mobile, the menu/theme buttons only exist with `js:` and language switching is a plain link. Client scripts (`src/scripts/*.ts`, ≤ 60 lines, no framework) only enhance: `menu`, `theme-toggle`, `lang-switch` (remembers the choice in `localStorage.lang` and keeps the current hash). `scripts/` may only be imported by `components/layout`.
 - Root `/` (`pages/index.astro`) redirects with `ROOT_REDIRECT_SCRIPT` (stored choice → browser language → FR) and a `meta refresh` to `/fr/` without JS.
 - `vite.build.assetsInlineLimit: 0` keeps every client script an external file (CSP #76 will only allow `'self'` plus the hashed head script).
 
 ### Sections and site config
+
 - `src/config/site.ts` (`SITE`) is the **only** place for identity, URLs and contact details (name, domain, e-mail, GitHub/LinkedIn/CV, GitHub API URL). `src/config/site.test.ts` fails on any literal hostname/e-mail elsewhere in `src/` (allow-list: `site.ts`, styleguide, root page, tests).
 - `src/components/sections/` — one composed component per page section (`Hero`, `About`, `Contact`, …), built only from `ui` primitives + `useTranslations(lang)`; a section's number comes from `navIndex(id)` (`config/navigation.ts`), so nav order = numbering. `pages/[lang]/index.astro` just lists the sections.
 - Hero photo lives in `src/assets/photo.jpg` and goes through `astro:assets` (`<Image>` → WebP, explicit `width/height`, `loading=eager` + `fetchpriority=high` only on this LCP image). Sections may import `src/assets`.
@@ -62,9 +65,11 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 - Copy rule: factual, concrete sentences (roles, employers, technologies taken from the content data); no filler.
 
 ### UI primitives
+
 `src/components/ui/` holds logic-free, typed Astro primitives (`Container`, `Section`, `Heading`, `Card`, `Tag`, `ButtonLink`, `ExternalLink`, `Icon`, `DescriptionList`, `Timeline(Item)`, `VisuallyHidden`, `SkipLink`) — catalogue and rules in `docs/ui.md`, live showcase at `/{fr,en}/styleguide/` (`noindex`, must stay out of the sitemap). Repeated markup becomes a primitive; primitives receive already-translated strings and import only `lib/`. Link attributes come from `lib/links.ts`, icons from `lib/icons.ts`. Component tests use `src/test/render.ts` (Astro Container API, Vitest via `getViteConfig`).
 
 ### Effect rules
+
 - Build time only: no Effect code may reach the browser (`e2e/bundle-budget.spec.ts` enforces < 5 KB gzip JS and no Effect signature).
 - `Effect.gen`, typed errors in the error channel, no `try/catch`/`throw` outside `runBuild`; schemas are the single source of truth for both types and validation.
 - Tests use `@effect/vitest` (`it.effect`, `TestClock` for retries) with in-memory `Layer`s from `src/test/`. `@effect/vitest` declares a `vitest@^3` peer; `package.json#overrides` maps it to the installed Vitest 4.
@@ -127,7 +132,7 @@ Priority: search engines **and AI assistants must know Paul Perigault** — neve
 
 - **`SeoHead.astro`** (rendered by `BaseLayout`, skipped for `noindex` pages) is declarative: title, description, author, canonical (fixed `SITE.domain`, never `window.location`), `hreflang` `fr`/`en`/`x-default`(FR), Open Graph (+ `og:locale:alternate`, image 1200×630) and Twitter Card, `rel="me"` (GitHub, LinkedIn), light/dark `theme-color` (`THEME_COLOR`, tested against `tokens.css`), favicons/icons, JSON-LD. The pure logic is in `lib/seo.ts` (`alternates`, `socialTags`, `pathForLang`, `canonicalUrl`).
 - **JSON-LD**: `lib/build-json-ld.ts` (`buildJsonLd`, `serializeJsonLd` escaping `<`) composes `lib/json-ld.ts` (Person with `worksFor`/`alumniOf`/`knowsAbout`, WebSite, ProfilePage) and `lib/json-ld-lists.ts` (certifications, projects ItemLists). Everything comes from `SITE` + content; tests assert unique `@id`s and that every reference resolves. The page builds it in `pages/[lang]/index.astro` (image URL from `getImage`).
-- **Sitemap**: generated by `@astrojs/sitemap` (`sitemap-index.xml` → `sitemap-0.xml`, `fr`/`en` alternates, build-date `lastmod`); the root redirect and `/styleguide/` are filtered out. `public/robots.txt` points to it. `src/pages/404.astro` is a bilingual, `noindex` 404 (GitHub Pages serves `404.html`).
+- **Sitemap**: generated by `@astrojs/sitemap` (`sitemap-index.xml` → `sitemap-0.xml`, `fr`/`en` alternates, build-date `lastmod`); the root redirect and `/styleguide/` are filtered out. The generated `robots.txt` points to it. `src/pages/404.astro` is a bilingual, `noindex` 404 (GitHub Pages serves `404.html`).
 - **OG image:** `public/image/og-cover.png` is generated by `scripts/generate-og-image.mjs` (re-run and commit the PNG if the design changes; don't hand-edit). `public/image/logo.svg` is the single source of truth for branding; regenerate derived assets with the `update-favicon` skill.
 
 ### GEO — being known by AI assistants
@@ -136,6 +141,10 @@ Priority: search engines **and AI assistants must know Paul Perigault** — neve
 - **Facts live in static HTML** (hero `hero.summary` states name, role, employer, school, specialities in one entity sentence) and the JSON-LD `Person` (`description`, `hasOccupation`, `knowsLanguage`, `email`, `mainEntityOfPage`, `worksFor`, `alumniOf`, `sameAs`, `knowsAbout`) repeats **only** what the page says — `e2e/geo-entity.spec.ts` (JS disabled) enforces it. Keep name/role/employer/school identical everywhere (site, JSON-LD, llms, Markdown, OG).
 - **IndexNow**: key file `public/indexnow-key.txt`; `scripts/indexnow.mjs` submits the sitemap URLs (`--dry-run` in CI, real ping after `deploy-pages`, non-blocking). Search Console / Bing verification via `PUBLIC_GOOGLE_SITE_VERIFICATION` / `PUBLIC_BING_SITE_VERIFICATION`. `/.well-known/security.txt` (Expires recomputed each build) **and a copy at `/security.txt`** (RFC 9116 fallback: `actions/upload-pages-artifact` drops hidden folders, so `.well-known` may not reach GitHub Pages) and `/humans.txt` are generated too. The CI artifact is uploaded with `include-hidden-files: true`.
 - Manual, out-of-repo actions (submit sitemap, align LinkedIn/GitHub bios, AI knowledge checks): `docs/geo-checklist.md`.
+
+## Documentation map
+
+`docs/ui.md` (primitives) · `docs/design-charter.md` (design rules) · `docs/test-matrix.md` (feature → e2e spec) · `docs/geo-checklist.md` (manual AI-visibility actions) · `docs/adr/` (decisions) · `ROADMAP.md` (pending). `scripts/check-docs.mjs` (in `guard`) fails when a documented `npm run` script or repo path no longer exists.
 
 ## Maintenance
 

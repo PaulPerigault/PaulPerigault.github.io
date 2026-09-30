@@ -8,15 +8,13 @@ import { GithubClient } from './github-client';
 
 const Infrastructure = Layer.mergeAll(NodeContext.layer, FetchHttpClient.layer, BuildConfig.Live);
 
-/** @public — consommé par les pages à partir de l'issue contenu (#68). */
-export const AppLayer = Layer.mergeAll(ContentRepository.Live, GithubClient.Live).pipe(
+const AppLayer = Layer.mergeAll(ContentRepository.Live, GithubClient.Live).pipe(
   Layer.provide(Infrastructure),
 );
 
 const runtime = ManagedRuntime.make(AppLayer);
 
 /**
- * @public
  * Seul pont Effect → Promise : à appeler depuis le frontmatter des pages Astro.
  * Une erreur typée fait échouer le build avec son message explicite.
  */

@@ -1,12 +1,14 @@
 ---
 import '@/styles/global.css';
+import type { Lang } from '@/domain/lang';
 
 interface Props {
-  lang: 'fr' | 'en';
+  lang: Lang;
   title: string;
+  description: string;
 }
 
-const { lang, title } = Astro.props;
+const { lang, title, description } = Astro.props;
 ---
 
 <!doctype html>
@@ -15,6 +17,7 @@ const { lang, title } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
+    <meta name="description" content={description} />
   </head>
   <body>
     <slot />

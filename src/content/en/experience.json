@@ -1,0 +1,32 @@
+[
+  {
+    "id": "wevii",
+    "company": "WeVii",
+    "role": "DevOps Cloud Apprentice",
+    "location": "Bordeaux (remote)",
+    "dateStart": "2023-09",
+    "dateEnd": null,
+    "description": "Development of HR applications in Java and Angular, multicloud R&D in Golang. CI/CD pipelines, AWS/GCP cloud infrastructure with Terraform and Kubernetes. Security: Vault, SOPS, ArgoCD, Prometheus/Grafana monitoring.",
+    "tags": ["Go", "Angular", "Java", "Kubernetes", "Terraform", "AWS", "GCP", "ArgoCD"]
+  },
+  {
+    "id": "42",
+    "company": "École 42",
+    "role": "Piscine — intensive bootcamp",
+    "location": "Paris",
+    "dateStart": "2022-08",
+    "dateEnd": "2022-08",
+    "description": "Immersive 4-week programme: algorithmics, C, unsupervised peer learning.",
+    "tags": ["C", "Algorithmics", "Peer learning", "Shell"]
+  },
+  {
+    "id": "patounes",
+    "company": "Les Patounes de Bezons",
+    "role": "Volunteer",
+    "location": "Bezons",
+    "dateStart": "2022-01",
+    "dateEnd": "2022-12",
+    "description": "Managing the reception and well-being of abandoned animals.",
+    "tags": ["Volunteering"]
+  }
+]

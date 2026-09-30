@@ -50,21 +50,12 @@
   {
     "category": "Monitoring",
     "icon": "chart",
-    "items": [
-      "Prometheus",
-      "Grafana",
-      "ELK Stack",
-      "Alerting"
-    ]
+    "items": ["Prometheus", "Grafana", "ELK Stack", "Alerting"]
   },
   {
     "category": "Bases de données",
     "icon": "database",
-    "items": [
-      "PostgreSQL",
-      "MySQL",
-      "MongoDB"
-    ]
+    "items": ["PostgreSQL", "MySQL", "MongoDB"]
   },
   {
     "category": "Systèmes",

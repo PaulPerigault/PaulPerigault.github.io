@@ -4,7 +4,8 @@ import { walk } from '../../scripts/lib/walk.mjs';
 import { SITE } from './site';
 
 // Nom d'hôte littéral (https://exemple.fr) ou adresse e-mail littérale : jamais hors de la config.
-const EXTERNAL = /https?:\/\/[a-z0-9-]+(\.[a-z0-9-]+)+|[\w.-]+@[\w-]+\.[a-z]{2,}/i;
+// (schema.org est un vocabulaire normatif, pas une adresse du site.)
+const EXTERNAL = /https?:\/\/(?!schema\.org)[a-z0-9-]+(\.[a-z0-9-]+)+|[\w.-]+@[\w-]+\.[a-z]{2,}/i;
 // Fichiers autorisés à contenir une URL : la source unique, la démo du styleguide, la page racine.
 const ALLOWED = [
   /src\/config\/site\.ts$/,

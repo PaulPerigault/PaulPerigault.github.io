@@ -1,0 +1,38 @@
+---
+import '@/styles/global.css';
+import ButtonLink from '@/components/ui/ButtonLink.astro';
+import Heading from '@/components/ui/Heading.astro';
+import { SITE } from '@/config/site';
+import { useTranslations } from '@/lib/i18n';
+
+const fr = useTranslations('fr');
+const en = useTranslations('en');
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>404 — {SITE.name}</title>
+    <meta name="robots" content="noindex" />
+  </head>
+  <body class="bg-bg text-fg font-sans">
+    <main class="mx-auto max-w-prose px-6 py-section">
+      <p class="text-accent font-mono text-sm">404</p>
+      <Heading level={1} size="2xl" class="mt-4">
+        Page introuvable · Page not found
+      </Heading>
+      <p class="mt-6">
+        <span lang="fr">Cette page n'existe pas.</span>{' '}
+        <span lang="en">This page does not exist.</span>
+      </p>
+      <div class="mt-8 flex gap-3">
+        <ButtonLink href="/fr/" variant="primary">
+          {fr('lang.fr')}
+        </ButtonLink>
+        <ButtonLink href="/en/">{en('lang.en')}</ButtonLink>
+      </div>
+    </main>
+  </body>
+</html>

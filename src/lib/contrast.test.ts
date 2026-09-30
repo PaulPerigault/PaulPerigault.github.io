@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { contrastRatio } from './contrast';
+import { THEME_COLOR } from './theme';
 
 const TOKENS = readFileSync('src/styles/tokens.css', 'utf8');
 const PAIR = /--pp-([a-z-]+):\s*light-dark\((#[0-9a-f]{6}),\s*(#[0-9a-f]{6})\)/gi;
@@ -46,5 +47,12 @@ describe.each(['light', 'dark'] as const)('tokens de couleur (%s)', (mode) => {
     ['control', 'bg', CONTROL_AA],
   ] as const)('%s sur %s ≥ %s:1', (foreground, background, minimum) => {
     expect(ratio(mode, foreground, background)).toBeGreaterThanOrEqual(minimum);
+  });
+});
+
+describe('THEME_COLOR (meta theme-color)', () => {
+  it('reprend exactement le fond des tokens dans chaque thème', () => {
+    expect(THEME_COLOR.light).toBe(palettes.light.get('bg'));
+    expect(THEME_COLOR.dark).toBe(palettes.dark.get('bg'));
   });
 });

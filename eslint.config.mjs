@@ -54,7 +54,7 @@ export default tseslint.config(
   },
   {
     files: ['*.config.{ts,mjs}'],
-    rules: { '@typescript-eslint/no-magic-numbers': 'off' },
+    rules: { '@typescript-eslint/no-magic-numbers': 'off', 'no-undef': 'off' },
   },
   {
     files: ['scripts/**/*.mjs'],

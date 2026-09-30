@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://paulperigault.fr/sitemap.xml
+Sitemap: https://paulperigault.fr/sitemap-index.xml

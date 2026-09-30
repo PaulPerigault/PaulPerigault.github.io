@@ -1,3 +1,4 @@
 npx lint-staged
 npm run check:size
 npm run check:layers
+npm run check:design

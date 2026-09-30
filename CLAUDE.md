@@ -18,7 +18,7 @@ npm run lint           # eslint .
 npm run format:check   # prettier --check (src, e2e, scripts)
 npm test               # vitest run (unit)
 npm run e2e            # Playwright against dist/ served by scripts/serve-dist.mjs (build first)
-npm run guard          # check:size + check:layers + knip (architecture guardrails)
+npm run guard          # check:size + check:layers + check:design + knip (architecture guardrails)
 npm run verify         # guard + lint + format:check + check + test + build (also run by the pre-push hook)
 ```
 
@@ -80,8 +80,9 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
   - `scripts/check-file-size.mjs`: no `.ts/.astro/.css/.mjs` file under `src/`, `e2e/`, `scripts/` exceeds **120 lines** (`MAX_FILE_LINES`). Split the file instead of raising the limit.
   - ESLint design rules (`eslint.config.mjs`): function ≤ 40 lines, complexity ≤ 8, depth ≤ 3, ≤ 4 params, ≤ 3 nested callbacks, no magic numbers (tests, scripts and config files excepted), no `any`, no `console`.
   - `scripts/check-layers.mjs` + `scripts/lib/layers.mjs`: each layer lists the layers it may import (`domain` → nothing, `services` → `lib`/`domain`, `components/ui` → `lib` only, …); test files (`*.test.*`) are exempt; it reads `.ts` and `.astro` because dependency-cruiser cannot parse `.astro`. Add a layer there when you create a folder.
+  - `scripts/check-design.mjs`: design-charter rules (see Design below).
   - `knip` (`knip.json`): unused files, exports and dependencies fail the build.
-- Design: distinctive, non-generic art direction _(planned #78)_.
+- **Design charter « paper and ink »** (`docs/design-charter.md`): one accent, serif titles / mono metadata / system sans body, hairline rules, numbered sections, near-square corners; **forbidden**: gradients, decorative shadows, blur/glassmorphism, emoji, hard-coded colours, Tailwind palette colours, arbitrary px/hex values, and filler phrases (« passionné par… », « cutting-edge »…). Enforced by `scripts/check-design.mjs` (rules in `scripts/lib/design-rules.mjs`, part of `guard` and the pre-commit hook) and by `e2e/design-charter.spec.ts` (computed styles: no gradient/shadow/blur/filter, radius ≤ 4 px, only token colours, serif/mono/sans families, no emoji — FR/EN × light/dark). Screenshot baselines were deliberately not used: system fonts differ between machines and CI, which would make them flaky.
 
 ## Git workflow
 

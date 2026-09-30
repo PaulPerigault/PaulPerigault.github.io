@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
+    "prebuild": "node scripts/fetch-cv.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",

@@ -12,7 +12,7 @@ interface Person {
   email: string;
 }
 
-const ROLE = { fr: 'Ingénieur DevOps', en: 'DevOps Engineer' } as const;
+const ROLE = { fr: 'Alternant DevOps Cloud', en: 'Cloud DevOps Apprentice' } as const;
 
 for (const lang of ['fr', 'en'] as const) {
   test.describe(`entité Paul Perigault (${lang}, sans JavaScript)`, () => {

@@ -1,6 +1,6 @@
 # paulperigault.fr
 
-Portfolio personnel — Paul Perigault, Apprenti Ingénieur DevOps.
+Portfolio personnel — Paul Perigault, Alternant DevOps Cloud.
 
 ## Stack
 

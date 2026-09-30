@@ -12,7 +12,7 @@ The project was migrated from Angular 22 to Astro (epic [#64](https://github.com
 
 ```
 npm run dev            # astro dev
-npm run build          # static build to dist/
+npm run build          # static build to dist/ (prebuild copies the CV PDF into public/)
 npm run check          # astro check (types)
 npm run lint           # eslint .
 npm run format:check   # prettier --check (src, e2e, scripts)
@@ -61,6 +61,7 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 - Hero photo lives in `src/assets/photo.jpg` and goes through `astro:assets` (`<Image>` → WebP, explicit `width/height`, `loading=eager` + `fetchpriority=high` only on this LCP image). Sections may import `src/assets`.
 - Data sections get their data as props from `pages/[lang]/index.astro` (`portfolio = await runBuild(loadPortfolio(lang))`). `Skills` (definition list, items joined with « · »), `Certifications` (in-progress first, then newest), and `Experience`/`Formation`, which are thin wrappers over the shared `TimelineSection` fed by `lib/timeline.ts` (`experienceEntries`, `formationEntries`). **Ordering is done in code** (`lib/chronology.ts`: ongoing first, then end date desc, then start date desc), never by JSON order; dates go through `lib/format-date.ts` (`Intl`, UTC, « sept. 2023 — Présent » / « Sep 2023 — Present »).
 - **Projects (GitHub) are fetched at build time only**: `services/projects.ts` → `loadProjects(lang)` reads `projects-config.json`, calls `GithubClient.repo` per featured repo (concurrency 4), sorts with `lib/projects.ts` and returns a `ProjectsSnapshot` (`fetchedAt` from Effect's `Clock`). `BuildConfig.strictData` (`STRICT_DATA`, else `CI`): **strict = a missing repo fails the build** (`GithubUnavailable`, used in CI), lenient = warning + repo skipped (local dev/offline). `Projects.astro` renders `data-state="ready|empty"`; nothing ever calls `api.github.com` from the browser (asserted in e2e). CI passes `GITHUB_TOKEN` to build steps to avoid rate limits; `GITHUB_API_URL` can point to a mock.
+- **CV**: the PDF is served by the site itself at `SITE.cvPath` (`/cv-paul-perigault.pdf`, hero button with `download`). `scripts/fetch-cv.mjs` (npm `prebuild`, logic in `scripts/lib/cv-fetch.mjs`) copies it at build from the `cv-latex` repository into `public/` (git-ignored); it refuses anything that is not a PDF, is **strict in CI** (`CI`/`STRICT_DATA`: a missing CV fails the build) and lenient locally. A same-origin PDF is indexable and gets a clean file name, unlike the former `raw.githubusercontent.com` link (`application/octet-stream`, `main.pdf`). The CV must not contain a phone number or postal address (checked when this was set up: only `contact@…`).
 - `scripts/lib/astro-build.mjs` runs real `astro build`s for integration tests (`build-content-guard`, `build-projects`): hermetic (offline URL by default, `CI=false`), serialized by a lock because builds share `.astro/`. `build-projects.test.mjs` builds against a local fake GitHub server.
 - E2E specs read `src/content` through `e2e/helpers/content.ts` and compare the DOM with the data instead of copying values.
 - Copy rule: factual, concrete sentences (roles, employers, technologies taken from the content data); no filler.

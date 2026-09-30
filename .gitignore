@@ -57,3 +57,6 @@ node_modules/
 /.astro
 /playwright-report
 /test-results
+
+# CV copié au build (scripts/fetch-cv.mjs)
+/public/cv-paul-perigault.pdf

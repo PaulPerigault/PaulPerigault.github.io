@@ -1,7 +1,7 @@
 {
   "seo": {
-    "title": "Paul Perigault — DevOps Engineer",
-    "description": "Portfolio of Paul Perigault, DevOps engineering apprentice at ESIEA Paris, working at WeVii."
+    "title": "Paul Perigault — Cloud DevOps Apprentice, ESIEA Paris",
+    "description": "Paul Perigault, cloud DevOps apprentice at WeVii and student at ESIEA Paris: CI/CD pipelines, Terraform, Kubernetes, GitOps with ArgoCD, AWS and GCP."
   },
   "nav": {
     "about": "About",
@@ -18,17 +18,17 @@
     "lang_switch": "Change language"
   },
   "hero": {
-    "role": "DevOps Engineer",
-    "school": "ESIEA Paris · Apprentice at WeVii",
+    "role": "Cloud DevOps Apprentice",
+    "school": "Engineering cycle at ESIEA Paris · WeVii",
     "cta_cv": "Download CV",
     "cta_contact": "Get in touch",
     "cta_github": "GitHub",
     "cta_linkedin": "LinkedIn",
-    "summary": "Paul Perigault is a DevOps engineer apprenticed at WeVii and a student at ESIEA Paris. He builds CI/CD pipelines, AWS and GCP infrastructure with Terraform and Kubernetes, and GitOps deployments with ArgoCD."
+    "summary": "Paul Perigault is a cloud DevOps apprentice at WeVii and an engineering student at ESIEA Paris. He builds CI/CD pipelines, AWS and GCP infrastructure with Terraform and Kubernetes, and GitOps deployments with ArgoCD."
   },
   "about": {
     "title": "About",
-    "body": "DevOps engineering student at ESIEA Paris, apprenticed at WeVii since September 2023. I build CI/CD pipelines, AWS and GCP infrastructure with Terraform and Kubernetes, and GitOps deployments with ArgoCD. I also give talks at schools and mentor student projects and hackathons.",
+    "body": "Apprenticed at WeVii since September 2023, alongside the engineering cycle at ESIEA Paris. I also work with schools, where I mentor student projects and hackathons.",
     "location": "Paris, France",
     "location_label": "Location"
   },
@@ -57,7 +57,7 @@
   },
   "contact": {
     "title": "Contact",
-    "subtitle": "DevOps engineer — available for school talks, student project mentoring and hackathon supervision.",
+    "subtitle": "Available to speak at schools and to mentor student projects and hackathons.",
     "email_label": "Email",
     "linkedin_label": "LinkedIn",
     "github_label": "GitHub"

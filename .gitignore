@@ -30,7 +30,6 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-/.angular/cache
 .sass-cache/
 /connect.lock
 /coverage
@@ -53,3 +52,8 @@ node_modules/
 
 # Lighthouse CI
 /.lighthouseci/
+
+# Astro / tests
+/.astro
+/playwright-report
+/test-results

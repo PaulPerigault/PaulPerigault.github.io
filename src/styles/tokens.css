@@ -1,0 +1,35 @@
+/*
+ * Design tokens — source de vérité du design (charte : docs/design-charter.md, issue #78).
+ * Clair « papier » / sombre « encre » définis UNE fois avec light-dark() ; le thème suit le
+ * système sans JavaScript, `data-theme` sur <html> le force. Aucune couleur hors de ce fichier.
+ */
+:root {
+  color-scheme: light dark;
+
+  --pp-bg: light-dark(#f5f1e8, #14130f);
+  --pp-surface: light-dark(#ece6d8, #1d1c17);
+  --pp-fg: light-dark(#1c1b18, #ece7dc);
+  --pp-muted: light-dark(#5a564c, #a39d8f);
+  --pp-line: light-dark(#d6cfbe, #2e2c25);
+  --pp-control: light-dark(#8a8474, #78725f);
+  --pp-accent: light-dark(#0e7069, #4fb3a5);
+  --pp-on-accent: light-dark(#ffffff, #0b1f1c);
+
+  --pp-font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --pp-font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --pp-font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+
+  --pp-measure: 42rem;
+  --pp-page: 64rem;
+  --pp-space-section: clamp(4rem, 9vw, 7.5rem);
+  --pp-radius: 2px;
+  --pp-duration: 150ms;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}

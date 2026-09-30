@@ -1,7 +1,9 @@
 node_modules
 dist
-.angular
+.astro
 .git
 .husky
 coverage
+playwright-report
+test-results
 *.md

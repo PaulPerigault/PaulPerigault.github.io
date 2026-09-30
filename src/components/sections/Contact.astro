@@ -1,0 +1,42 @@
+---
+import ExternalLink from '@/components/ui/ExternalLink.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Section from '@/components/ui/Section.astro';
+import { navIndex } from '@/config/navigation';
+import { SITE } from '@/config/site';
+import type { Lang } from '@/domain/lang';
+import type { IconName } from '@/lib/icons';
+import { useTranslations } from '@/lib/i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const t = useTranslations(Astro.props.lang);
+const newTab = t('a11y.new_tab');
+const channels: { icon: IconName; label: string; href: string; text: string }[] = [
+  { icon: 'mail', label: t('contact.email_label'), href: `mailto:${SITE.email}`, text: SITE.email },
+  {
+    icon: 'link',
+    label: t('contact.linkedin_label'),
+    href: SITE.linkedinUrl,
+    text: 'paul-perigault',
+  },
+  { icon: 'branch', label: t('contact.github_label'), href: SITE.githubUrl, text: SITE.githubUser },
+];
+---
+
+<Section id="contact" index={navIndex('contact')} title={t('contact.title')}>
+  <p class="max-w-prose text-lg">{t('contact.subtitle')}</p>
+  <ul class="mt-8 space-y-3">
+    {channels.map(({ icon, label, href, text }) => (
+      <li class="flex items-center gap-3">
+        <Icon name={icon} class="text-accent" />
+        <span class="text-muted w-20 font-mono text-sm">{label}</span>
+        <ExternalLink href={href} newTabLabel={newTab}>
+          {text}
+        </ExternalLink>
+      </li>
+    ))}
+  </ul>
+</Section>

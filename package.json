@@ -1,73 +1,78 @@
 {
   "name": "paul-portfolio",
   "version": "1.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@11.6.1",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "test:coverage": "ng test --coverage",
-    "lint": "eslint src --ext .ts,.html",
-    "lint:fix": "eslint src --ext .ts,.html --fix",
-    "format": "prettier --write \"src/**/*.{ts,html,css}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,html,css}\"",
-    "prepare": "husky",
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"{src,e2e,scripts}/**/*.{ts,mjs,astro,css,json}\" \"*.{ts,mjs,json}\"",
+    "format:check": "prettier --check \"{src,e2e,scripts}/**/*.{ts,mjs,astro,css,json}\" \"*.{ts,mjs,json}\"",
+    "test": "vitest run --passWithNoTests",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
-    "serve:ssr:paul-portfolio": "node dist/paul-portfolio/server/server.mjs"
+    "verify": "npm run guard && npm run lint && npm run format:check && npm run check && npm test && npm run build",
+    "prepare": "husky",
+    "check:size": "node scripts/check-file-size.mjs",
+    "check:layers": "node scripts/check-layers.mjs",
+    "knip": "knip",
+    "guard": "npm run check:size && npm run check:layers && npm run check:design && npm run check:matrix && npm run check:docs && npm run knip",
+    "check:design": "node scripts/check-design.mjs",
+    "check:matrix": "node scripts/check-test-matrix.mjs",
+    "check:docs": "node scripts/check-docs.mjs"
   },
-  "private": true,
-  "packageManager": "npm@11.6.1",
   "dependencies": {
-    "@angular/common": "^22.2.0",
-    "@angular/compiler": "^22.2.0",
-    "@angular/core": "^22.2.0",
-    "@angular/forms": "^22.2.0",
-    "@angular/platform-browser": "^22.2.0",
-    "@angular/platform-server": "^22.2.0",
-    "@angular/router": "^22.2.0",
-    "@angular/ssr": "^22.2.0",
-    "@ngx-translate/core": "^17.0.0",
-    "@ngx-translate/http-loader": "^17.0.0",
-    "@tailwindcss/vite": "^4.2.2",
-    "express": "^5.1.0",
-    "rxjs": "~7.8.0",
-    "tailwindcss": "^4.2.2",
-    "tslib": "^2.3.0"
+    "@astrojs/sitemap": "^3.7.4",
+    "@effect/platform": "^0.97.2",
+    "@effect/platform-node": "^0.108.2",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.5",
+    "effect": "^3.22.2",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
-    "@angular/build": "^22.2.0",
-    "@angular/cli": "^22.2.0",
-    "@angular/compiler-cli": "^22.2.0",
+    "@astrojs/check": "^0.9.10",
+    "@axe-core/playwright": "^4.13.0",
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
+    "@effect/language-service": "^0.87.3",
+    "@effect/vitest": "^0.30.0",
+    "@eslint/js": "^10.0.0",
     "@playwright/test": "^1.59.1",
-    "@tailwindcss/postcss": "^4.2.2",
-    "@types/express": "^5.0.1",
-    "@types/node": "^20.17.19",
-    "@vitest/coverage-v8": "^4.1.11",
-    "angular-eslint": "^22.5.0",
+    "@types/node": "^24.0.0",
     "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-astro": "^3.2.1",
     "husky": "^9.1.7",
-    "jsdom": "^28.0.0",
+    "knip": "^6.38.0",
     "lint-staged": "^16.4.0",
     "prettier": "^3.9.9",
+    "prettier-plugin-astro": "^1.1.0",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.70.0",
     "vitest": "^4.1.11"
   },
   "lint-staged": {
-    "*.ts": [
+    "*.{ts,mjs,astro}": [
       "eslint --fix",
       "prettier --write"
     ],
-    "*.html": [
-      "prettier --write"
-    ],
-    "*.css": [
+    "*.{css,json}": [
       "prettier --write"
     ]
+  },
+  "overrides": {
+    "@effect/vitest": {
+      "vitest": "$vitest"
+    }
   }
 }

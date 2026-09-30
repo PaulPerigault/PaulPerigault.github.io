@@ -1,0 +1,51 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import type { Lang } from '@/domain/lang';
+import { useTranslations } from '@/lib/i18n';
+import NavLinks from './NavLinks.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<button
+  type="button"
+  data-menu-open
+  aria-haspopup="dialog"
+  aria-expanded="false"
+  aria-controls="mobile-menu"
+  aria-label={t('nav.menu_open')}
+  class="border-control hidden rounded-sm border p-1.5 js:max-md:inline-flex"
+>
+  <Icon name="menu" />
+</button>
+
+<dialog
+  id="mobile-menu"
+  data-menu-dialog
+  aria-label={t('nav.primary')}
+  class="bg-bg text-fg backdrop:bg-fg/40 m-0 h-dvh max-h-none w-full max-w-none p-6"
+>
+  <div class="flex justify-end">
+    <button
+      type="button"
+      data-menu-close
+      aria-label={t('nav.menu_close')}
+      class="border-control rounded-sm border p-1.5"
+    >
+      <Icon name="close" />
+    </button>
+  </div>
+  <nav aria-label={t('nav.primary')} class="mt-8">
+    <NavLinks lang={lang} vertical />
+  </nav>
+</dialog>
+
+<script>
+  import { initMenu } from '@/scripts/menu';
+  initMenu();
+</script>

@@ -1,6 +1,6 @@
 ---
 name: update-favicon
-description: Régénère le jeu complet de favicons et d'icônes web à partir d'un logo SVG ou raster. À utiliser lorsqu'un logo est ajouté ou modifié, lorsqu'un favicon doit être actualisé, ou lorsqu'il faut mettre à jour les balises d'icône dans index.html et ouvrir une pull request.
+description: Régénère le jeu complet de favicons et d'icônes web à partir d'un logo SVG ou raster. À utiliser lorsqu'un logo est ajouté ou modifié, lorsqu'un favicon doit être actualisé, ou lorsqu'il faut mettre à jour les balises d'icône dans SeoHead.astro et ouvrir une pull request.
 ---
 
 # Update favicon
@@ -38,7 +38,7 @@ déjà en place, ne pas créer une nouvelle arborescence) :
   une logique PWA/manifest ; sinon ne pas l'ajouter.
 
 ## 3. Mise à jour du code
-- Mettre à jour les balises `<link rel="icon"...>` dans `index.html` (ou
+- Mettre à jour les balises `<link rel="icon"...>` dans `src/components/layout/SeoHead.astro` (ou
   l'équivalent SSR) sans dupliquer ni toucher au reste du `<head>`.
 
 ## 4. Vérifications

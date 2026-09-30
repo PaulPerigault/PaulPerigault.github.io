@@ -10,6 +10,13 @@ body:
     validations:
       required: true
   - type: textarea
+    id: tests
+    attributes:
+      label: Comment vérifier
+      description: Test, script ou commande qui prouve que c'est fait.
+    validations:
+      required: true
+  - type: textarea
     id: impact
     attributes:
       label: Impact si non traité

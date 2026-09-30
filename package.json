@@ -28,6 +28,7 @@
     "guard": "npm run check:size && npm run check:layers && npm run knip"
   },
   "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
     "@effect/platform": "^0.97.2",
     "@effect/platform-node": "^0.108.2",
     "@tailwindcss/vite": "^4.3.3",

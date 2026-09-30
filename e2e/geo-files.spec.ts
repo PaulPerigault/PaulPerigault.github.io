@@ -64,8 +64,8 @@ test.describe('robots et fichiers pour les IA', () => {
 
   test('llms-full.txt contient les deux profils', async ({ request }) => {
     const text = await (await request.get('/llms-full.txt')).text();
-    expect(text).toContain('# Paul Perigault — Ingénieur DevOps');
-    expect(text).toContain('# Paul Perigault — DevOps Engineer');
+    expect(text).toContain('# Paul Perigault — Alternant DevOps Cloud');
+    expect(text).toContain('# Paul Perigault — Cloud DevOps Apprentice');
   });
 
   test('la clé IndexNow est servie, security.txt est valide et non expiré', async ({ request }) => {

@@ -16,7 +16,7 @@ for (const lang of ['fr', 'en'] as const) {
       await expect(about).toBeVisible();
       await expect(about).toContainText('ESIEA Paris');
       await expect(about).toContainText('WeVii');
-      await expect(about).toContainText('Terraform');
+      await expect(about).toContainText(lang === 'fr' ? 'septembre 2023' : 'September 2023');
       await expect(about.getByText(COPY[lang].place)).toBeVisible();
       await expect(about).toContainText('Paris, France');
     });
@@ -33,11 +33,6 @@ for (const lang of ['fr', 'en'] as const) {
         await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
       }
       await expect(contact.getByText(COPY[lang].email)).toBeVisible();
-    });
-
-    test('les sections sont numérotées dans l’ordre de la navigation', async ({ page }) => {
-      await expect(page.locator('#about header span')).toHaveText('01 —');
-      await expect(page.locator('#contact header span')).toHaveText('07 —');
     });
   });
 }

@@ -17,10 +17,9 @@ const requireData = async (region: Locator) => {
 
 for (const lang of ['fr', 'en'] as const) {
   test.describe(`projets (${lang})`, () => {
-    test('la section est un repère nommé, numéroté 05', async ({ page }) => {
+    test('la section est un repère nommé par son titre', async ({ page }) => {
       await page.goto(`/${lang}/`);
       await expect(page.getByRole('region', { name: COPY[lang].title })).toBeVisible();
-      await expect(page.locator('#projects header span')).toHaveText('05 —');
     });
 
     test('affiche un projet par dépôt configuré, avec liens sûrs et thèmes limités', async ({

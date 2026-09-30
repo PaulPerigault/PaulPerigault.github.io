@@ -1,0 +1,7 @@
+/*
+ * Atkinson Hyperlegible Next (Braille Institute, licence SIL OFL) : conçue pour la lisibilité,
+ * auto-hébergée par Fontsource → aucune requête tierce (CSP `font-src 'self'`, RGPD). Le paquet
+ * ne fournit que les sous-ensembles latin et latin étendu ; le navigateur ne télécharge que celui
+ * dont la page a besoin (le français tient dans « latin »).
+ */
+@import '@fontsource-variable/atkinson-hyperlegible-next/wght.css';

@@ -4,20 +4,19 @@ Composants Astro **sans logique métier** de `src/components/ui/`. Ils reçoiven
 
 Vitrine vivante : `/fr/styleguide/` et `/en/styleguide/` (non indexées, `noindex`, exclues du sitemap).
 
-| Composant                   | Rôle                                                                   | Props principales                                                 |
-| --------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `Container`                 | Largeur max de page + gouttière                                        | `as` (`div`, `header`, `nav`, `footer`), `class`                  |
-| `Section`                   | Section ancrée, nommée par son titre (`aria-labelledby`)               | `id`, `title`, `index` (affiche « 03 — »)                         |
-| `Heading`                   | Titre h1–h4 ; **niveau sémantique découplé de la taille**              | `level`, `size` (`display`, `2xl`, `xl`, `lg`), `id`, `class`     |
-| `Card`                      | Bloc à filet, sans ombre                                               | `as` (`div`, `li`, `article`), `interactive`                      |
-| `Tag`                       | Étiquette mono rectangulaire                                           | slot                                                              |
-| `ButtonLink`                | Lien stylé en bouton ; lien externe → `target`/`rel` sûrs automatiques | `href`, `variant` (`primary`, `secondary`), `icon`, `newTabLabel` |
-| `ExternalLink`              | Lien de texte sortant + annonce « nouvel onglet »                      | `href`, `newTabLabel`                                             |
-| `Icon`                      | SVG décoratif (`aria-hidden`), jeu défini dans `lib/icons.ts`          | `name`                                                            |
-| `DescriptionList`           | `<dl>` terme/description                                               | `items`                                                           |
-| `Timeline` / `TimelineItem` | Liste ordonnée chronologique, `<time datetime>`                        | `title`, `subtitle`, `period`, `dateTime`                         |
-| `VisuallyHidden`            | Texte réservé aux lecteurs d'écran                                     | slot                                                              |
-| `SkipLink`                  | Lien d'évitement (premier arrêt clavier)                               | `label`, `target`                                                 |
+| Composant                   | Rôle                                                                   | Props principales                                                             |
+| --------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `Container`                 | Largeur max de page + gouttière                                        | `as` (`div`, `header`, `nav`, `footer`), `class`                              |
+| `Section`                   | Section ancrée, nommée par son titre (`aria-labelledby`)               | `id`, `title` (titre à gauche, contenu à droite)                              |
+| `Heading`                   | Titre h1–h4 ; **niveau sémantique découplé de la taille**              | `level`, `size` (`display`, `2xl`, `xl`, `lg`), `id`, `class`                 |
+| `Card`                      | Bloc à filet, sans ombre                                               | `as` (`div`, `li`, `article`), `interactive`                                  |
+| `ButtonLink`                | Lien stylé en bouton ; lien externe → `target`/`rel` sûrs automatiques | `href`, `variant` (`primary`, `secondary`), `icon`, `newTabLabel`, `download` |
+| `ExternalLink`              | Lien de texte sortant + annonce « nouvel onglet »                      | `href`, `newTabLabel`                                                         |
+| `Icon`                      | SVG décoratif (`aria-hidden`), jeu défini dans `lib/icons.ts`          | `name`                                                                        |
+| `DescriptionList`           | `<dl>` terme/description                                               | `items`                                                                       |
+| `Timeline` / `TimelineItem` | Liste ordonnée chronologique (titre et date sur une ligne)             | `title`, `subtitle`, `period`, `dateTime`                                     |
+| `VisuallyHidden`            | Texte réservé aux lecteurs d'écran                                     | slot                                                                          |
+| `SkipLink`                  | Lien d'évitement (premier arrêt clavier)                               | `label`, `target`                                                             |
 
 ## Règles d'usage
 

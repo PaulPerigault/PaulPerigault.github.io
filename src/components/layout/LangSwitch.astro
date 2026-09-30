@@ -18,7 +18,7 @@ const href = Astro.url.pathname.replace(`/${lang}/`, `/${other}/`);
   lang={other}
   data-lang-switch={other}
   aria-label={t(`lang.${other}`)}
-  class="border-control hover:border-accent hover:text-accent rounded-sm border px-2 py-1 font-mono text-xs uppercase transition-colors duration-(--pp-duration)"
+  class="border-control hover:border-accent hover:text-accent rounded-sm border px-2 py-1 text-sm font-semibold uppercase transition-colors duration-(--pp-duration)"
 >
   {other}
 </a>

@@ -14,7 +14,7 @@ Le dépôt fait tout ce qui est automatisable (voir `CLAUDE.md`, section « GEO 
 
 Poser les mêmes questions aux assistants (ChatGPT, Claude, Gemini, Perplexity, Copilot) et consigner la date et le résultat :
 
-1. « Qui est Paul Perigault, ingénieur DevOps ? »
+1. « Qui est Paul Perigault, alternant DevOps Cloud ? »
 2. « Où travaille Paul Perigault ? Où a-t-il étudié ? »
 3. « Quelles sont les compétences et certifications de Paul Perigault ? »
 

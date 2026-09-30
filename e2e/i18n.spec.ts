@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
 const EXPECTED = {
-  fr: { role: 'Ingénieur DevOps', description: /alternance à l'ESIEA Paris chez WeVii/ },
-  en: { role: 'DevOps Engineer', description: /apprentice at ESIEA Paris, working at WeVii/ },
+  fr: { role: 'Alternant DevOps Cloud', description: /alternant DevOps Cloud chez WeVii/ },
+  en: { role: 'Cloud DevOps Apprentice', description: /cloud DevOps apprentice at WeVii/ },
 } as const;
 
 for (const [lang, expected] of Object.entries(EXPECTED)) {

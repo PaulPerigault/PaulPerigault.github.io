@@ -31,9 +31,7 @@ for (const lang of ['fr', 'en'] as const) {
       await page.goto(`/${lang}/`);
     });
 
-    test('Compétences : une ligne par catégorie, éléments joints, icônes décoratives', async ({
-      page,
-    }) => {
+    test('Compétences : une ligne par catégorie, éléments joints, sans icône', async ({ page }) => {
       const categories = loadContent<Skill[]>(lang, 'skills');
       const region = page.getByRole('region', { name: NAMES[lang].skills });
       await expect(region.locator('dt')).toHaveCount(categories.length);
@@ -41,7 +39,7 @@ for (const lang of ['fr', 'en'] as const) {
         await expect(region.locator('dt', { hasText: category })).toBeVisible();
         await expect(region).toContainText(items.join(' · '));
       }
-      await expect(region.locator('dt svg[aria-hidden="true"]')).toHaveCount(categories.length);
+      await expect(region.locator('svg')).toHaveCount(0);
     });
 
     test('Expérience : ordre du plus récent au plus ancien, période et étiquettes', async ({
@@ -61,9 +59,8 @@ for (const lang of ['fr', 'en'] as const) {
         lang === 'fr' ? 'sept. 2023 — Présent' : 'Sep 2023 — Present',
       );
       await expect(region.locator('time').first()).toHaveAttribute('datetime', '2023-09');
-      await expect(
-        region.locator('li').first().getByText('Kubernetes', { exact: true }),
-      ).toBeVisible();
+      const [latest] = source as unknown as { tags: string[] }[];
+      await expect(region.locator('li').first()).toContainText((latest?.tags ?? []).join(', '));
     });
 
     test('Formation : diplôme, école, spécialité et période localisée', async ({ page }) => {

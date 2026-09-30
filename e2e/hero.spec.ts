@@ -2,14 +2,14 @@ import { expect, test } from '@playwright/test';
 
 const COPY = {
   fr: {
-    role: 'Ingénieur DevOps',
-    school: 'ESIEA Paris · Alternant chez WeVii',
+    role: 'Alternant DevOps Cloud',
+    school: 'Cycle ingénieur ESIEA Paris · WeVii',
     cv: /Télécharger le CV/,
     contact: /Me contacter/,
   },
   en: {
-    role: 'DevOps Engineer',
-    school: 'ESIEA Paris · Apprentice at WeVii',
+    role: 'Cloud DevOps Apprentice',
+    school: 'Engineering cycle at ESIEA Paris · WeVii',
     cv: /Download CV/,
     contact: /Get in touch/,
   },
@@ -29,9 +29,8 @@ for (const lang of ['fr', 'en'] as const) {
 
     test('les liens d’action pointent vers les bonnes cibles, de façon sûre', async ({ page }) => {
       const cv = page.getByRole('link', { name: COPY[lang].cv });
-      await expect(cv).toHaveAttribute('href', /cv-latex\/main\/out\/main\.pdf$/);
-      await expect(cv).toHaveAttribute('target', '_blank');
-      await expect(cv).toHaveAttribute('rel', 'noopener noreferrer');
+      await expect(cv).toHaveAttribute('href', '/cv-paul-perigault.pdf');
+      await expect(cv).toHaveAttribute('download', 'cv-paul-perigault.pdf');
 
       const contact = page.getByRole('link', { name: COPY[lang].contact });
       await expect(contact).toHaveAttribute('href', 'mailto:contact@paulperigault.fr');

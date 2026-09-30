@@ -6,6 +6,7 @@ import { buildSite } from './lib/astro-build.mjs';
 import { walk } from './lib/walk.mjs';
 
 const BUILD_TIMEOUT_MS = 120_000;
+const GITHUB_API_PATTERN = /api\.github\.com/;
 const REPO = {
   id: 7,
   name: 'GetUrlCloudRun',
@@ -55,7 +56,7 @@ describe('projets GitHub récupérés au build', () => {
         for (const topic of ['t-cinq', 't-six']) expect(page).not.toContain(topic);
       }
       const shipped = walk(outDir, ['.html', '.js', '.json']);
-      const leaks = shipped.filter((file) => readFileSync(file, 'utf8').includes('api.github.com'));
+      const leaks = shipped.filter((file) => GITHUB_API_PATTERN.test(readFileSync(file, 'utf8')));
       expect(leaks).toEqual([]);
     },
     BUILD_TIMEOUT_MS,

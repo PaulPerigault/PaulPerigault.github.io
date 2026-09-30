@@ -6,6 +6,7 @@ const COPY = {
   en: { title: 'Projects', updated: 'Updated', fetched: 'GitHub data' },
 } as const;
 const MAX_TOPICS = 4;
+const GITHUB_API_HOST = 'api.github.com';
 
 /** Le build local sans accès à GitHub se replie sur un état vide ; en CI il est strict : données exigées. */
 const requireData = async (region: Locator) => {
@@ -44,7 +45,7 @@ for (const lang of ['fr', 'en'] as const) {
     test('ne contacte jamais l’API GitHub depuis le navigateur', async ({ page }) => {
       const calls: string[] = [];
       page.on('request', (request) => {
-        if (request.url().includes('api.github.com')) calls.push(request.url());
+        if (new URL(request.url()).hostname === GITHUB_API_HOST) calls.push(request.url());
       });
       await page.goto(`/${lang}/`);
       await page.waitForLoadState('networkidle');

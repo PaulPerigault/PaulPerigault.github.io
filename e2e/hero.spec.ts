@@ -3,13 +3,13 @@ import { expect, test } from '@playwright/test';
 const COPY = {
   fr: {
     role: 'Alternant DevOps Cloud',
-    school: 'Cycle ingénieur ESIEA Paris · WeVii',
+    school: 'ESIEA Paris (majeure Software Engineering) · WeVii',
     cv: /Télécharger le CV/,
     contact: /Me contacter/,
   },
   en: {
     role: 'Cloud DevOps Apprentice',
-    school: 'Engineering cycle at ESIEA Paris · WeVii',
+    school: 'ESIEA Paris (Software Engineering major) · WeVii',
     cv: /Download CV/,
     contact: /Get in touch/,
   },

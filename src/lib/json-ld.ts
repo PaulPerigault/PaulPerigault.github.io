@@ -8,6 +8,7 @@ export interface JsonLdInput {
   title: string;
   description: string;
   jobTitle: string;
+  summary: string;
   imageUrl: string;
   skills: readonly string[];
   certifications: readonly Certification[];
@@ -27,6 +28,11 @@ export const personNode = (input: JsonLdInput): Node => ({
   name: SITE.name,
   url: SITE.domain,
   jobTitle: input.jobTitle,
+  description: input.summary,
+  email: `mailto:${SITE.email}`,
+  hasOccupation: { '@type': 'Occupation', name: input.jobTitle },
+  knowsLanguage: ['fr', 'en'],
+  mainEntityOfPage: `${SITE.domain}${input.path}`,
   image: input.imageUrl,
   sameAs: [SITE.githubUrl, SITE.linkedinUrl],
   worksFor: organization('Organization', SITE.employer),

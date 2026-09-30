@@ -16,6 +16,7 @@ const input: JsonLdInput = {
   title: 'Paul Perigault — Ingénieur DevOps',
   description: 'Portfolio',
   jobTitle: 'Ingénieur DevOps',
+  summary: 'Paul Perigault est ingénieur DevOps chez WeVii.',
   imageUrl: 'https://paulperigault.fr/_astro/photo.webp',
   skills: ['Docker', 'Terraform'],
   certifications: [certification],
@@ -60,6 +61,17 @@ describe('buildJsonLd', () => {
       jobTitle: 'Ingénieur DevOps',
       knowsAbout: ['Docker', 'Terraform'],
       sameAs: ['https://github.com/PaulPerigault', 'https://www.linkedin.com/in/paul-perigault'],
+    });
+  });
+
+  it('décrit l’entité pour les moteurs et les IA (résumé, métier, langues, contact)', () => {
+    expect(nodes(data)[0]).toMatchObject({
+      description: 'Paul Perigault est ingénieur DevOps chez WeVii.',
+      hasOccupation: { '@type': 'Occupation', name: 'Ingénieur DevOps' },
+      knowsLanguage: ['fr', 'en'],
+      email: 'mailto:contact@paulperigault.fr',
+      mainEntityOfPage: 'https://paulperigault.fr/fr/',
+      worksFor: { name: 'WeVii' },
     });
   });
 

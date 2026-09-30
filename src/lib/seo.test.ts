@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { alternates, canonicalUrl, pathForLang, socialTags } from './seo';
+import { alternates, canonicalUrl, pathForLang, socialTags, verificationTags } from './seo';
 
 const input = { lang: 'en', path: '/en/', title: 'T', description: 'D' } as const;
 
@@ -32,5 +32,19 @@ describe('seo', () => {
     expect(property['og:image:width']).toBe('1200');
     expect(name['twitter:card']).toBe('summary_large_image');
     expect(name['twitter:title']).toBe(property['og:title']);
+  });
+
+  it('ne produit des balises de vérification que pour les variables renseignées', () => {
+    expect(verificationTags({})).toEqual([]);
+    expect(verificationTags({ PUBLIC_GOOGLE_SITE_VERIFICATION: '' })).toEqual([]);
+    expect(
+      verificationTags({
+        PUBLIC_GOOGLE_SITE_VERIFICATION: 'abc',
+        PUBLIC_BING_SITE_VERIFICATION: 'def',
+      }),
+    ).toEqual([
+      { name: 'google-site-verification', content: 'abc' },
+      { name: 'msvalidate.01', content: 'def' },
+    ]);
   });
 });

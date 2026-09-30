@@ -57,3 +57,17 @@ export const socialTags = ({ lang, path, title, description }: SeoInput) => {
 };
 
 export const canonicalUrl = (path: string): string => absolute(path);
+
+const VERIFICATION_VARIABLES = {
+  PUBLIC_GOOGLE_SITE_VERIFICATION: 'google-site-verification',
+  PUBLIC_BING_SITE_VERIFICATION: 'msvalidate.01',
+} as const;
+
+/** Balises de vérification de propriété (Search Console, Bing) issues de variables d'environnement. */
+export const verificationTags = (
+  env: Readonly<Record<string, unknown>>,
+): { name: string; content: string }[] =>
+  Object.entries(VERIFICATION_VARIABLES).flatMap(([variable, name]) => {
+    const content = env[variable];
+    return typeof content === 'string' && content.length > 0 ? [{ name, content }] : [];
+  });

@@ -2,7 +2,7 @@
 import { SITE } from '@/config/site';
 import type { Lang } from '@/domain/lang';
 import { serializeJsonLd } from '@/lib/build-json-ld';
-import { alternates, canonicalUrl, socialTags } from '@/lib/seo';
+import { alternates, canonicalUrl, socialTags, verificationTags } from '@/lib/seo';
 import { THEME_COLOR } from '@/lib/theme';
 
 interface Props {
@@ -17,6 +17,7 @@ const { lang, title, description, jsonLd } = Astro.props;
 const path = Astro.url.pathname;
 const { property, name } = socialTags({ lang, path, title, description });
 const links = [SITE.githubUrl, SITE.linkedinUrl];
+const verification = verificationTags(import.meta.env);
 ---
 
 <title>{title}</title>
@@ -36,6 +37,10 @@ const links = [SITE.githubUrl, SITE.linkedinUrl];
 ))}
 {links.map((href) => (
   <link rel="me" href={href} />
+))}
+<link rel="alternate" type="text/markdown" href={`${path}index.md`} />
+{verification.map((tag) => (
+  <meta name={tag.name} content={tag.content} />
 ))}
 <link rel="icon" href="/favicon.ico" sizes="48x48" />
 <link rel="icon" type="image/svg+xml" href="/image/logo.svg" />

@@ -15,9 +15,7 @@ import { LANGS, type Lang } from '@/domain/lang';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { useTranslations } from '@/lib/i18n';
 import { buildJsonLd } from '@/lib/build-json-ld';
-import { loadPortfolio } from '@/services/portfolio';
-import { loadProjects } from '@/services/projects';
-import { runBuild } from '@/services/runtime';
+import { getSiteData } from '@/services/site-data';
 
 export const getStaticPaths = (() =>
   LANGS.map((lang) => ({ params: { lang } }))) satisfies GetStaticPaths;
@@ -26,8 +24,7 @@ const lang = Astro.params.lang as Lang;
 const t = useTranslations(lang);
 
 // Charge et valide tout le contenu et les projets GitHub au build (erreur typée = build rouge).
-const portfolio = await runBuild(loadPortfolio(lang));
-const projects = await runBuild(loadProjects(lang));
+const { portfolio, projects } = await getSiteData(lang);
 const image = await getImage({ src: photo, width: 200, height: 200, format: 'webp' });
 const jsonLd = buildJsonLd({
   lang,
@@ -35,6 +32,7 @@ const jsonLd = buildJsonLd({
   title: t('seo.title'),
   description: t('seo.description'),
   jobTitle: t('hero.role'),
+  summary: t('hero.summary'),
   imageUrl: `${SITE.domain}${image.src}`,
   skills: portfolio.skills.flatMap((category) => category.items),
   certifications: portfolio.certifications,

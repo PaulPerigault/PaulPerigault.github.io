@@ -15,17 +15,17 @@ Fait :
 - Infrastructure appliquée par la séquence de `infra/README.md` (widget, Worker, import Resend, DMARC, code, secrets, domaine) ; `plan` final : « No changes ».
 - Vraie clé de site dans la variable de dépôt `PUBLIC_TURNSTILE_SITEKEY` ; secret `CLOUDFLARE_API_TOKEN_DEPLOY` créé.
 - Worker vérifié en ligne (`https://contact.paulperigault.dev/`) : 405 sur GET, origine inconnue refusée, faux jeton Turnstile refusé par la vraie clé secrète.
-- Page légale et registre finalisés (#158), sources dans `docs/compliance.md`.
+- Page légale et registre finalisés (#158), sources dans `docs/compliance.md` ; fiches DPF de Cloudflare et Resend vérifiées par le propriétaire.
+- Mesure de Turnstile avec la clé de production (#166) ; envoi réel de bout en bout réussi depuis `/fr/` (2026-10-13).
+- Autorisation des rapports DMARC sur `paulperigault.fr` (TXT chez OVH).
 
 Reste :
 
-- **Après la mise en production** : faire un envoi réel de bout en bout et vérifier sa réception. La mesure de Turnstile avec la clé de production est faite (2026-10-13, `docs/compliance.md`).
-- **À vérifier dans un navigateur** : présence active de Cloudflare (participant 5666) et de Resend / Plus Five Five (participant 8907) sur la liste officielle du Data Privacy Framework (pages rendues en JavaScript, non lisibles automatiquement).
 - **Portage des helpers PowerShell en Node** (#161), priorité basse.
 
 ## Infrastructure : suites possibles
 
-- **Durcir DMARC sur `paulperigault.dev`** : l'enregistrement `_dmarc` est créé par Terraform en mode observation (`v=DMARC1; p=none; rua=mailto:contact@paulperigault.fr`, module `resend-domain`, #156). **Prérequis pour recevoir les rapports** : l'adresse `rua` est sur un autre domaine (`.fr`) ; selon la RFC 7489 (§ 7.1), `paulperigault.fr` doit l'autoriser par un TXT `paulperigault.dev._report._dmarc.paulperigault.fr` = `v=DMARC1`, à créer **chez OVH** par le propriétaire (hors Terraform), sans quoi la plupart des expéditeurs n'enverront pas de rapport. Lire ensuite les rapports agrégés reçus sur `contact@paulperigault.fr`. Après quelques semaines de rapports propres (tous les envois légitimes alignés SPF/DKIM via Resend, aucune source inconnue), passer à `p=quarantine`, puis, après une nouvelle période propre, à `p=reject`. Chaque étape = une modification de `dmarc_policy` dans `infra/main.tf`, un `plan` relu, un `apply` par le propriétaire.
+- **Durcir DMARC sur `paulperigault.dev`** : l'enregistrement `_dmarc` est en mode observation (`v=DMARC1; p=none; rua=mailto:contact@paulperigault.fr`, module `resend-domain`, #156), et `paulperigault.fr` autorise la réception des rapports (TXT chez OVH, fait). Lire les rapports agrégés reçus sur `contact@paulperigault.fr`. Après quelques semaines de rapports propres (tous les envois légitimes alignés SPF/DKIM via Resend, aucune source inconnue), passer à `p=quarantine`, puis, après une nouvelle période propre, à `p=reject`. Chaque étape = une modification de `dmarc_policy` dans `infra/main.tf`, un `plan` relu, un `apply`.
 - **Secrets Store de Cloudflare (option C de l'ADR-0007)** : un secret « en écriture seule », géré par Terraform (`cloudflare_secrets_store_secret`) et lié au Worker par un binding `secrets_store_secret`, indépendant des versions du code. Cela rendrait les secrets déclaratifs sans les rejouer contre `wrangler deploy`. Nécessite les permissions _Secrets Store_ sur le token et une vérification de la façon dont la valeur est conservée dans le state.
 - **`plan` Terraform en CI** avec un token Cloudflare en lecture seule dédié (issue à ouvrir) ; aujourd'hui seulement `fmt` et `validate`.
 

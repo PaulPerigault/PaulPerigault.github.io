@@ -17,7 +17,9 @@ $ErrorActionPreference = 'Stop'
 
 $exitCode = 1
 try {
-  Import-Secrets -Path (Get-SecretsFilePath)
+  # Terraform : token Cloudflare (provider) et clés S3 du bucket R2 (backend). Pas la clé Resend :
+  # elle est posée sur le Worker par contact-form-secrets.ps1 et n'entre jamais dans le state.
+  Import-Secrets -Path (Get-SecretsFilePath) -Names TF_VAR_cloudflare_api_token, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
   & terraform "-chdir=$PSScriptRoot" @args
   $exitCode = $LASTEXITCODE
 }

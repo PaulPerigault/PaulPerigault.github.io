@@ -13,7 +13,7 @@ $zoneName = 'paulperigault.dev'
 $api = 'https://api.cloudflare.com/client/v4'
 
 try {
-  Import-Secrets -Path (Get-SecretsFilePath)
+  Import-Secrets -Path (Get-SecretsFilePath) -Names TF_VAR_cloudflare_api_token
   $headers = @{ Authorization = "Bearer $env:TF_VAR_cloudflare_api_token" }
   $zone = (Invoke-RestMethod -Uri "$api/zones?name=$zoneName" -Headers $headers).result | Select-Object -First 1
   if (-not $zone) { throw "Zone $zoneName introuvable pour ce token." }

@@ -1,6 +1,8 @@
 # Worker du formulaire de contact. Secrets (jamais ici) : RESEND_API_KEY, TURNSTILE_SECRET.
 # Le domaine `contact.paulperigault.dev` et le widget Turnstile sont gérés par Terraform (infra/).
 name = "contact-form"
+# Compte Cloudflare (identifiant, pas un secret) : lève l'ambiguïté si un token voit plusieurs comptes.
+account_id = "5d7f707043c8dbe25d945c965f24880e"
 main = "src/index.ts"
 compatibility_date = "2026-10-01"
 

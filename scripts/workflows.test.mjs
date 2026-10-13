@@ -77,6 +77,17 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
     expect(browsers).toContain('all-browsers: true');
   });
 
+  it('cherchent des secrets dans tout l’historique Git avec un binaire vérifié', () => {
+    const gitleaks =
+      text('security.yml')
+        .split(/^ {2}gitleaks:\n/m)[1]
+        ?.split(/^ {2}\w/m)[0] ?? '';
+    expect(gitleaks).toContain('fetch-depth: 0');
+    expect(gitleaks).toMatch(/GITLEAKS_SHA256: [0-9a-f]{64}/);
+    expect(gitleaks).toContain('sha256sum -c');
+    expect(gitleaks).toContain('--redact');
+  });
+
   it('installent les dépendances avec npm ci (jamais npm install)', () => {
     for (const { name, text } of workflows) expect(text, name).not.toMatch(/run: npm install\b/);
   });

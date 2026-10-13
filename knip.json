@@ -1,5 +1,11 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["scripts/check-*.mjs", "scripts/serve-dist.mjs", "scripts/generate-og-image.mjs"],
+  "entry": [
+    "scripts/check-*.mjs",
+    "scripts/serve-dist.mjs",
+    "scripts/generate-og-image.mjs",
+    "scripts/guard-secret-files.mjs"
+  ],
+  "ignoreDependencies": ["@secretlint/secretlint-rule-preset-recommend"],
   "project": ["src/**/*.{ts,astro}", "e2e/**/*.ts", "scripts/**/*.mjs", "src/**/*.css"]
 }

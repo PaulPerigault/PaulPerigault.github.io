@@ -19,13 +19,14 @@ npm run format:check   # prettier --check (src, e2e, scripts)
 npm test               # vitest run (unit)
 npm run e2e            # Playwright against dist/ served by scripts/serve-dist.mjs (build first)
 npm run check:live     # contrôle le site EN PRODUCTION (redirections, en-têtes, robots, bots IA) — voir docs/infra.md
-npm run guard          # check:size + check:layers + check:design + check:matrix + knip (architecture guardrails)
+npm run check:secrets  # secretlint on every non-ignored file (masked output)
+npm run guard          # check:secrets + check:size + check:layers + check:design + check:matrix + check:docs + knip
 npm run verify         # guard + lint + format:check + check + test + build (also run by the pre-push hook)
 ```
 
 Node 24 (`.nvmrc`) and npm 11 are required; CI uses `npm ci` everywhere. `astro preview` self-daemonizes when an AI agent is detected (`AI_AGENT`), so e2e serves `dist/` with `scripts/serve-dist.mjs` (mimics GitHub Pages: directory index, `404.html`, no SPA fallback). To run e2e with a preinstalled Chromium set `PW_CHROMIUM_PATH`.
 
-Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → commitlint (Conventional Commits, subject lower-case, ≤ 72 chars), `pre-push` → `npm run verify`.
+Husky: `pre-commit` → lint-staged (secretlint on every staged file, eslint --fix + prettier), `commit-msg` → commitlint (Conventional Commits, subject lower-case, ≤ 72 chars), `pre-push` → `npm run verify`.
 
 ## Architecture
 
@@ -77,6 +78,15 @@ Husky: `pre-commit` → lint-staged (eslint --fix + prettier), `commit-msg` → 
 - Tests use `@effect/vitest` (`it.effect`, `TestClock` for retries) with in-memory `Layer`s from `src/test/`. `@effect/vitest` declares a `vitest@^3` peer; `package.json#overrides` maps it to the installed Vitest 4.
 - `@effect/language-service` is enabled in `tsconfig.json`.
 
+## Engineering principle
+
+Senior, maintainable code made of independent bricks.
+
+- One responsibility per file, component or Terraform module, behind an explicit interface (types; Terraform variables and outputs).
+- Inject dependencies (`fetch`, env, clock) instead of importing them; no global state, no hidden coupling.
+- Each brick (Worker, form, Terraform module) has its own tests, config and README, and can be replaced or removed without touching the others. Terraform: one module per service (`infra/modules/<service>`), composed by the root.
+- Readable before clever. No abstraction without a real second use. Any non-obvious decision goes into an ADR.
+
 ## Conventions
 
 - Component names `PascalCase.astro`, typed `interface Props`, no business logic in templates.
@@ -127,6 +137,9 @@ Required checks on protected branches stay `ci` and `commitlint` (names are stab
 - **GitHub Pages cannot set response headers**, so header-only protections (`frame-ancestors`, HSTS, COOP/CORP, `X-Frame-Options`…) exist only in the Docker/nginx deployment (`nginx.conf`, unprivileged image, non-root, read-only-friendly). nginx does **not** repeat script/style hashes (they change every build and are in the meta tag; browsers intersect both policies) and uses `expires` rather than `add_header` inside locations, because a location-level `add_header` would drop the server-level security headers. `scripts/check-container.sh` (CI job `container`) builds the image and verifies headers, 404, Markdown MIME, cache headers and non-root user. To get headers on the real site, put a proxy such as Cloudflare Transform Rules in front of GitHub Pages (infra decision for the owner).
 - **Supply chain / CI** (`scripts/workflows.test.mjs` enforces it): every action pinned by commit SHA with a `# vN` comment (Dependabot keeps them fresh), explicit least-privilege `permissions`, `timeout-minutes`, `persist-credentials: false`, `npm ci` only. `npm audit`, CodeQL and SBOM run in `security.yml`.
 - Secrets: `GITHUB_TOKEN` is read through Effect `Config.redacted`; never log it.
+- **Local secret files** (`infra/.secrets.env`, any `*.env` / `.env*`, `.dev.vars`) are git-ignored **and** docker-ignored (the `Dockerfile` does `COPY . .`; `scripts/check-container.sh` asserts that `infra/`, `worker/`, `.claude/` and env files are absent from the build stage). `*.tfstate*` and `*.tfplan` are ignored too: both hold secrets in clear. Only `*.example` templates are committed.
+- **AI assistant guard** (`.claude/settings.json`): `deny` rules forbid `Read`/`Edit` on those files, and a `PreToolUse` hook on `Bash|PowerShell` (`scripts/guard-secret-files.mjs`, logic in `scripts/lib/secret-files.mjs`, exec form, `onFailure: block`) refuses any shell command that names one. It guards against accidents, not an adversary (a glob such as `infra/.sec*` passes).
+- **Secret scanning**: `secretlint` (`.secretlintrc.json`, recommended preset; respects `.gitignore`, masks values) runs on staged files in `pre-commit` and on the whole tree in `guard` (so in CI); `scripts/secretlint.test.mjs` is a canary that proves a token is detected and masked. `security.yml` job `gitleaks` scans the **whole Git history** with the official binary, verified by a pinned SHA-256 (`--redact`, no third-party action, read-only). Secret files are deliberately **not** in a `.secretlintignore`: if one is ever force-added, the commit must fail.
 
 ## Privacy / GDPR
 

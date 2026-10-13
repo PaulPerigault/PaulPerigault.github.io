@@ -4,11 +4,11 @@ Enregistrements DNS qui permettent à Resend d'envoyer depuis `paulperigault.dev
 
 Ils ont été créés à la main lors de la vérification du domaine chez Resend. Ils sont **importés** (`infra/imports.tf`), jamais recréés : leurs valeurs ici doivent rester exactement celles de Resend, sinon le domaine perd sa vérification.
 
-Aucun enregistrement **DMARC** (`_dmarc`) n'existait dans la zone au moment de l'import (2026-10-13) : voir `ROADMAP.md`.
+Il gère aussi la politique **DMARC** (`_dmarc`, TXT) : aucun enregistrement n'existait dans la zone au moment de l'import (2026-10-13). Elle est **créée** par Terraform à partir de `dmarc_policy` (validée : `v=DMARC1;` et `p=none|quarantine|reject`), d'abord en observation (`p=none`), puis durcie (voir `ROADMAP.md`).
 
 ## Entrées
 
-`zone_id`, `domain`, `dkim_public_key` (publique), `return_path_targets` (sous-domaine → cible CNAME).
+`zone_id`, `domain`, `dkim_public_key` (publique), `return_path_targets` (sous-domaine → cible CNAME), `dmarc_policy`.
 
 ## Supprimer ce service
 

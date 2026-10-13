@@ -11,6 +11,7 @@
 
 Fait :
 
+- **En production** depuis #163 (`main`), Worker redéployé par `deploy-worker.yml`, Pages publié.
 - Infrastructure appliquée par la séquence de `infra/README.md` (widget, Worker, import Resend, DMARC, code, secrets, domaine) ; `plan` final : « No changes ».
 - Vraie clé de site dans la variable de dépôt `PUBLIC_TURNSTILE_SITEKEY` ; secret `CLOUDFLARE_API_TOKEN_DEPLOY` créé.
 - Worker vérifié en ligne (`https://contact.paulperigault.dev/`) : 405 sur GET, origine inconnue refusée, faux jeton Turnstile refusé par la vraie clé secrète.
@@ -18,7 +19,7 @@ Fait :
 
 Reste :
 
-- **Après la mise en production** : refaire la mesure de Turnstile avec la clé de production (`MEASURE_TURNSTILE=1`, `MEASURE_URL=https://paulperigault.fr/fr/`), mettre à jour le tableau de `docs/compliance.md`, et faire un envoi réel de bout en bout.
+- **Après la mise en production** : faire un envoi réel de bout en bout et vérifier sa réception. La mesure de Turnstile avec la clé de production est faite (2026-10-13, `docs/compliance.md`).
 - **À vérifier dans un navigateur** : présence active de Cloudflare (participant 5666) et de Resend / Plus Five Five (participant 8907) sur la liste officielle du Data Privacy Framework (pages rendues en JavaScript, non lisibles automatiquement).
 - **Portage des helpers PowerShell en Node** (#161), priorité basse.
 

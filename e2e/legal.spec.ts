@@ -43,6 +43,20 @@ for (const lang of ['fr', 'en'] as const) {
       }
     });
 
+    test('ne publie aucune ébauche : ni TODO ni marqueur de décision', async ({ page }) => {
+      await page.goto(`/${lang}/legal/`);
+      const text = await page.locator('main').innerText();
+      expect(text).not.toMatch(/TODO|\[(À DÉCIDER|À VÉRIFIER|TO DECIDE|TO CHECK)/i);
+    });
+
+    test('formulaire : conservation, iCloud, Turnstile et transferts', async ({ page }) => {
+      await page.goto(`/${lang}/legal/`);
+      const text = await page.locator('main').innerText();
+      for (const fact of ['12', 'iCloud', 'Turnstile', 'Resend', 'Cloudflare']) {
+        expect(text, fact).toContain(fact);
+      }
+    });
+
     test('est indexable, localisée et reliée à sa version dans l’autre langue', async ({
       page,
     }) => {

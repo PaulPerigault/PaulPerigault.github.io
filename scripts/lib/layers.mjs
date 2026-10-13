@@ -15,8 +15,19 @@ const LAYERS = {
     'src/domain',
     'src/config',
   ],
+  // Composants qui embarquent un script client (seul autre endroit, avec `layout`, autorisé à
+  // importer `src/scripts`) : les sections restent sans JavaScript.
+  'src/components/interactive': [
+    'src/components/interactive',
+    'src/components/ui',
+    'src/scripts',
+    'src/lib',
+    'src/domain',
+    'src/config',
+  ],
   'src/components/sections': [
     'src/assets',
+    'src/components/interactive',
     'src/components/sections',
     'src/components/ui',
     'src/lib',
@@ -38,6 +49,9 @@ const isInside = (path, layer) => path === layer || path.startsWith(`${layer}/`)
 function layerOf(path) {
   return Object.keys(LAYERS).find((layer) => isInside(path, layer));
 }
+
+/** Le fichier appartient-il à une couche déclarée (chemin POSIX relatif à la racine) ? */
+export const isInLayer = (path) => layerOf(path) !== undefined;
 
 export function isAllowed(fromPath, toPath) {
   const layer = layerOf(fromPath);

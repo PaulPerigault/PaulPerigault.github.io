@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findViolations } from './check-layers.mjs';
+import { coverageProblem, findViolations, run } from './check-layers.mjs';
 import { isAllowed } from './lib/layers.mjs';
 
 const file = (path, source) => ({ path, source });
@@ -16,6 +16,13 @@ describe('couches', () => {
   it('autorise les composants de layout à charger leurs scripts client, pas les sections', () => {
     expect(isAllowed('src/components/layout/Navbar.astro', 'src/scripts/menu.ts')).toBe(true);
     expect(isAllowed('src/components/sections/Hero.astro', 'src/scripts/menu.ts')).toBe(false);
+  });
+
+  it('autorise les composants interactifs à charger leurs scripts, utilisés par les sections', () => {
+    const form = 'src/components/interactive/ContactForm.astro';
+    expect(isAllowed(form, 'src/scripts/contact-form.ts')).toBe(true);
+    expect(isAllowed('src/components/sections/Contact.astro', form)).toBe(true);
+    expect(isAllowed(form, 'src/components/sections/Contact.astro')).toBe(false);
   });
 
   it('interdit le domaine vers les services', () => {
@@ -49,5 +56,23 @@ describe('findViolations', () => {
       'src/domain/a.ts',
       'src/components/ui/Card.astro',
     ]);
+  });
+});
+
+describe('couverture du contrôle (fail-closed)', () => {
+  it('échoue si aucun fichier n’appartient à une couche (chemins Windows non normalisés)', () => {
+    const files = [file(String.raw`src\domain\a.ts`, ''), file(String.raw`src\lib\b.ts`, '')];
+    expect(coverageProblem(files)).toMatch(/aucun des 2 fichiers/);
+  });
+
+  it('passe dès qu’un fichier est rattaché à une couche', () => {
+    expect(
+      coverageProblem([file('src/domain/a.ts', ''), file('src/pages/x.astro', '')]),
+    ).toBeNull();
+    expect(coverageProblem([])).toBeNull();
+  });
+
+  it('le dépôt réel est couvert : run() ne lève pas et ne trouve aucune violation', () => {
+    expect(run()).toEqual([]);
   });
 });

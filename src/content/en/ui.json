@@ -60,7 +60,27 @@
     "subtitle": "I'm available to speak at schools and to mentor student projects and hackathons.",
     "email_label": "Email",
     "linkedin_label": "LinkedIn",
-    "github_label": "GitHub"
+    "github_label": "GitHub",
+    "form": {
+      "heading": "Send a message",
+      "intro": "Your message reaches me by email and I reply to the address you give.",
+      "name": "Name",
+      "email": "Your email",
+      "message": "Message",
+      "honeypot": "Leave this field empty",
+      "submit": "Send",
+      "sending": "Sending…",
+      "privacy": "Your name, email and message are only used to reply to you; they are not kept anywhere but my inbox. A Cloudflare Turnstile bot check loads when you start typing.",
+      "privacy_link": "Details on the privacy page",
+      "error_required": "This field is required.",
+      "error_email": "Enter a full email address, for example name@example.com.",
+      "error_too_long": "This field is too long.",
+      "error_rejected": "This field contains characters that are not accepted.",
+      "invalid": "The message was not sent: please fix the highlighted fields.",
+      "sent": "Message sent. I will reply to the address you gave.",
+      "challenge": "The bot check did not complete. Wait a few seconds, then send the message again.",
+      "unavailable": "Sending failed. You can write to me directly at {email}."
+    }
   },
   "theme": {
     "light": "Light",

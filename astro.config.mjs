@@ -41,7 +41,6 @@ export default defineConfig({
         "base-uri 'none'",
         "form-action 'none'",
         "object-src 'none'",
-        "frame-src 'none'",
         "worker-src 'none'",
       ],
     },

@@ -32,7 +32,7 @@ for (const lang of ['fr', 'en'] as const) {
         await expect(link).toHaveAttribute('target', '_blank');
         await expect(link).toHaveAttribute('rel', 'noopener noreferrer');
       }
-      await expect(contact.getByText(COPY[lang].email)).toBeVisible();
+      await expect(contact.getByText(COPY[lang].email, { exact: true })).toBeVisible();
     });
   });
 }

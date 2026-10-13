@@ -14,6 +14,14 @@ for (const lang of ['fr', 'en'] as const) {
       await expect(page.locator('[data-theme-toggle]')).toBeHidden();
     });
 
+    test('pas de formulaire de contact : le lien e-mail reste le moyen de contact', async ({
+      page,
+    }) => {
+      await page.goto(`/${lang}/`);
+      await expect(page.locator('[data-contact-form]')).toBeHidden();
+      await expect(page.locator('#contact a[href^="mailto:"]')).toBeVisible();
+    });
+
     test('le changement de langue fonctionne', async ({ page }) => {
       await page.goto(`/${lang}/`);
       await page.locator('[data-lang-switch]').click();

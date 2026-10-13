@@ -28,7 +28,7 @@ async function acquire() {
 const ASTRO_BIN = join('node_modules', 'astro', 'bin', 'astro.mjs');
 
 const run = (outDir, env) =>
-  new Promise((resolve) => {
+  new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [ASTRO_BIN, 'build', '--outDir', outDir], {
       env: {
         ...process.env,
@@ -41,7 +41,9 @@ const run = (outDir, env) =>
     let output = '';
     child.stdout.on('data', (chunk) => (output += chunk));
     child.stderr.on('data', (chunk) => (output += chunk));
-    child.on('error', (error) => resolve({ status: null, output: String(error) }));
+    // Lancement impossible (binaire introuvable…) : rejet explicite, jamais un faux « échec du
+    // build » qu'un test attendant un échec pourrait prendre pour le comportement voulu.
+    child.on('error', reject);
     child.on('close', (status) => resolve({ status, output }));
   });
 

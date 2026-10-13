@@ -60,7 +60,27 @@
     "subtitle": "Je suis disponible pour intervenir en école, encadrer des projets étudiants et des hackathons.",
     "email_label": "E-mail",
     "linkedin_label": "LinkedIn",
-    "github_label": "GitHub"
+    "github_label": "GitHub",
+    "form": {
+      "heading": "Écrire un message",
+      "intro": "Le message m’arrive par e-mail et je réponds à l’adresse que vous indiquez.",
+      "name": "Nom",
+      "email": "Votre e-mail",
+      "message": "Message",
+      "honeypot": "Laisser ce champ vide",
+      "submit": "Envoyer",
+      "sending": "Envoi en cours…",
+      "privacy": "Nom, e-mail et message servent uniquement à vous répondre ; ils ne sont pas conservés ailleurs que dans ma boîte de réception. Une vérification anti-robot Cloudflare Turnstile se charge quand vous commencez à écrire.",
+      "privacy_link": "Détails dans la page de confidentialité",
+      "error_required": "Ce champ est obligatoire.",
+      "error_email": "Indiquez une adresse e-mail complète, par exemple nom@domaine.fr.",
+      "error_too_long": "Ce champ est trop long.",
+      "error_rejected": "Ce champ contient des caractères refusés.",
+      "invalid": "Le message n’est pas parti : corrigez les champs signalés.",
+      "sent": "Message envoyé. Je vous réponds à l’adresse indiquée.",
+      "challenge": "La vérification anti-robot n’a pas abouti. Patientez quelques secondes puis renvoyez le message.",
+      "unavailable": "L’envoi n’a pas fonctionné. Vous pouvez m’écrire directement à {email}."
+    }
   },
   "theme": {
     "light": "Clair",

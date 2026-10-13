@@ -1,4 +1,5 @@
 ---
+import ContactForm from '@/components/interactive/ContactForm.astro';
 import ExternalLink from '@/components/ui/ExternalLink.astro';
 import Section from '@/components/ui/Section.astro';
 import { SITE } from '@/config/site';
@@ -32,4 +33,5 @@ const channels = [
       </>
     ))}
   </dl>
+  <ContactForm lang={Astro.props.lang} />
 </Section>

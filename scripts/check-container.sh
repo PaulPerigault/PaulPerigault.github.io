@@ -8,6 +8,12 @@ PORT=18080
 trap 'docker rm -f "$NAME" >/dev/null 2>&1 || true' EXIT
 
 docker build -t "$IMAGE" .
+
+# Le Dockerfile fait `COPY . .` : .dockerignore doit garder secrets, infra et Worker hors du contexte.
+docker build -q --target builder -t "$IMAGE-builder" . >/dev/null
+docker run --rm --entrypoint sh "$IMAGE-builder" -c \
+  'test ! -e infra && test ! -e worker && test ! -e .claude && [ -z "$(find . -path ./node_modules -prune -o \( -name "*.env" -o -name ".env*" -o -name ".dev.vars" \) -print)" ]' \
+  || { echo "Secrets, infra/ ou worker/ présents dans le contexte de build"; exit 1; }
 docker run -d --name "$NAME" -p "$PORT:8080" --read-only --tmpfs /tmp --tmpfs /var/cache/nginx "$IMAGE" >/dev/null
 
 for _ in $(seq 1 30); do

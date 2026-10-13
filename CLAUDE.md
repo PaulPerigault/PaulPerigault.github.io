@@ -6,7 +6,7 @@ Guidance for Claude Code (claude.ai/code) in this repository.
 
 Personal portfolio for Paul Perigault (paulperigault.fr): **Astro 7** static site (`output: 'static'`, zero JS by default), Tailwind CSS v4, TypeScript `strictest`, FR/EN routes (`/fr/`, `/en/`), deployed to GitHub Pages. Data logic runs **at build time only** with [Effect](https://effect.website) (no Effect in the browser).
 
-The project was migrated from Angular 22 to Astro (epic [#64](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/64)); the reasoning is in `docs/adr/` (ADR-0001 to 0005), measured before/after.
+The project was migrated from Angular 22 to Astro (epic [#64](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/64)); the reasoning is in `docs/adr/` (ADR-0001 to 0005), measured before/after. ADR-0006 is the visual identity, ADR-0007 the contact form (Worker + Turnstile + Resend + Terraform, option A ownership split).
 
 ## Commands
 
@@ -174,7 +174,7 @@ Priority: search engines **and AI assistants must know Paul Perigault** — neve
 
 ## Documentation map
 
-`docs/ui.md` (primitives) · `docs/design-charter.md` (design rules) · `docs/test-matrix.md` (feature → e2e spec) · `docs/geo-checklist.md` (manual AI-visibility actions) · `docs/compliance.md` (GDPR register, domains) · `docs/audit-ia.md` (audit of AI-generated-site defects and of this site, with the improvement plan) · `docs/infra.md` (DNS, HTTPS, `.dev` → `.fr`, Cloudflare headers, search consoles, `check:live`) · `docs/adr/` (decisions) · `ROADMAP.md` (pending). `scripts/check-docs.mjs` (in `guard`) fails when a documented `npm run` script or repo path no longer exists.
+`docs/ui.md` (primitives) · `docs/design-charter.md` (design rules) · `docs/test-matrix.md` (feature → e2e spec) · `docs/geo-checklist.md` (manual AI-visibility actions) · `docs/compliance.md` (GDPR register, domains) · `docs/audit-ia.md` (audit of AI-generated-site defects and of this site, with the improvement plan) · `docs/infra.md` (DNS, HTTPS, `.dev` → `.fr`, Cloudflare headers, search consoles, `check:live`) · `docs/adr/` (decisions) · `docs/pistes-rust-go.md` (measured Rust/Go tooling options: none worth it today) · `infra/README.md` (Terraform, helpers, deploy sequence) · `worker/README.md` (Worker contract) · `ROADMAP.md` (pending). `scripts/check-docs.mjs` (in `guard`) fails when a documented `npm run` script or repo path no longer exists.
 
 ## Maintenance
 

@@ -18,6 +18,13 @@ describe('couches', () => {
     expect(isAllowed('src/components/sections/Hero.astro', 'src/scripts/menu.ts')).toBe(false);
   });
 
+  it('autorise les composants interactifs à charger leurs scripts, utilisés par les sections', () => {
+    const form = 'src/components/interactive/ContactForm.astro';
+    expect(isAllowed(form, 'src/scripts/contact-form.ts')).toBe(true);
+    expect(isAllowed('src/components/sections/Contact.astro', form)).toBe(true);
+    expect(isAllowed(form, 'src/components/sections/Contact.astro')).toBe(false);
+  });
+
   it('interdit le domaine vers les services', () => {
     expect(isAllowed('src/domain/skill.ts', 'src/services/content.ts')).toBe(false);
   });

@@ -32,16 +32,14 @@ test.describe('politique CSP', () => {
     const policy = await policyOf(page);
     for (const directive of [
       "default-src 'none'",
-      "connect-src 'self'",
       "base-uri 'none'",
       "form-action 'none'",
       "object-src 'none'",
-      "frame-src 'none'",
     ]) {
       expect(policy).toContain(directive);
     }
     expect(policy).toMatch(/script-src 'self'/);
-    expect(policy).not.toMatch(/unsafe-inline|unsafe-eval|https?:/);
+    expect(policy).not.toMatch(/unsafe-inline|unsafe-eval/);
   });
 
   test('autorise chaque script inline exécutable par son empreinte exacte', async ({ page }) => {

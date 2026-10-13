@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
+import { fillValid, mockTurnstile, mockWorker } from './helpers/contact';
 
 const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 const VIEWPORTS = {
@@ -61,6 +62,22 @@ test.describe('accessibilité des états interactifs', () => {
     await page.locator('[data-theme-toggle]').click();
     expect(await audit(page)).toEqual([]);
   });
+
+  for (const [state, reply] of [
+    ['erreurs de saisie affichées', null],
+    ['message envoyé', { status: 200, body: { ok: true } }],
+    ['envoi impossible', { status: 502, body: { ok: false, error: 'unavailable' } }],
+  ] as const) {
+    test(`formulaire de contact : ${state}`, async ({ page }) => {
+      await mockTurnstile(page);
+      await mockWorker(page, reply ?? {});
+      await page.goto('/fr/');
+      if (reply) await fillValid(page, 'fr');
+      await page.locator('[data-contact-form] button[type="submit"]').click();
+      await expect(page.locator('[data-form-status]')).not.toBeEmpty();
+      expect(await audit(page)).toEqual([]);
+    });
+  }
 
   test('cible d’une ancre : section atteinte', async ({ page }) => {
     await page.goto('/fr/#certifications');

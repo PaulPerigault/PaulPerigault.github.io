@@ -1,0 +1,60 @@
+---
+/**
+ * Champ de formulaire accessible : libellé visible relié au champ, message d'erreur relié par
+ * `aria-describedby` (vide et masqué tant qu'il n'y a pas d'erreur ; rempli par le script).
+ */
+interface Props {
+  id: string;
+  name: string;
+  label: string;
+  type?: 'text' | 'email' | 'textarea';
+  maxlength: number;
+  autocomplete?: string;
+  required?: boolean;
+  rows?: number;
+}
+
+const DEFAULT_ROWS = 6;
+const {
+  id,
+  name,
+  label,
+  type = 'text',
+  maxlength,
+  autocomplete,
+  required = true,
+  rows = DEFAULT_ROWS,
+} = Astro.props;
+const errorId = `${id}-error`;
+const control =
+  'border-control bg-bg text-fg aria-invalid:border-fg w-full rounded-sm border px-3 py-2 aria-invalid:border-2';
+---
+
+<div class="flex flex-col gap-1.5">
+  <label for={id} class="text-sm font-medium">
+    {label}
+  </label>
+  {type === 'textarea' ? (
+    <textarea
+      {id}
+      {name}
+      {maxlength}
+      {rows}
+      {required}
+      aria-describedby={errorId}
+      class:list={[control, 'resize-y']}
+    />
+  ) : (
+    <input
+      {id}
+      {name}
+      {type}
+      {maxlength}
+      {autocomplete}
+      {required}
+      aria-describedby={errorId}
+      class={control}
+    />
+  )}
+  <p id={errorId} class="text-sm font-medium" data-field-error hidden></p>
+</div>

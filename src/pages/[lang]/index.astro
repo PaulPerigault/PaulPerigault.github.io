@@ -15,6 +15,8 @@ import { LANGS, type Lang } from '@/domain/lang';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { useTranslations } from '@/lib/i18n';
 import { buildJsonLd } from '@/lib/build-json-ld';
+import { allowContactForm } from '@/lib/contact-csp';
+import { turnstileSiteKey } from '@/lib/contact-form';
 import { getSiteData } from '@/services/site-data';
 
 export const getStaticPaths = (() =>
@@ -22,6 +24,8 @@ export const getStaticPaths = (() =>
 
 const lang = Astro.params.lang as Lang;
 const t = useTranslations(lang);
+// Le formulaire de contact (section Contact) n'existe que si une clé Turnstile est fournie au build.
+if (turnstileSiteKey(import.meta.env)) allowContactForm(Astro.csp);
 
 // Charge et valide tout le contenu et les projets GitHub au build (erreur typée = build rouge).
 const { portfolio, projects } = await getSiteData(lang);

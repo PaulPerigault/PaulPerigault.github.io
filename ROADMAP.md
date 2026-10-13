@@ -7,6 +7,10 @@
 - **En-têtes de sécurité réels pour le site GitHub Pages** : mettre un proxy qui sait poser des en-têtes devant Pages (Cloudflare Transform Rules ou Worker) pour `frame-ancestors`, HSTS, COOP/CORP… Voir ADR-0004 et la section Sécurité de `CLAUDE.md`. Décision d'infrastructure (DNS, tiers).
 - **Actions GEO manuelles** : Search Console, Bing Webmaster, alignement des profils LinkedIn/GitHub, contrôles mensuels auprès des assistants (`docs/geo-checklist.md`).
 
+## Avant la mise en production du formulaire de contact (épic #133)
+
+- La variable de dépôt `PUBLIC_TURNSTILE_SITEKEY` vaut aujourd'hui la **clé de test publique** de Cloudflare (`1x00000000000000000000AA`, toujours acceptée) pour que la CI construise et teste le formulaire. Avant toute fusion `develop` → `main`, la remplacer par la vraie clé de site (sortie Terraform du widget, #138) et vérifier que le Worker est déployé sur `contact.paulperigault.dev` (#139). Sinon, en production, chaque envoi serait refusé par le Worker.
+
 ## Maintenance manuelle
 
 - **gitleaks est épinglé à la main** (`security.yml`, variables `GITLEAKS_VERSION` et `GITLEAKS_SHA256`) : Dependabot ne voit pas un binaire téléchargé. À mettre à jour régulièrement (par exemple à chaque trimestre) : prendre la dernière release de `gitleaks/gitleaks`, recopier la somme SHA-256 de l'archive `linux_x64` depuis son fichier `checksums.txt`, vérifier que le job reste vert.

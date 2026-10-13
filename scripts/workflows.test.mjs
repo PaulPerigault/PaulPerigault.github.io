@@ -59,7 +59,7 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
   it('expose les checks requis par la protection de branche : ci (agrégat) et commitlint', () => {
     const ci = text('ci.yml');
     expect(ci).toMatch(
-      /^ {2}ci:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify, build, e2e, lighthouse, container\]/m,
+      /^ {2}ci:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify, build, e2e, lighthouse, container, worker, infra\]/m,
     );
     expect(ci).toMatch(/^ {2}commitlint:/m);
   });
@@ -93,7 +93,14 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
   });
 
   it('ne laissent pas les identifiants Git dans les checkouts de vérification', () => {
-    for (const name of ['ci.yml', 'e2e.yml', 'build.yml', 'deploy.yml', 'security.yml']) {
+    for (const name of [
+      'ci.yml',
+      'e2e.yml',
+      'build.yml',
+      'deploy.yml',
+      'security.yml',
+      'deploy-worker.yml',
+    ]) {
       const checkouts = (text(name).match(/actions\/checkout@/g) ?? []).length;
       expect((text(name).match(/persist-credentials: false/g) ?? []).length, name).toBe(checkouts);
     }

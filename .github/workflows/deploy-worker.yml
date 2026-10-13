@@ -1,0 +1,51 @@
+name: Deploy Worker
+
+# Déploie le CODE du Worker du formulaire (worker/) avec Wrangler. Le service, son domaine et le
+# widget Turnstile sont gérés par Terraform (infra/, appliqué par le propriétaire) ; les secrets du
+# Worker sont posés par infra/contact-form-secrets.ps1 et conservés par `wrangler deploy`.
+on:
+  push:
+    branches: [main]
+    paths: ['worker/**', '.github/workflows/deploy-worker.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-worker
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+      - run: npm ci
+      # Jamais de déploiement d'un code qui ne passe pas ses propres contrôles.
+      - run: npm run verify
+      - name: Vérifier la présence du token de déploiement
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_DEPLOY }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::Secret CLOUDFLARE_API_TOKEN_DEPLOY absent (token « Workers Scripts : Edit », voir infra/README.md)."
+            exit 1
+          fi
+      - name: wrangler deploy
+        env:
+          # Token distinct de celui de Terraform, limité à « Workers Scripts : Edit » sur le compte.
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_DEPLOY }}
+        run: npx wrangler deploy

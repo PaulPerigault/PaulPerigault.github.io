@@ -86,10 +86,52 @@ jobs:
       - name: Construire l'image et vérifier en-têtes, pages et utilisateur non-root
         run: scripts/check-container.sh
 
+  # Worker du formulaire (brique autonome, ses propres dépendances) : lint, format, types, tests.
+  worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+      - run: npm ci
+      - run: npm run verify
+
+  # Terraform sans secret ni backend : format et validité. Jamais de plan ni d'apply en CI.
+  infra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
+        with:
+          terraform_version: 1.15.8
+          terraform_wrapper: false
+      - run: terraform fmt -check -recursive infra
+      - run: terraform -chdir=infra init -backend=false -input=false
+      - run: terraform -chdir=infra validate
+      - name: Tests des helpers PowerShell (faux secrets, doublures)
+        shell: pwsh
+        run: |
+          foreach ($test in Get-ChildItem infra/tests/*.test.ps1) {
+            pwsh -NoProfile -File $test.FullName
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          }
+
   # Point de contrôle unique (check requis `ci`) : vert seulement si TOUT le reste est vert.
   ci:
     if: ${{ always() }}
-    needs: [verify, build, e2e, lighthouse, container]
+    needs: [verify, build, e2e, lighthouse, container, worker, infra]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

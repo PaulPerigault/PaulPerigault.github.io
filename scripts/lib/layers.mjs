@@ -50,6 +50,9 @@ function layerOf(path) {
   return Object.keys(LAYERS).find((layer) => isInside(path, layer));
 }
 
+/** Le fichier appartient-il à une couche déclarée (chemin POSIX relatif à la racine) ? */
+export const isInLayer = (path) => layerOf(path) !== undefined;
+
 export function isAllowed(fromPath, toPath) {
   const layer = layerOf(fromPath);
   if (fromPath.includes('.test.') || !layer || !toPath.startsWith('src/')) return true;

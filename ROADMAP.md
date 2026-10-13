@@ -7,15 +7,20 @@
 - **En-têtes de sécurité réels pour le site GitHub Pages** : mettre un proxy qui sait poser des en-têtes devant Pages (Cloudflare Transform Rules ou Worker) pour `frame-ancestors`, HSTS, COOP/CORP… Voir ADR-0004 et la section Sécurité de `CLAUDE.md`. Décision d'infrastructure (DNS, tiers).
 - **Actions GEO manuelles** : Search Console, Bing Webmaster, alignement des profils LinkedIn/GitHub, contrôles mensuels auprès des assistants (`docs/geo-checklist.md`).
 
-## Avant la mise en production du formulaire de contact (épic #133)
+## Formulaire de contact (épic #133) : état au 2026-10-13
 
-Rien de ceci n'est automatique : à cocher avant toute fusion `develop` → `main`.
+Fait :
 
-- **Infrastructure appliquée** par le propriétaire selon la séquence de `infra/README.md` (« Premier déploiement ») : Worker, widget, import Resend, code, secrets, puis domaine `contact.paulperigault.dev`.
-- **Clé de site** : la variable de dépôt `PUBLIC_TURNSTILE_SITEKEY` vaut aujourd'hui la **clé de test publique** de Cloudflare (`1x00000000000000000000AA`, toujours acceptée) pour que la CI construise et teste le formulaire. La remplacer par la vraie clé (`gh variable set`, sortie `contact_form_turnstile_sitekey`). Sinon, en production, chaque envoi serait refusé par le Worker.
-- **Token de déploiement du Worker** : créer le secret GitHub `CLOUDFLARE_API_TOKEN_DEPLOY`, un token limité à _Workers Scripts : Edit_ sur le compte (#139).
-- Compléter les `TODO (propriétaire)` de la page légale (`src/content/{fr,en}/legal.json`, section `contact`) et de `docs/compliance.md` : durée de conservation des messages et des journaux Resend, cadre des transferts hors UE (Cloudflare, Resend), mention éventuelle d'iCloud, exemption de consentement de Turnstile.
-- Refaire la mesure de Turnstile avec la clé de production (`MEASURE_TURNSTILE=1`, `MEASURE_URL=https://paulperigault.fr/fr/`) et mettre à jour le tableau de `docs/compliance.md` si le résultat diffère de la clé de test.
+- Infrastructure appliquée par la séquence de `infra/README.md` (widget, Worker, import Resend, DMARC, code, secrets, domaine) ; `plan` final : « No changes ».
+- Vraie clé de site dans la variable de dépôt `PUBLIC_TURNSTILE_SITEKEY` ; secret `CLOUDFLARE_API_TOKEN_DEPLOY` créé.
+- Worker vérifié en ligne (`https://contact.paulperigault.dev/`) : 405 sur GET, origine inconnue refusée, faux jeton Turnstile refusé par la vraie clé secrète.
+- Page légale et registre finalisés (#158), sources dans `docs/compliance.md`.
+
+Reste :
+
+- **Après la mise en production** : refaire la mesure de Turnstile avec la clé de production (`MEASURE_TURNSTILE=1`, `MEASURE_URL=https://paulperigault.fr/fr/`), mettre à jour le tableau de `docs/compliance.md`, et faire un envoi réel de bout en bout.
+- **À vérifier dans un navigateur** : présence active de Cloudflare (participant 5666) et de Resend / Plus Five Five (participant 8907) sur la liste officielle du Data Privacy Framework (pages rendues en JavaScript, non lisibles automatiquement).
+- **Portage des helpers PowerShell en Node** (#161), priorité basse.
 
 ## Infrastructure : suites possibles
 

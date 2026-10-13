@@ -1,0 +1,12 @@
+# Modèle de `.dev.vars` (git-ignoré) pour `npm run dev`. Copier en `.dev.vars` et remplir.
+# Ne jamais versionner `.dev.vars`.
+
+# Ajoute l'origine du site lancé par `npm run dev` à la racine du dépôt.
+ALLOWED_ORIGINS=https://paulperigault.fr,http://localhost:4321
+
+# Clés de test publiques de Cloudflare (le jeton est toujours accepté) ou vraie clé.
+# Voir https://developers.cloudflare.com/turnstile/troubleshooting/testing/
+TURNSTILE_SECRET=
+
+# Clé Resend (accès « Sending » limité au domaine paulperigault.dev).
+RESEND_API_KEY=

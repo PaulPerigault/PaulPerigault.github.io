@@ -21,7 +21,8 @@ npm run e2e            # Playwright against dist/ served by scripts/serve-dist.m
 npm run check:live     # contrôle le site EN PRODUCTION (redirections, en-têtes, robots, bots IA) — voir docs/infra.md
 npm run check:secrets  # secretlint on every non-ignored file (masked output)
 npm run guard          # check:secrets + check:size + check:layers + check:design + check:matrix + check:docs + knip
-npm run verify         # guard + lint + format:check + check + test + build (also run by the pre-push hook)
+npm run verify         # guard + lint + format:check + check + test + build + verify:worker (also run by the pre-push hook)
+npm run verify:worker  # worker/: lint + format + types + unit tests (run `npm ci` in worker/ once)
 ```
 
 Node 24 (`.nvmrc`) and npm 11 are required; CI uses `npm ci` everywhere. `astro preview` self-daemonizes when an AI agent is detected (`AI_AGENT`), so e2e serves `dist/` with `scripts/serve-dist.mjs` (mimics GitHub Pages: directory index, `404.html`, no SPA fallback). To run e2e with a preinstalled Chromium set `PW_CHROMIUM_PATH`.
@@ -41,6 +42,13 @@ Husky: `pre-commit` → lint-staged (secretlint on every staged file, eslint --f
 - `src/lib/i18n.ts` — `useTranslations(lang)` returns `t(key)`; keys are dotted paths derived from `fr/ui.json` so an unknown key does not compile, and EN must have the exact shape of FR (`satisfies`). `services/portfolio.ts` — `loadPortfolio(lang)` loads and validates everything for a language.
 - Adding a UI string: add the key to **both** `ui.json` files. Adding a content item: same `id` in both languages. Never fetch content in the browser.
 - SEO head, JSON-LD, sitemap and GEO: see « SEO and AI visibility »; CSP: see « Security ».
+
+### Contact Worker (`worker/`)
+
+- Standalone brick (own `package.json`, lock, `tsconfig`, `eslint.config.mjs`, `.prettierrc`, Vitest, `README.md`): a Cloudflare Worker on `contact.paulperigault.dev` that validates the contact form, checks Turnstile (`siteverify`, no `remoteip`) and sends a **plain-text** e-mail through Resend (`reply_to` = visitor). Nothing is stored or logged (`observability` off, no `console`).
+- `POST`/`OPTIONS` only (else 405); **CORS** exact origins from `ALLOWED_ORIGINS` (`wrangler.toml`; `*` ignored; `localhost` only through the local dev vars file); stable generic error codes (`invalid`, `forbidden`, `challenge`, `too_large`, `unsupported`, `unavailable`); honeypot `website` → 200 without sending. Contract and order of checks: `worker/README.md`.
+- `createHandler({ fetch })` injects `fetch`; tests use `worker/src/test/fakes.ts` (no network). Field limits live in `worker/src/limits.ts`.
+- Kept out of the site tooling: root ESLint ignores `worker/**` (the worker config imports the **same** `eslint.design-rules.mjs`), root `tsconfig`/Vitest/knip never see it, `check:size` does cover `worker/src`. Secrets `RESEND_API_KEY`/`TURNSTILE_SECRET` never in the repo.
 
 ### Design system (tokens)
 

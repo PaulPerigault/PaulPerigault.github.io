@@ -21,7 +21,7 @@
     "test": "vitest run --passWithNoTests",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
-    "verify": "npm run guard && npm run lint && npm run format:check && npm run check && npm test && npm run build",
+    "verify": "npm run guard && npm run lint && npm run format:check && npm run check && npm test && npm run build && npm run verify:worker",
     "prepare": "husky",
     "check:size": "node scripts/check-file-size.mjs",
     "check:layers": "node scripts/check-layers.mjs",
@@ -31,7 +31,8 @@
     "check:matrix": "node scripts/check-test-matrix.mjs",
     "check:docs": "node scripts/check-docs.mjs",
     "check:live": "node scripts/check-live.mjs",
-    "check:secrets": "secretlint \"**/*\""
+    "check:secrets": "secretlint \"**/*\"",
+    "verify:worker": "npm --prefix worker run verify"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -72,7 +73,7 @@
       "secretlint"
     ],
     "*.{ts,mjs,astro}": [
-      "eslint --fix",
+      "eslint --fix --no-warn-ignored",
       "prettier --write"
     ],
     "*.{css,json}": [

@@ -5,7 +5,7 @@ import { walk } from './lib/walk.mjs';
 
 export const MAX_FILE_LINES = 120;
 const EXTENSIONS = ['.ts', '.astro', '.css', '.mjs'];
-const ROOTS = ['src', 'e2e', 'scripts'];
+const ROOTS = ['src', 'e2e', 'scripts', 'worker/src'];
 
 export function countLines(text) {
   return text.endsWith('\n') ? text.split('\n').length - 1 : text.split('\n').length;

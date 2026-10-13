@@ -10,6 +10,8 @@
 ## Avant la mise en production du formulaire de contact (épic #133)
 
 - La variable de dépôt `PUBLIC_TURNSTILE_SITEKEY` vaut aujourd'hui la **clé de test publique** de Cloudflare (`1x00000000000000000000AA`, toujours acceptée) pour que la CI construise et teste le formulaire. Avant toute fusion `develop` → `main`, la remplacer par la vraie clé de site (sortie Terraform du widget, #138) et vérifier que le Worker est déployé sur `contact.paulperigault.dev` (#139). Sinon, en production, chaque envoi serait refusé par le Worker.
+- Compléter les `TODO (propriétaire)` de la page légale (`src/content/{fr,en}/legal.json`, section `contact`) et de `docs/compliance.md` : durée de conservation des messages et des journaux Resend, cadre des transferts hors UE (Cloudflare, Resend), mention éventuelle d'iCloud, exemption de consentement de Turnstile.
+- Refaire la mesure de Turnstile avec la clé de production (`MEASURE_TURNSTILE=1`, `MEASURE_URL=https://paulperigault.fr/fr/`) et mettre à jour le tableau de `docs/compliance.md` si le résultat diffère de la clé de test.
 
 ## Maintenance manuelle
 

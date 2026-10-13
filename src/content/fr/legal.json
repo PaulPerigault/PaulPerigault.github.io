@@ -1,7 +1,7 @@
 {
   "title": "Mentions légales et confidentialité",
   "description": "Éditeur, hébergeur, données personnelles et droits des visiteurs de paulperigault.fr.",
-  "updated": "30 septembre 2026",
+  "updated": "13 octobre 2026",
   "sections": [
     {
       "id": "editeur",
@@ -17,36 +17,50 @@
       "title": "Hébergement et domaines",
       "paragraphs": [
         "Le site est un site statique hébergé par GitHub Pages : GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.",
-        "Le domaine principal est {domain} ; l'adresse paulperigault.dev redirige vers celui-ci."
+        "Le domaine principal est {domain} ; l'adresse paulperigault.dev redirige vers celui-ci.",
+        "Le service qui reçoit les messages du formulaire de contact est hébergé par Cloudflare, Inc. (101 Townsend Street, San Francisco, CA 94107, États-Unis) à l'adresse contact.paulperigault.dev."
       ]
     },
     {
       "id": "donnees",
       "title": "Données personnelles",
       "paragraphs": [
-        "Ce site ne dépose aucun cookie, n'utilise aucun outil de mesure d'audience ni de publicité, ne comporte aucun formulaire et ne charge aucune ressource d'un tiers (polices, scripts, images, vidéos). Il ne collecte donc aucune donnée personnelle de sa propre initiative.",
+        "Ce site ne dépose aucun cookie et n'utilise aucun outil de mesure d'audience ni de publicité. À l'ouverture des pages, il ne charge aucune ressource d'un tiers (polices, scripts, images, vidéos). Seul le formulaire de contact fait appel à des services tiers, et seulement quand vous l'utilisez (voir « Formulaire de contact »).",
         "Comme tout hébergeur web, GitHub peut enregistrer des données techniques de connexion (adresse IP, date et heure, pages demandées) pour assurer la sécurité et le bon fonctionnement du service. Ces traitements relèvent de GitHub, qui les décrit dans sa déclaration de confidentialité, y compris pour les transferts de données hors de l'Union européenne."
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Formulaire de contact",
+      "paragraphs": [
+        "Le formulaire de la section Contact transmet votre nom, votre adresse e-mail et votre message. Ils servent uniquement à vous répondre (base légale : intérêt légitime à répondre aux sollicitations). Le formulaire n'existe qu'avec JavaScript ; vous pouvez aussi écrire directement à {email}.",
+        "Le message passe par un service Cloudflare Workers qui le vérifie puis le confie au service d'envoi d'e-mails Resend (Resend, Inc., envoi depuis la région Union européenne, en Irlande). Ce service ne stocke ni ne journalise votre message. Il arrive ensuite dans ma boîte de réception ({email}), où il est conservé le temps de l'échange.",
+        "Pour bloquer les envois automatisés, le formulaire utilise Cloudflare Turnstile. Ce service n'est chargé que lorsque vous commencez à remplir le formulaire, jamais à l'ouverture de la page. Il analyse des informations techniques de votre navigateur et de votre connexion, dont l'adresse IP, pour distinguer une personne d'un robot ; Cloudflare les traite selon sa propre politique de confidentialité. Mesuré sur ce site : aucun cookie n'est déposé ; Cloudflare enregistre une valeur technique (« cf.turnstile.u ») dans le stockage de son propre cadre intégré, distinct de celui de ce site.",
+        "Cloudflare, Inc. et Resend, Inc. sont des sociétés établies aux États-Unis.",
+        "TODO (propriétaire) : durée de conservation des messages dans la boîte de réception, et durée de conservation des journaux d'envoi chez Resend.",
+        "TODO (propriétaire) : cadre des transferts hors de l'Union européenne pour Cloudflare et Resend (Data Privacy Framework ou clauses contractuelles types, selon leurs accords de traitement des données)."
       ]
     },
     {
       "id": "stockage",
       "title": "Stockage local du navigateur",
       "paragraphs": [
-        "Deux préférences d'affichage sont mémorisées dans le stockage local de votre navigateur lorsque vous les modifiez : « theme » (clair ou sombre) et « lang » (français ou anglais). Elles restent sur votre appareil, ne sont jamais envoyées à un serveur et servent uniquement à personnaliser l'affichage à votre demande ; elles ne nécessitent donc pas de consentement. Vous pouvez les effacer à tout moment depuis les réglages de votre navigateur."
+        "Deux préférences d'affichage sont mémorisées dans le stockage local de votre navigateur lorsque vous les modifiez : « theme » (clair ou sombre) et « lang » (français ou anglais). Elles restent sur votre appareil, ne sont jamais envoyées à un serveur et servent uniquement à personnaliser l'affichage à votre demande ; elles ne nécessitent donc pas de consentement. Vous pouvez les effacer à tout moment depuis les réglages de votre navigateur.",
+        "Le site lui-même n'écrit rien d'autre. Si vous utilisez le formulaire de contact, Cloudflare Turnstile enregistre une valeur technique dans le stockage de son propre cadre (voir « Formulaire de contact »)."
       ]
     },
     {
       "id": "liens",
       "title": "Liens externes",
       "paragraphs": [
-        "Le site renvoie vers GitHub, LinkedIn et vers un CV au format PDF hébergé sur raw.githubusercontent.com. Ces services appliquent leurs propres règles de confidentialité dès que vous cliquez sur un lien ; ils ne reçoivent aucune donnée de ce site tant que vous ne le faites pas."
+        "Le site renvoie vers GitHub et LinkedIn. Ces services appliquent leurs propres règles de confidentialité dès que vous cliquez sur un lien ; ils ne reçoivent aucune donnée de ce site tant que vous ne le faites pas. Le CV au format PDF est servi par ce site lui-même."
       ]
     },
     {
       "id": "droits",
       "title": "Vos droits",
       "paragraphs": [
-        "Si vous écrivez à {email}, votre adresse et votre message sont utilisés uniquement pour vous répondre et conservés le temps nécessaire à cet échange (base légale : intérêt légitime à répondre aux sollicitations).",
+        "Si vous m'écrivez à {email} ou par le formulaire de contact, votre nom, votre adresse et votre message sont utilisés uniquement pour vous répondre et conservés le temps nécessaire à cet échange (base légale : intérêt légitime à répondre aux sollicitations).",
         "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité sur les données vous concernant, que vous pouvez exercer à la même adresse. En cas de désaccord, vous pouvez saisir la CNIL (cnil.fr)."
       ]
     },

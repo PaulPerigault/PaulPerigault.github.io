@@ -1,7 +1,7 @@
 // Garde-fou : la documentation ne cite que des scripts npm, des fichiers et des liens qui existent,
 // et n'emploie plus le vocabulaire de l'ancienne architecture (hors ADR, qui sont historiques).
 import { existsSync, readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { posix } from 'node:path';
 import { walk } from './lib/walk.mjs';
 
 const NPM_RUN = /npm run ([\w:.-]+)/g;
@@ -22,7 +22,7 @@ const pathProblems = (path, text, exists) =>
 
 const linkProblems = (path, text, exists) =>
   [...text.matchAll(MD_LINK)]
-    .filter(([, target]) => !exists(join(dirname(path), target)))
+    .filter(([, target]) => !exists(posix.join(posix.dirname(path), target)))
     .map(([, target]) => `${path} : lien relatif cassé « ${target} »`);
 
 const legacyProblems = (path, text) => {

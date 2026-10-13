@@ -1,4 +1,7 @@
-import { dirname, join, normalize } from 'node:path';
+import { posix } from 'node:path';
+
+// Chemins en `/` sur toutes les plateformes : ils sont comparés aux couches de layers.mjs.
+const { dirname, join, normalize } = posix;
 
 const IMPORT_RE = /(?:from|import)\s*\(?\s*['"]([^'"]+)['"]/g;
 

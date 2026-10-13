@@ -1,0 +1,107 @@
+---
+/**
+ * Formulaire de contact : n'existe qu'avec JavaScript (`js:`), le `mailto:` de la section reste
+ * le repli. Turnstile n'est chargé qu'au premier focus (`scripts/contact-form.ts`). Rendu absent
+ * si aucune clé de site n'est fournie au build.
+ */
+import FormField from '@/components/ui/FormField.astro';
+import { FIELD_LIMITS } from '@/config/contact';
+import { SITE } from '@/config/site';
+import type { Lang } from '@/domain/lang';
+import { BUTTON_BASE, BUTTON_VARIANT } from '@/lib/button-styles';
+import { HONEYPOT_FIELD, turnstileSiteKey } from '@/lib/contact-form';
+import { useTranslations } from '@/lib/i18n';
+import { fillPlaceholders } from '@/lib/placeholders';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const siteKey = turnstileSiteKey(import.meta.env);
+const id = (field: string) => `contact-${field}`;
+const messages = {
+  required: t('contact.form.error_required'),
+  email: t('contact.form.error_email'),
+  tooLong: t('contact.form.error_too_long'),
+  rejected: t('contact.form.error_rejected'),
+  invalid: t('contact.form.invalid'),
+  sent: t('contact.form.sent'),
+  challenge: t('contact.form.challenge'),
+  unavailable: fillPlaceholders(t('contact.form.unavailable'), { email: SITE.email }),
+  sending: t('contact.form.sending'),
+};
+---
+
+{siteKey && (
+  <form
+    class="mt-12 hidden max-w-prose flex-col gap-5 js:flex"
+    aria-labelledby="contact-form-heading"
+    novalidate
+    data-contact-form
+    data-endpoint={SITE.contactEndpoint}
+    data-turnstile-src={SITE.turnstileScriptUrl}
+    data-sitekey={siteKey}
+    data-lang={lang}
+    data-messages={JSON.stringify(messages)}
+  >
+    <h3 id="contact-form-heading" class="text-xl font-medium">
+      {t('contact.form.heading')}
+    </h3>
+    <p class="text-muted">{t('contact.form.intro')}</p>
+    <FormField
+      id={id('name')}
+      name="name"
+      label={t('contact.form.name')}
+      maxlength={FIELD_LIMITS.name}
+      autocomplete="name"
+    />
+    <FormField
+      id={id('email')}
+      name="email"
+      type="email"
+      label={t('contact.form.email')}
+      maxlength={FIELD_LIMITS.email}
+      autocomplete="email"
+    />
+    <FormField
+      id={id('message')}
+      name="message"
+      type="textarea"
+      label={t('contact.form.message')}
+      maxlength={FIELD_LIMITS.message}
+    />
+    <div class="sr-only" aria-hidden="true">
+      <label for={id(HONEYPOT_FIELD)}>{t('contact.form.honeypot')}</label>
+      <input
+        id={id(HONEYPOT_FIELD)}
+        name={HONEYPOT_FIELD}
+        type="text"
+        tabindex="-1"
+        autocomplete="off"
+      />
+    </div>
+    <div data-turnstile-container />
+    <p class="text-muted text-sm">
+      {t('contact.form.privacy')}{' '}
+      <a href={`/${lang}/legal/`} class="text-fg underline underline-offset-4 hover:text-accent">
+        {t('contact.form.privacy_link')}
+      </a>
+    </p>
+    <div class="flex flex-wrap items-center gap-4">
+      <button
+        type="submit"
+        class:list={[BUTTON_BASE, BUTTON_VARIANT.primary, 'disabled:cursor-wait']}
+      >
+        {t('contact.form.submit')}
+      </button>
+      <p role="status" aria-live="polite" class="font-medium" data-form-status />
+    </div>
+  </form>
+)}
+
+<script>
+  import { initContactForm } from '@/scripts/contact-form';
+  initContactForm();
+</script>

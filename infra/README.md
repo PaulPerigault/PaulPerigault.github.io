@@ -66,6 +66,18 @@ Ensuite, la CI déploie le code ; les secrets ne bougent qu'à une rotation (ét
 
 Backend `s3` vers R2 (`backend.tf`) : bucket `tfstate-portfolio`, créé à la main et **non géré par Terraform**. Le state contient un secret, celui du widget Turnstile ; la clé Resend n'y entre pas. Il reste dans R2 et n'est jamais dans le dépôt. `*.tfstate*` et `*.tfplan` sont ignorés : un plan enregistré contient aussi les secrets en clair. Pas de verrou de state : un seul opérateur, aucun `apply` automatique.
 
+### Accès au state (prérequis avant tout `apply`)
+
+Le state contient le secret Turnstile en clair : le bucket ne doit être joignable par **aucun accès public**.
+
+- Vérification automatique, en lecture seule : `.\infra\r2-public-access.ps1` (code 1 si un accès public existe). Elle demande la permission _Workers R2 Storage : Read_ sur le compte. Le token « terraform-portfolio » ne l'avait pas au 2026-10-13 (`Authentication error`), d'où le contrôle manuel ci-dessous.
+- Contrôle manuel dans le dashboard Cloudflare, **R2 → `tfstate-portfolio` → Settings** :
+  1. **Public Development URL** (`r2.dev`) : **Disabled** ;
+  2. **Custom Domains** : **aucun** domaine connecté ;
+  3. **CORS Policy** : vide, puisque le bucket n'est lu que par Terraform via l'API S3 ;
+  4. **R2 → Manage API tokens** : les clés S3 du state sont limitées à ce bucket (_Object Read & Write_, bucket `tfstate-portfolio` seulement) ;
+  5. facultatif : une **Bucket lock rule** ou le versionnement des objets, pour pouvoir revenir à un state précédent en cas de corruption.
+
 ## Rotation des tokens
 
 1. Créer le nouveau token ou la nouvelle clé dans Cloudflare, Resend ou R2, avec les **mêmes** permissions minimales.

@@ -21,3 +21,14 @@ resource "cloudflare_dns_record" "return_path" {
   ttl     = 3600
   proxied = false
 }
+
+# Politique DMARC du domaine d'envoi (Resend est le seul expéditeur de paulperigault.dev). Créée par
+# Terraform (aucun enregistrement n'existait), en mode observation d'abord : voir ROADMAP.md.
+resource "cloudflare_dns_record" "dmarc" {
+  zone_id = var.zone_id
+  name    = "_dmarc.${var.domain}"
+  type    = "TXT"
+  content = "\"${var.dmarc_policy}\""
+  ttl     = 3600
+  proxied = false
+}

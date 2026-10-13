@@ -43,6 +43,13 @@ Husky: `pre-commit` → lint-staged (secretlint on every staged file, eslint --f
 - Adding a UI string: add the key to **both** `ui.json` files. Adding a content item: same `id` in both languages. Never fetch content in the browser.
 - SEO head, JSON-LD, sitemap and GEO: see « SEO and AI visibility »; CSP: see « Security ».
 
+### Infrastructure (`infra/`, Terraform)
+
+- Cloudflare services on the `paulperigault.dev` zone (the canonical `.fr` stays at OVH, never managed here). One module per service composed by `infra/main.tf`: `modules/contact-form` (Turnstile widget, code-less `cloudflare_worker`, custom domain `contact.paulperigault.dev`) and `modules/resend-domain` (DKIM + return-path CNAMEs, **imported** via `infra/imports.tf`, never recreated). Terraform 1.15.x, provider Cloudflare 5.27.x pinned, `.terraform.lock.hcl` committed (Windows/Linux/macOS hashes). State in the R2 bucket `tfstate-portfolio` (S3 backend, created by hand, not managed); it contains the Turnstile secret, never committed (`*.tfstate*`, `*.tfplan` ignored).
+- **Ownership split = option A (ADR-0007)**: Terraform owns service, domain and widget; Wrangler owns the Worker **code** and **secrets** (provider v5 has no standalone secret resource). Secrets are pushed by `infra/contact-form-secrets.ps1` (`wrangler secret bulk` on stdin; Resend key from the local secrets file, Turnstile secret from `terraform output -raw`), so the Resend key never enters the state.
+- PowerShell helpers load the local secrets file only for one command and only the variables they need (`infra/lib/secrets.ps1`: unknown variable → error, values never printed): `tf.ps1` (Terraform), `dns-records.ps1` (read-only DNS listing), `contact-form-secrets.ps1`. Tests with fake files and stubbed `terraform`/`npx`: `infra/tests/*.test.ps1`.
+- **Never `apply`/`destroy` from CI or the assistant**: the owner applies after reading the `plan`. Never run `terraform show`, `state show` or a bare `output` (they would print the Turnstile secret). First-deploy sequence (targeted apply → `wrangler deploy` → secrets → full apply → real sitekey): `infra/README.md`.
+
 ### Contact Worker (`worker/`)
 
 - Standalone brick (own `package.json`, lock, `tsconfig`, `eslint.config.mjs`, `.prettierrc`, Vitest, `README.md`): a Cloudflare Worker on `contact.paulperigault.dev` that validates the contact form, checks Turnstile (`siteverify`, no `remoteip`) and sends a **plain-text** e-mail through Resend (`reply_to` = visitor). Nothing is stored or logged (`observability` off, no `console`).

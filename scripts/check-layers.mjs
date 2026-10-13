@@ -1,6 +1,6 @@
 // Garde-fou : les imports respectent le sens des dépendances entre couches (scripts/lib/layers.mjs).
 import { readFileSync } from 'node:fs';
-import { relative } from 'node:path';
+import { posix } from 'node:path';
 import { localImports } from './lib/imports.mjs';
 import { isAllowed } from './lib/layers.mjs';
 import { walk } from './lib/walk.mjs';
@@ -15,7 +15,7 @@ export function findViolations(files) {
 
 export function run(root = process.cwd()) {
   const files = walk(`${root}/src`, ['.ts', '.astro']).map((file) => ({
-    path: relative(root, file),
+    path: posix.relative(root.replaceAll('\\', '/'), file),
     source: readFileSync(file, 'utf8'),
   }));
   return findViolations(files);

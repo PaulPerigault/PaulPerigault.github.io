@@ -16,7 +16,7 @@
 Le `.dev` appartient à une extension **HSTS préchargée** : les navigateurs n'y parlent qu'en HTTPS. Une redirection « web » d'un registrar qui ne sert que du HTTP ne fonctionne donc pas ; il faut un redirecteur qui sert aussi du HTTPS. Avec Cloudflare :
 
 1. Ajouter `paulperigault.dev` à Cloudflare (plan gratuit) et pointer les serveurs de noms chez le registrar.
-2. DNS : un `A` `@` → `192.0.2.1` et un `A` `www` → `192.0.2.1`, tous deux **Proxied** (adresse factice : le trafic ne va jamais jusque-là).
+2. DNS : il faut que l'apex et `www` soient **Proxied**, pour que Cloudflare réponde lui-même et applique la règle de redirection. État réel (relevé du 2026-10-13) : quatre `A` `@` vers les adresses de GitHub Pages (`185.199.108.153` à `185.199.111.153`) et un `CNAME` `www` vers `paulperigault.github.io`, tous proxifiés. Le trafic n'atteint pas GitHub Pages : la redirection de l'étape 3 répond avant. Une adresse factice (`192.0.2.1`) conviendrait aussi. Ces enregistrements ne sont pas gérés par Terraform ; ne pas les modifier sans raison.
 3. **Rules → Redirect Rules → Create rule** : _When_ `http.host in {"paulperigault.dev" "www.paulperigault.dev"}` ; _Then_ redirection **dynamique** vers `concat("https://paulperigault.fr", http.request.uri.path)`, code **301**, cocher **Preserve query string**.
 4. `www.paulperigault.fr` : GitHub Pages redirige déjà `www` vers l'apex quand le `CNAME` `www` existe ; le contrôle ci-dessous le vérifie.
 
@@ -55,3 +55,9 @@ npm run check:live
 ```
 
 Contrôle : HTTP → HTTPS, `www` → apex, `.dev` → `.fr` (301, chemin et paramètres conservés), pages FR/EN, en-têtes de sécurité, `robots.txt` intact (aucun `Disallow`, aucun `Content-Signal` ajouté par un CDN), GPTBot/ClaudeBot/PerplexityBot non bloqués, sitemap, `llms.txt`, `security.txt`, vrai 404. Les domaines se changent avec `LIVE_DOMAIN` et `LIVE_ALIAS`. Relancer après chaque modification DNS ou Cloudflare ; le certificat peut mettre jusqu'à une heure à être émis.
+
+## 6. Services Cloudflare gérés par Terraform (`infra/`)
+
+Les services du portfolio vivent sur la zone `paulperigault.dev` et sont décrits en Terraform (un module par service, state dans R2) : formulaire de contact (Worker `contact.paulperigault.dev`, widget Turnstile) et enregistrements Resend importés. Répartition Terraform / Wrangler, helpers PowerShell, séquence de premier déploiement et rotation des tokens : `infra/README.md` ; décision : `docs/adr/0007-formulaire-de-contact-worker-terraform.md`. Aucun `apply` en CI : le propriétaire applique lui-même après lecture du `plan`.
+
+Relevé du 2026-10-13 (lecture seule, `infra/dns-records.ps1`) : l'état réel des enregistrements `A`/`www` du `.dev` est décrit à l'étape 2 de la section 2. L'enregistrement `_dmarc` (`p=none`, rapports vers `contact@paulperigault.fr`) est géré par Terraform (module `resend-domain`) ; son durcissement est prévu dans `ROADMAP.md`. Le bucket R2 du state ne doit avoir aucun accès public : contrôle dans `infra/README.md` (« Accès au state »).

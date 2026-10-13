@@ -1,25 +1,19 @@
 ---
 import Icon from './Icon.astro';
 import VisuallyHidden from './VisuallyHidden.astro';
+import { BUTTON_BASE, BUTTON_VARIANT, type ButtonVariant } from '@/lib/button-styles';
 import type { IconName } from '@/lib/icons';
 import { isExternalHref, linkAttributes } from '@/lib/links';
 
-type Variant = 'primary' | 'secondary';
-
 interface Props {
   href: string;
-  variant?: Variant;
+  variant?: ButtonVariant;
   icon?: IconName;
   newTabLabel?: string;
   /** Nom du fichier proposé au téléchargement (lien vers un fichier du même site). */
   download?: string;
   class?: string;
 }
-
-const VARIANT_CLASS: Record<Variant, string> = {
-  primary: 'border-accent bg-accent text-on-accent hover:border-fg hover:bg-fg hover:text-bg',
-  secondary: 'border-control text-fg hover:border-accent hover:text-accent',
-};
 
 const { href, variant = 'secondary', icon, newTabLabel, download, class: className } = Astro.props;
 ---
@@ -28,11 +22,7 @@ const { href, variant = 'secondary', icon, newTabLabel, download, class: classNa
   href={href}
   download={download}
   {...linkAttributes(href)}
-  class:list={[
-    'inline-flex items-center gap-2 rounded-sm border px-5 py-2.5 text-sm font-medium transition-colors duration-(--pp-duration)',
-    VARIANT_CLASS[variant],
-    className,
-  ]}
+  class:list={[BUTTON_BASE, BUTTON_VARIANT[variant], className]}
 >
   {icon && <Icon name={icon} />}
   <slot />

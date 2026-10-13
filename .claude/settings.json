@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(**/.secrets.env)",
+      "Read(**/*.env)",
+      "Read(**/.dev.vars)",
+      "Edit(**/.secrets.env)",
+      "Edit(**/*.env)",
+      "Edit(**/.dev.vars)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PROJECT_DIR}/scripts/guard-secret-files.mjs"],
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
+  }
+}

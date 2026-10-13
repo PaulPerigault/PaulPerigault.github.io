@@ -1,3 +1,5 @@
+# Contexte de build Docker : le Dockerfile fait `COPY . .`, donc tout ce qui n'est pas exclu ici
+# entre dans l'image de build. Les secrets, l'infra et le Worker n'ont rien à y faire.
 node_modules
 dist
 .astro
@@ -7,3 +9,28 @@ coverage
 playwright-report
 test-results
 *.md
+
+# Secrets et fichiers sensibles (même règle que .gitignore)
+*.env
+.env*
+.dev.vars
+**/*.env
+**/.env*
+**/.dev.vars
+
+# Briques hors du site statique
+infra
+worker
+.terraform
+**/.terraform
+*.tfstate*
+**/*.tfstate*
+*.tfplan
+**/*.tfplan
+.wrangler
+
+# Outillage local
+.claude
+.angular
+.idea
+.vscode

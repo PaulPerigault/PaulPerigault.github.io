@@ -1,7 +1,7 @@
 {
   "title": "Legal notice and privacy",
   "description": "Publisher, host, personal data and visitor rights for paulperigault.fr.",
-  "updated": "30 September 2026",
+  "updated": "13 October 2026",
   "sections": [
     {
       "id": "editeur",
@@ -17,36 +17,50 @@
       "title": "Hosting and domains",
       "paragraphs": [
         "The site is a static site hosted by GitHub Pages: GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, United States.",
-        "The main domain is {domain}; the address paulperigault.dev redirects to it."
+        "The main domain is {domain}; the address paulperigault.dev redirects to it.",
+        "The service that receives contact form messages is hosted by Cloudflare, Inc. (101 Townsend Street, San Francisco, CA 94107, United States) at contact.paulperigault.dev."
       ]
     },
     {
       "id": "donnees",
       "title": "Personal data",
       "paragraphs": [
-        "This site sets no cookies, uses no analytics or advertising tools, has no forms and loads no third-party resources (fonts, scripts, images, videos). It therefore collects no personal data on its own initiative.",
+        "This site sets no cookie and uses no audience measurement or advertising tool. When pages open, it loads no third-party resource (fonts, scripts, images, videos). Only the contact form relies on third-party services, and only when you use it (see \"Contact form\").",
         "Like any web host, GitHub may record technical connection data (IP address, date and time, requested pages) to keep the service secure and running. This processing is GitHub's responsibility and is described in its privacy statement, including transfers of data outside the European Union."
+      ]
+    },
+    {
+      "id": "contact",
+      "title": "Contact form",
+      "paragraphs": [
+        "The form in the Contact section sends your name, your email address and your message. They are only used to reply to you (legal basis: legitimate interest in answering requests). The form only exists with JavaScript; you can also write directly to {email}.",
+        "The message goes through the form service, hosted on Cloudflare Workers, which checks it and hands it to the Resend email delivery service (operated by Plus Five Five, Inc., United States). The form service neither stores nor logs your message. The message then reaches my inbox ({email}).",
+        "To block automated submissions, the form uses Cloudflare Turnstile. This service only loads when you start filling in the form, never when the page opens. According to the Turnstile privacy policy, Cloudflare then processes the IP address, the TLS fingerprint, the User-Agent header of your browser and the site origin, to tell a person from a bot. Measured on this site: no cookie is set; Cloudflare stores a technical value (\"cf.turnstile.u\") in the storage of its own embedded frame, separate from this site's storage. This check is only used to protect the form against automated submissions.",
+        "Cloudflare, Inc. and Resend (Plus Five Five, Inc.) are companies based in the United States. Resend sends emails from its Ireland region but, according to its documentation, keeps account data, email content and delivery logs in the United States. According to their data processing agreements, these transfers rely on the EU–US Data Privacy Framework, which both companies state they adhere to, and on the European Commission's standard contractual clauses.",
+        "I keep messages received in my inbox for 12 months after our last exchange, then delete them. The form service keeps no copy. According to its documentation, Resend keeps email content, email metadata and delivery logs for 30 days.",
+        "The {email} inbox is hosted by Apple (iCloud Mail), which receives and stores messages on my behalf under its own privacy policy."
       ]
     },
     {
       "id": "stockage",
       "title": "Browser local storage",
       "paragraphs": [
-        "Two display preferences are saved in your browser's local storage when you change them: “theme” (light or dark) and “lang” (French or English). They stay on your device, are never sent to a server and only personalise the display at your request; they therefore do not require consent. You can delete them at any time from your browser settings."
+        "Two display preferences are saved in your browser's local storage when you change them: “theme” (light or dark) and “lang” (French or English). They stay on your device, are never sent to a server and only personalise the display at your request; they therefore do not require consent. You can delete them at any time from your browser settings.",
+        "The site itself writes nothing else. If you use the contact form, Cloudflare Turnstile stores a technical value in the storage of its own frame (see \"Contact form\")."
       ]
     },
     {
       "id": "liens",
       "title": "External links",
       "paragraphs": [
-        "The site links to GitHub, LinkedIn and to a CV in PDF format hosted on raw.githubusercontent.com. These services apply their own privacy rules as soon as you click a link; they receive no data from this site until you do."
+        "The site links to GitHub and LinkedIn. These services apply their own privacy rules as soon as you click a link; they receive no data from this site until you do. The PDF resume is served by this site itself."
       ]
     },
     {
       "id": "droits",
       "title": "Your rights",
       "paragraphs": [
-        "If you write to {email}, your address and message are used only to reply to you and kept as long as needed for that exchange (legal basis: legitimate interest in answering enquiries).",
+        "If you write to {email} or through the contact form, your name, address and message are only used to reply to you and kept as long as this exchange requires (legal basis: legitimate interest in answering requests).",
         "Under the GDPR you have the right of access, rectification, erasure, restriction, objection and portability regarding data about you, which you can exercise at the same address. If you disagree, you may lodge a complaint with the CNIL (cnil.fr)."
       ]
     },

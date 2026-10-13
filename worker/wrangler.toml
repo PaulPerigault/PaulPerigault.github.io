@@ -1,0 +1,22 @@
+# Worker du formulaire de contact. Secrets (jamais ici) : RESEND_API_KEY, TURNSTILE_SECRET.
+# Le domaine `contact.paulperigault.dev` et le widget Turnstile sont gérés par Terraform (infra/).
+name = "contact-form"
+# Compte Cloudflare (identifiant, pas un secret) : lève l'ambiguïté si un token voit plusieurs comptes.
+account_id = "5d7f707043c8dbe25d945c965f24880e"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# Joignable seulement par son domaine personnalisé : ni *.workers.dev, ni URL de prévisualisation.
+workers_dev = false
+preview_urls = false
+
+# Aucune journalisation : le Worker traite des données personnelles (nom, e-mail, message).
+[observability]
+enabled = false
+
+[vars]
+# Origines autorisées (CORS), séparées par des virgules. `www` redirige vers l'apex : inutile.
+# En local, `.dev.vars` ajoute http://localhost:4321.
+ALLOWED_ORIGINS = "https://paulperigault.fr"
+MAIL_FROM = "Formulaire paulperigault.fr <contact@paulperigault.dev>"
+MAIL_TO = "contact@paulperigault.fr"

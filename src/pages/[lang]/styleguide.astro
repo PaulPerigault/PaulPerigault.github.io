@@ -4,6 +4,7 @@ import ButtonLink from '@/components/ui/ButtonLink.astro';
 import Card from '@/components/ui/Card.astro';
 import DescriptionList from '@/components/ui/DescriptionList.astro';
 import ExternalLink from '@/components/ui/ExternalLink.astro';
+import FormField from '@/components/ui/FormField.astro';
 import Heading from '@/components/ui/Heading.astro';
 import Icon from '@/components/ui/Icon.astro';
 import Section from '@/components/ui/Section.astro';
@@ -58,6 +59,12 @@ const icons = Object.keys(ICONS) as IconName[];
       </ExternalLink>{' '}
       dans un texte.
     </p>
+  </Section>
+
+  <Section id="forms" title="Champs de formulaire">
+    <div class="max-w-prose">
+      <FormField id="demo-name" name="demo-name" label="Nom" maxlength={100} autocomplete="name" />
+    </div>
   </Section>
 
   <Section id="cards" title="Cartes et listes">

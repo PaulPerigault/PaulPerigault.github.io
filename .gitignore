@@ -60,3 +60,25 @@ node_modules/
 
 # CV copié au build (scripts/fetch-cv.mjs)
 /public/cv-paul-perigault.pdf
+
+# Secrets locaux : jamais versionnés (voir infra/README.md et CLAUDE.md « Security »)
+infra/.secrets.env
+*.env
+.env*
+.dev.vars
+!.dev.vars.example
+!.env.example
+
+# Terraform : le state et les plans enregistrés contiennent des secrets en clair
+.terraform/
+*.tfstate*
+*.tfplan
+*.tfvars
+!*.example.tfvars
+crash.log
+
+# Wrangler (dev local du Worker)
+.wrangler/
+
+# Reste de l'ancienne version Angular
+.angular/

@@ -17,4 +17,10 @@ export const SITE = {
   /** CV servi par le site (copié au build par `scripts/fetch-cv.mjs`). */
   cvPath: CV_PATH,
   cvUrl: `${DOMAIN}${CV_PATH}`,
+  /** Worker du formulaire de contact (`worker/`), appelé par `fetch` depuis le navigateur. */
+  contactEndpoint: 'https://contact.paulperigault.dev/',
+  /** Origine de Turnstile : script, iframe et connexions du widget anti-robot (CSP). */
+  turnstileOrigin: 'https://challenges.cloudflare.com',
+  /** URL exacte imposée par Cloudflare (ni proxy ni cache), chargée au premier focus du formulaire. */
+  turnstileScriptUrl: 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',
 } as const;

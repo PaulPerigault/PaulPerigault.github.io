@@ -55,3 +55,9 @@ npm run check:live
 ```
 
 Contrôle : HTTP → HTTPS, `www` → apex, `.dev` → `.fr` (301, chemin et paramètres conservés), pages FR/EN, en-têtes de sécurité, `robots.txt` intact (aucun `Disallow`, aucun `Content-Signal` ajouté par un CDN), GPTBot/ClaudeBot/PerplexityBot non bloqués, sitemap, `llms.txt`, `security.txt`, vrai 404. Les domaines se changent avec `LIVE_DOMAIN` et `LIVE_ALIAS`. Relancer après chaque modification DNS ou Cloudflare ; le certificat peut mettre jusqu'à une heure à être émis.
+
+## 6. Services Cloudflare gérés par Terraform (`infra/`)
+
+Les services du portfolio vivent sur la zone `paulperigault.dev` et sont décrits en Terraform (un module par service, state dans R2) : formulaire de contact (Worker `contact.paulperigault.dev`, widget Turnstile) et enregistrements Resend importés. Répartition Terraform / Wrangler, helpers PowerShell, séquence de premier déploiement et rotation des tokens : `infra/README.md` ; décision : `docs/adr/0007-formulaire-de-contact-worker-terraform.md`. Aucun `apply` en CI : le propriétaire applique lui-même après lecture du `plan`.
+
+Relevé du 2026-10-13 (lecture seule, `infra/dns-records.ps1`) : les enregistrements `A` de `paulperigault.dev` pointent vers les adresses de GitHub Pages (185.199.108–111.153, proxifiées), pas vers l'adresse factice de l'étape 2 ci-dessus. La redirection 301 reste assurée par la Redirect Rule ; aucune action n'est requise, mais l'étape 2 ne décrit pas l'état réel. Aucun enregistrement `_dmarc` n'existe (voir `ROADMAP.md`).

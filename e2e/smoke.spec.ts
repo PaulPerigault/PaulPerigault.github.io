@@ -24,4 +24,10 @@ test.describe('racine', () => {
     await page.goto('/');
     await expect(page).toHaveURL(/\/fr\/$/);
   });
+
+  test('désigne /fr/ comme page canonique, sans noindex contradictoire', async ({ request }) => {
+    const html = await (await request.get('/')).text();
+    expect(html).toContain('<link rel="canonical" href="https://paulperigault.fr/fr/">');
+    expect(html).not.toContain('name="robots"');
+  });
 });

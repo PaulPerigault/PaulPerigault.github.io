@@ -44,7 +44,13 @@ const jsonLd = buildJsonLd({
 });
 ---
 
-<BaseLayout lang={lang} title={t('seo.title')} description={t('seo.description')} jsonLd={jsonLd}>
+<BaseLayout
+  lang={lang}
+  title={t('seo.title')}
+  description={t('seo.description')}
+  jsonLd={jsonLd}
+  markdown
+>
   <Hero lang={lang} />
   <About lang={lang} />
   <Experience lang={lang} items={portfolio.experience} />

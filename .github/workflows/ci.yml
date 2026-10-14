@@ -57,6 +57,26 @@ jobs:
     needs: build
     uses: ./.github/workflows/e2e.yml
 
+  # Liens internes, ancres et URL du domaine dans l'artefact, hors ligne (lychee, docs/tooling.md).
+  links:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: site
+          path: dist
+      - uses: ./.github/actions/setup-lychee
+      # Aucun `npm ci` : le script n'utilise que Node et scripts/lib.
+      - run: npm run check:links
+
   lighthouse:
     needs: build
     runs-on: ubuntu-latest
@@ -131,7 +151,7 @@ jobs:
   # Point de contrôle unique (check requis `ci`) : vert seulement si TOUT le reste est vert.
   ci:
     if: ${{ always() }}
-    needs: [verify, build, e2e, lighthouse, container, worker, infra]
+    needs: [verify, build, e2e, links, lighthouse, container, worker, infra]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

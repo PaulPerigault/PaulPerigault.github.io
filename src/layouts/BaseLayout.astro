@@ -17,9 +17,11 @@ interface Props {
   /** Pages techniques (styleguide) : exclues des moteurs de recherche. */
   noindex?: boolean;
   jsonLd?: object | undefined;
+  /** Voir SeoHead : la page a une version Markdown. */
+  markdown?: boolean;
 }
 
-const { lang, title, description, noindex = false, jsonLd } = Astro.props;
+const { lang, title, description, noindex = false, jsonLd, markdown } = Astro.props;
 const t = useTranslations(lang);
 
 // Le script inline du <head> est autorisé par son empreinte, pas par 'unsafe-inline'.
@@ -40,7 +42,13 @@ Astro.csp?.insertScriptHash(scriptHash(HEAD_INIT_SCRIPT));
         <meta name="robots" content="noindex, nofollow" />
       </>
     ) : (
-      <SeoHead lang={lang} title={title} description={description} jsonLd={jsonLd} />
+      <SeoHead
+        lang={lang}
+        title={title}
+        description={description}
+        jsonLd={jsonLd}
+        markdown={markdown}
+      />
     )}
   </head>
   <body class="bg-bg text-fg font-sans">

@@ -59,7 +59,7 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
   it('expose les checks requis par la protection de branche : ci (agrégat) et commitlint', () => {
     const ci = text('ci.yml');
     expect(ci).toMatch(
-      /^ {2}ci:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify, build, e2e, lighthouse, container, worker, infra\]/m,
+      /^ {2}ci:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify, build, e2e, links, lighthouse, container, worker, infra\]/m,
     );
     expect(ci).toMatch(/^ {2}commitlint:/m);
   });
@@ -86,6 +86,16 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
     expect(gitleaks).toMatch(/GITLEAKS_SHA256: [0-9a-f]{64}/);
     expect(gitleaks).toContain('sha256sum -c');
     expect(gitleaks).toContain('--redact');
+  });
+
+  it('vérifient les liens de l’artefact avec un lychee épinglé et vérifié', () => {
+    const setup = readFileSync('.github/actions/setup-lychee/action.yml', 'utf8');
+    expect(setup).toMatch(/default: [0-9a-f]{64}/);
+    expect(setup).toContain('sha256sum -c');
+    expect(text('ci.yml')).toMatch(
+      /^ {2}links:\n {4}needs: build[\s\S]*?run: npm run check:links\n/m,
+    );
+    expect(text('browsers.yml')).toContain('run: npm run check:links -- --external');
   });
 
   it('installent les dépendances avec npm ci (jamais npm install)', () => {

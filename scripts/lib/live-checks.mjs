@@ -21,6 +21,17 @@ const robotsProblem = (body) => {
 
 const status = (res, expected) => (res.status === expected ? null : `statut ${res.status}`);
 
+// security.txt doit rester valide au moins 30 jours (même seuil que e2e/geo-files.spec.ts).
+const MIN_VALIDITY_MS = 30 * 86_400_000;
+
+/** RFC 9116 : `Contact` présent, `Expires` lisible et à plus de 30 jours de `now`. */
+const securityTxtProblem = (body, now) => {
+  if (!/^Contact: \S+/m.test(body)) return 'champ Contact absent';
+  const expires = Date.parse(/^Expires: (.+)$/m.exec(body)?.[1] ?? '');
+  if (Number.isNaN(expires)) return 'champ Expires absent ou illisible';
+  return expires - now < MIN_VALIDITY_MS ? 'Expires à moins de 30 jours' : null;
+};
+
 const headerProblems = (res) =>
   SECURITY_HEADERS.filter(([name, pattern]) => !pattern.test(res.headers.get(name) ?? '')).map(
     ([name]) => `en-tête manquant ou invalide : ${name}`,
@@ -49,7 +60,7 @@ const crawlers = (site) =>
     test: (r) => status(r, 200),
   }));
 
-const files = (site) => [
+const files = (site, now) => [
   {
     name: 'robots.txt',
     url: `${site}/robots.txt`,
@@ -57,12 +68,24 @@ const files = (site) => [
   },
   { name: 'sitemap', url: `${site}/sitemap-index.xml`, test: (r) => status(r, 200) },
   { name: 'llms.txt', url: `${site}/llms.txt`, test: (r) => status(r, 200) },
-  { name: 'security.txt', url: `${site}/.well-known/security.txt`, test: (r) => status(r, 200) },
+  {
+    name: 'security.txt (/.well-known/, fait foi)',
+    url: `${site}/.well-known/security.txt`,
+    test: (r, body) => status(r, 200) ?? securityTxtProblem(body, now),
+  },
+  {
+    name: 'security.txt (copie à la racine)',
+    url: `${site}/security.txt`,
+    test: (r) => status(r, 200),
+  },
   { name: '404 réel', url: `${site}/introuvable/`, test: (r) => status(r, 404) },
 ];
 
-/** @param {{ domain: string, alias: string }} sites */
-export const buildChecks = (sites) => {
+/**
+ * @param {{ domain: string, alias: string }} sites
+ * @param {number} [now] instant de référence (ms), injectable pour les tests
+ */
+export const buildChecks = (sites, now = Date.now()) => {
   const site = `https://${sites.domain}`;
   return [
     ...redirects(sites),
@@ -75,7 +98,7 @@ export const buildChecks = (sites) => {
       all: headerProblems,
     },
     ...crawlers(site),
-    ...files(site),
+    ...files(site, now),
   ];
 };
 

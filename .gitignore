@@ -82,3 +82,6 @@ crash.log
 
 # Reste de l'ancienne version Angular
 .angular/
+
+# Mesures locales de npm run bench
+/bench-results.json

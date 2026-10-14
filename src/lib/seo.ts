@@ -58,6 +58,12 @@ export const socialTags = ({ lang, path, title, description }: SeoInput) => {
 
 export const canonicalUrl = (path: string): string => absolute(path);
 
+/**
+ * Directive des pages hors index (styleguide, 404). Sans `nofollow` : leurs liens mènent à des
+ * pages indexables que les moteurs peuvent suivre.
+ */
+export const NOINDEX = 'noindex';
+
 const VERIFICATION_VARIABLES = {
   PUBLIC_GOOGLE_SITE_VERIFICATION: 'google-site-verification',
   PUBLIC_BING_SITE_VERIFICATION: 'msvalidate.01',

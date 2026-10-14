@@ -1,0 +1,30 @@
+name: Installer lychee
+description: >-
+  Binaire officiel de lychee (vérificateur de liens en Rust), épinglé et vérifié par sa somme
+  SHA-256 ; aucune action tierce. Mise à jour : nouvelle version + somme du fichier .sha256 publié
+  avec la release (lychee-x86_64-unknown-linux-gnu.tar.gz.sha256).
+
+inputs:
+  version:
+    description: Version de lychee (sans le « v »)
+    default: 0.24.2
+  sha256:
+    description: SHA-256 de lychee-x86_64-unknown-linux-gnu.tar.gz pour cette version
+    default: 1f4e0ef7f6554a6ed33dd7ac144fb2e1bbed98598e7af973042fc5cd43951c9a
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        LYCHEE_VERSION: ${{ inputs.version }}
+        LYCHEE_SHA256: ${{ inputs.sha256 }}
+      run: |
+        archive="lychee-x86_64-unknown-linux-gnu.tar.gz"
+        cd "$RUNNER_TEMP"
+        curl -fsSLO "https://github.com/lycheeverse/lychee/releases/download/lychee-v${LYCHEE_VERSION}/${archive}"
+        echo "${LYCHEE_SHA256}  ${archive}" | sha256sum -c -
+        mkdir -p lychee-bin
+        tar -xzf "${archive}" -C lychee-bin --strip-components=1 lychee-x86_64-unknown-linux-gnu/lychee
+        echo "$RUNNER_TEMP/lychee-bin" >> "$GITHUB_PATH"
+        lychee-bin/lychee --version

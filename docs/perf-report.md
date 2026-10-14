@@ -39,3 +39,16 @@ Aucun outil de lint, de format ni de build n'a été remplacé (voir les refus m
 | Lighthouse `/fr/legal/` | 100 / 100 / 100 / 100, LCP 323 ms | 100 / 100 / 100 / 100, LCP 332 ms |
 
 CLS 0 et TBT 0 ms partout, avant comme après. Les écarts de LCP (± 40 ms) sont du bruit de mesure locale : le HTML de la page d'accueil est identique et celui des pages légales ne perd qu'une balise `<link>` dans le `<head>`.
+
+## Chantier sitemap (`feat/sitemap`)
+
+| Mesure                               | Avant                                  | Après                                                                                  |
+| ------------------------------------ | -------------------------------------- | -------------------------------------------------------------------------------------- |
+| `lastmod`                            | une seule date pour les 4 URL          | une date par URL (accueil 2026-10-14, pages légales 2026-10-13 au moment de la mesure) |
+| `lastmod` de `sitemap-index.xml`     | absente                                | la plus récente des URL                                                                |
+| Espaces de noms XML                  | news, xhtml, image, video              | xhtml seul                                                                             |
+| Cohérence sitemap ⇄ pages indexables | partielle (présence de `/fr/`, `/en/`) | prouvée sur `dist/` : 200, indexable, canonique, hreflang, ensemble exact              |
+| `astro build`                        | 2,18 s                                 | 1,93 s (écart dans le bruit) ; 4 `git log` à 8 ms chacun                               |
+| `dist/`                              | 632 Kio                                | 632 Kio                                                                                |
+
+Les pages ne changent pas : Lighthouse reste celui du chantier outillage.

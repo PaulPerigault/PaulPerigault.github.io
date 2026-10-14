@@ -55,9 +55,9 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
     expect(text('e2e.yml')).toContain('name: site');
     expect(text('deploy.yml')).toMatch(/needs: e2e[\s\S]*upload-pages-artifact/);
     // Sans cette option, upload-pages-artifact exclut `.well-known/` (security.txt en 404).
-    expect(text('deploy.yml')).toMatch(
-      /upload-pages-artifact@\S+ # v\d+\n\s+with:\n(?:\s+.+\n)*?\s+include-hidden-files: true/,
-    );
+    const pagesUpload =
+      text('deploy.yml').split('upload-pages-artifact@')[1]?.split('\n      - ')[0] ?? '';
+    expect(pagesUpload).toContain('include-hidden-files: true');
     expect(text('build.yml')).toContain('include-hidden-files: true');
   });
 

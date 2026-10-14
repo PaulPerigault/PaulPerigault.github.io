@@ -36,11 +36,7 @@ Astro.csp?.insertScriptHash(scriptHash(HEAD_INIT_SCRIPT));
     <script is:inline set:html={HEAD_INIT_SCRIPT} />
     <link rel="preload" href={latinFont} as="font" type="font/woff2" crossorigin />
     {noindex ? (
-      <>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <meta name="robots" content="noindex, nofollow" />
-      </>
+      <SeoHead kind="noindex" title={title} description={description} />
     ) : (
       <SeoHead
         lang={lang}

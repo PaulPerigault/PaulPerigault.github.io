@@ -1,6 +1,6 @@
 # Baseline de performance (2026-10-14)
 
-État mesuré **avant** les chantiers outillage, SEO et sitemap, sur `develop` au commit `b03c115`. Comparaison après les changements : le rapport de performance (`docs/`).
+État mesuré **avant** les chantiers outillage, SEO et sitemap, sur `develop` au commit `b03c115`. Comparaison après les changements : `docs/perf-report.md`.
 
 ## Conditions
 
@@ -25,7 +25,7 @@
 
 ## CI (GitHub Actions, `ubuntu-latest`)
 
-Exécution `38445609453` (push sur `develop`, 2026-10-13) : **2 min 42 s** de bout en bout.
+Exécution `38445609453` (push sur `develop`, 2026-10-13) : **157 s** du premier job démarré au dernier job terminé (2 min 42 s en comptant la mise en file).
 
 | Job          | Durée | Détail                                                                         |
 | ------------ | ----- | ------------------------------------------------------------------------------ |

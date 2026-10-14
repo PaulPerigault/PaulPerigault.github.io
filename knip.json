@@ -7,5 +7,6 @@
     "scripts/guard-secret-files.mjs"
   ],
   "ignoreDependencies": ["@secretlint/secretlint-rule-preset-recommend"],
+  "ignoreBinaries": ["lychee"],
   "project": ["src/**/*.{ts,astro}", "e2e/**/*.ts", "scripts/**/*.mjs", "src/**/*.css"]
 }

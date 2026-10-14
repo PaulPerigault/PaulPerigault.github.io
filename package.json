@@ -32,7 +32,8 @@
     "check:docs": "node scripts/check-docs.mjs",
     "check:live": "node scripts/check-live.mjs",
     "check:secrets": "secretlint \"**/*\"",
-    "verify:worker": "npm --prefix worker run verify"
+    "verify:worker": "npm --prefix worker run verify",
+    "check:links": "node scripts/check-links.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

@@ -39,3 +39,18 @@ Aucun outil de lint, de format ni de build n'a été remplacé (voir les refus m
 | Lighthouse `/fr/legal/` | 100 / 100 / 100 / 100, LCP 323 ms | 100 / 100 / 100 / 100, LCP 332 ms |
 
 CLS 0 et TBT 0 ms partout, avant comme après. Les écarts de LCP (± 40 ms) sont du bruit de mesure locale : le HTML de la page d'accueil est identique et celui des pages légales ne perd qu'une balise `<link>` dans le `<head>`.
+
+## Chantier SEO (`feat/seo-foundation`)
+
+Changements de `<head>` seulement : rendu visible, poids et vitesse inchangés (build sans clé Turnstile, comme la baseline ; avec la clé, le formulaire ajoute 4 Kio à `dist/` et 1 Kio par page d'accueil).
+
+| Mesure                                                 | Avant                                  | Après                             |
+| ------------------------------------------------------ | -------------------------------------- | --------------------------------- |
+| `dist/`                                                | 632 Kio, 35 fichiers                   | 632 Kio, 35 fichiers              |
+| Lighthouse `/fr/`                                      | 100 / 100 / 100 / 100, LCP 363 ms      | 100 / 100 / 100 / 100, LCP 329 ms |
+| Lighthouse `/en/`                                      | 100 / 100 / 100 / 100, LCP 367 ms      | 100 / 100 / 100 / 100, LCP 365 ms |
+| Lighthouse `/fr/legal/`                                | 100 / 100 / 100 / 100, LCP 323 ms      | 100 / 100 / 100 / 100, LCP 327 ms |
+| Balises SEO écrites hors de `SeoHead`                  | 3 fichiers (`BaseLayout`, 404, racine) | 0                                 |
+| Signaux contradictoires (racine `noindex` + canonical) | 1                                      | 0                                 |
+
+Validation HTML (`html-validate` 11.16.2 en `npx`, hors dépendances) : une seule règle en échec, `unique-landmark` (12 occurrences). La barre de navigation et le menu mobile (`<dialog>` fermé) portent tous deux « Navigation principale ». C'est hors du périmètre SEO et cela touche l'interface : à traiter séparément.

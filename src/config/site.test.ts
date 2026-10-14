@@ -6,14 +6,8 @@ import { SITE } from './site';
 // Nom d'hôte littéral (https://exemple.fr) ou adresse e-mail littérale : jamais hors de la config.
 // (schema.org est un vocabulaire normatif, pas une adresse du site.)
 const EXTERNAL = /https?:\/\/(?!schema\.org)[a-z0-9-]+(\.[a-z0-9-]+)+|[\w.-]+@[\w-]+\.[a-z]{2,}/i;
-// Fichiers autorisés à contenir une URL : la source unique, la démo du styleguide, la page racine.
-const ALLOWED = [
-  /src\/config\/site\.ts$/,
-  /styleguide\.astro$/,
-  /pages\/index\.astro$/,
-  /\.test\.ts$/,
-  /src\/test\//,
-];
+// Fichiers autorisés à contenir une URL : la source unique et la démo du styleguide.
+const ALLOWED = [/src\/config\/site\.ts$/, /styleguide\.astro$/, /\.test\.ts$/, /src\/test\//];
 
 describe('SITE', () => {
   it('ne contient que des URLs https valides et un e-mail bien formé', () => {

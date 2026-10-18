@@ -6,7 +6,7 @@ Guidance for Claude Code (claude.ai/code) in this repository.
 
 Personal portfolio for Paul Perigault (paulperigault.fr): **Astro 7** static site (`output: 'static'`, zero JS by default), Tailwind CSS v4, TypeScript `strictest`, FR/EN routes (`/fr/`, `/en/`), deployed to GitHub Pages. Data logic runs **at build time only** with [Effect](https://effect.website).
 
-Migrated from Angular 22 to Astro (epic [#64](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/64)); reasoning and before/after measures in `docs/adr/` (ADR-0001 to 0005). ADR-0006 = visual identity, ADR-0007 = contact form (Worker + Turnstile + Resend + Terraform, option A ownership split). `.angular/` is a git-ignored leftover of the old version.
+Migrated from Angular 22 to Astro (epic [#64](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/64)); reasoning and before/after measures in `docs/adr/` (ADR-0001 to 0005). ADR-0006 = visual identity, ADR-0007 = contact form (Worker + Turnstile + Resend + Terraform, option A ownership split).
 
 ## Commands
 
@@ -195,7 +195,7 @@ Priority: search engines **and AI assistants must know Paul Perigault** — neve
 
 ## Documentation map
 
-`docs/ui.md` (primitives) · `docs/design-charter.md` · `docs/test-matrix.md` (feature → e2e spec) · `docs/geo-checklist.md` · `docs/compliance.md` (GDPR register, domains) · `docs/audit-ia.md` (AI-generated-site defects audit, improvement plan) · `docs/seo.md` (SEO decisions, `SeoHead` contract) · `docs/infra.md` (DNS, HTTPS, `.dev` → `.fr`, Cloudflare headers, search consoles, `check:live`) · `docs/tooling.md` (native tools kept/rejected) · `docs/tooling-skills.md` (Claude Code plugins audit, assistant guardrails) · `docs/pistes-rust-go.md` · `docs/perf-baseline.md` / `docs/perf-report.md` (measurements) · `docs/adr/` · `infra/README.md` · `worker/README.md` · `ROADMAP.md`. `scripts/check-docs.mjs` (in `guard`) fails on a documented `npm run` script or repo path that no longer exists, and on legacy vocabulary.
+`docs/ui.md` (primitives) · `docs/design-charter.md` · `docs/test-matrix.md` (feature → e2e spec) · `docs/geo-checklist.md` · `docs/compliance.md` (GDPR register, domains) · `docs/audit-ia.md` (AI-generated-site defects audit, improvement plan) · `docs/seo.md` (SEO decisions, `SeoHead` contract) · `docs/infra.md` (DNS, HTTPS, `.dev` → `.fr`, Cloudflare headers, search consoles, `check:live`) · `docs/tooling.md` (native tools kept/rejected) · `docs/tooling-skills.md` (Claude Code plugins audit, assistant guardrails) · `docs/pistes-rust-go.md` · `docs/perf-baseline.md` / `docs/perf-report.md` (measurements) · `docs/adr/` · `infra/README.md` · `worker/README.md` · `ROADMAP.md`. `scripts/check-docs.mjs` (in `guard`) fails on a documented `npm run` script, repo path or relative link that no longer exists.
 
 ## Maintenance
 

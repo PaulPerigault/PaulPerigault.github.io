@@ -51,7 +51,7 @@
     "@axe-core/playwright": "^4.13.0",
     "@commitlint/cli": "^20.5.0",
     "@commitlint/config-conventional": "^20.5.0",
-    "@effect/language-service": "^0.87.3",
+    "@effect/language-service": "^0.87.4",
     "@effect/vitest": "^0.30.0",
     "@eslint/js": "^10.0.0",
     "@fontsource-variable/atkinson-hyperlegible-next": "^5.3.0",

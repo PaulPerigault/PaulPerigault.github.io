@@ -67,3 +67,26 @@ Validation HTML (`html-validate` 11.16.2 en `npx`, hors dépendances) : une seul
 | `dist/`                              | 632 Kio                                | 632 Kio                                                                                |
 
 Les pages ne changent pas : Lighthouse reste celui du chantier outillage.
+
+## Chantier qualité web (lot 6, #176)
+
+Mesures sur `dist/` servi localement (sans compression), Chrome DevTools : mobile 412 px, réseau Slow 4G, processeur ×4, cache vidé, 3 chargements par configuration. CI : Lighthouse desktop, 3 passages par page.
+
+| Mesure                                         | Avant                                    | Après                                       |
+| ---------------------------------------------- | ---------------------------------------- | ------------------------------------------- |
+| LCP `/fr/` (mobile bridé, moyenne de 3)        | 1 565 ms (1 560, 1 572, 1 564)           | 921 ms (948, 916, 900), −41 %               |
+| Requêtes `/fr/`                                | 10                                       | 9 (feuille CSS intégrée)                    |
+| HTML + CSS gzip, première visite               | 6 137 + 5 008 = 11 145 o                 | 11 010 o                                    |
+| HTML gzip, deuxième page (CSS déjà en cache)   | 5 275 o                                  | 10 038 o (+4,8 Ko par page suivante)        |
+| Photo du hero                                  | WebP 6 618 o                             | AVIF 3 530 o (−47 %), WebP en repli         |
+| Budgets Lighthouse CI                          | perf ≥ 0,95, LCP ≤ 2 s, 250 Ko, JS 10 Ko | perf ≥ 0,98, LCP ≤ 800 ms, 90 Ko, JS 6 Ko, ≤ 12 requêtes, TBT ≤ 50 ms, CLS ≤ 0,01, bonnes pratiques = 1 ; pages légales ajoutées |
+| Lighthouse CI (desktop, avant le lot)          | 100/100/100/100, LCP ≈ 368 ms, 59 Ko, JS 4,3 Ko, 10 requêtes | budgets resserrés sur ces valeurs |
+
+Décisions :
+
+- **CSS intégré** (`build.inlineStylesheets: 'always'`) : la feuille de 19 Ko bloquait le rendu du texte, qui est l'élément LCP. Astro ajoute son empreinte à la CSP. Coût : +4,8 Ko gzip par page vue après la première ; pour un CV consulté le plus souvent sur une seule page, le gain de LCP l'emporte.
+- **AVIF** : `<Picture>` d'`astro:assets`, géométrie identique (160 × 160 à la même position, captures avant/après : 0,157 % de pixels différents, tous dans la photo).
+- **Abandonnés, gain nul ou trop faible** : recompression de l'image OG (vraiment sans perte : −4,4 %, 8,5 Ko sur une image que la page ne charge pas, au prix d'une dépendance déclarée ; les −66 % d'abord mesurés venaient d'une palette, donc avec perte) ; sous-ensemble plus fin de la police (outil Python en plus, aucun effet sur le LCP grâce au préchargement et à `font-display: swap` ; `latin-ext` n'est jamais téléchargé) ; regroupement des scripts (modules différés, hors du chemin critique).
+- **Photo en haute densité** : la source fait 200 × 200 px ; un `srcset` 2x/3x demande une photo plus grande (action du propriétaire, #181).
+- **WCAG 2.2 au-delà d'axe** (mesuré à 320 px) : aucune cible sous 24 × 24 px (2.5.8), aucun défilement horizontal, y compris avec l'espacement de texte imposé (1.4.10, 1.4.12), titres des sections visibles sous la barre collante après une ancre (2.4.11). Le doublon `unique-landmark` de `html-validate` n'est pas corrigé : le `<dialog>` fermé est absent de l'arbre d'accessibilité et, ouvert en modal, rend le reste inerte ; un lecteur d'écran ne voit jamais les deux repères ensemble.
+- **SEO technique** : titres de 43 à 56 caractères, descriptions de 71 à 160, canonique sur soi-même, `hreflang` fr/en/x-default et `lang` corrects sur les 4 pages indexables ; rien à corriger.

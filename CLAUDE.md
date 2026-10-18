@@ -148,7 +148,7 @@ Everything is in `.github/workflows/`; the site is **built once** and the **same
 | `dependabot-auto-merge.yml` | Dependabot PRs | auto-merge patch/minor, **except the Terraform provider** (read changelog, update lock, plan) |
 
 - Required checks stay `ci` and `commitlint`; `scripts/workflows.test.mjs` asserts them, the single build, pinned actions, permissions, weekly redeploy.
-- Lighthouse budgets (`.lighthouserc.json`): performance ≥ 0.95, accessibility = 1, best-practices ≥ 0.95, SEO = 1, JS ≤ 10 KB, weight ≤ 250 KB, LCP ≤ 2 s, TBT ≤ 200 ms, CLS ≤ 0.05.
+- Lighthouse budgets (`.lighthouserc.json`, desktop, `/fr/`, `/en/` and both legal pages): performance ≥ 0.98, accessibility = 1, best-practices = 1, SEO = 1, JS ≤ 6 KB, weight ≤ 90 KB, ≤ 12 requests, LCP ≤ 800 ms, TBT ≤ 50 ms, CLS ≤ 0.01 (measured 2026-10-19: 100 everywhere, LCP ≈ 370 ms, 59 KB, 4.3 KB JS). CSS is inlined in each page (`build.inlineStylesheets: always`, LCP −41 % on throttled mobile); Astro hashes it into the CSP.
 - Dependabot groups npm (astro, effect, tailwind, tooling), `/worker`, `/infra` (never auto-merged), github-actions, Docker base images; npm majors and the Docker `node` major are ignored (build stage follows `.nvmrc`).
 - A multi-stage `Dockerfile` + `nginx.conf` deploy `dist/` elsewhere (`docker-compose.yml`).
 - Schedules run from the **default branch** (`develop`), hence `ref: main` in `deploy.yml`.

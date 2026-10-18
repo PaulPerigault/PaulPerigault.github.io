@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import photo from '@/assets/photo.jpg';
 import ButtonLink from '@/components/ui/ButtonLink.astro';
 import Container from '@/components/ui/Container.astro';
@@ -43,12 +43,13 @@ const newTab = t('a11y.new_tab');
         </ButtonLink>
       </div>
     </div>
-    <Image
+    <Picture
       src={photo}
       alt={SITE.name}
       width={200}
       height={200}
-      format="webp"
+      formats={['avif']}
+      fallbackFormat="webp"
       loading="eager"
       fetchpriority="high"
       class="border-line size-40 border object-cover md:size-52"

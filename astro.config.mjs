@@ -7,7 +7,7 @@ export default defineConfig({
   site: 'https://paulperigault.fr',
   output: 'static',
   trailingSlash: 'always',
-  build: { format: 'directory' },
+  build: { format: 'directory', inlineStylesheets: 'always' },
   i18n: {
     defaultLocale: 'fr',
     locales: ['fr', 'en'],

@@ -54,3 +54,16 @@ Changements de `<head>` seulement : rendu visible, poids et vitesse inchangés (
 | Signaux contradictoires (racine `noindex` + canonical) | 1                                      | 0                                 |
 
 Validation HTML (`html-validate` 11.16.2 en `npx`, hors dépendances) : une seule règle en échec, `unique-landmark` (12 occurrences). La barre de navigation et le menu mobile (`<dialog>` fermé) portent tous deux « Navigation principale ». C'est hors du périmètre SEO et cela touche l'interface : à traiter séparément.
+
+## Chantier sitemap (`feat/sitemap`)
+
+| Mesure                               | Avant                                  | Après                                                                                  |
+| ------------------------------------ | -------------------------------------- | -------------------------------------------------------------------------------------- |
+| `lastmod`                            | une seule date pour les 4 URL          | une date par URL (accueil 2026-10-14, pages légales 2026-10-13 au moment de la mesure) |
+| `lastmod` de `sitemap-index.xml`     | absente                                | la plus récente des URL                                                                |
+| Espaces de noms XML                  | news, xhtml, image, video              | xhtml seul                                                                             |
+| Cohérence sitemap ⇄ pages indexables | partielle (présence de `/fr/`, `/en/`) | prouvée sur `dist/` : 200, indexable, canonique, hreflang, ensemble exact              |
+| `astro build`                        | 2,18 s                                 | 1,93 s (écart dans le bruit) ; 4 `git log` à 8 ms chacun                               |
+| `dist/`                              | 632 Kio                                | 632 Kio                                                                                |
+
+Les pages ne changent pas : Lighthouse reste celui du chantier outillage.

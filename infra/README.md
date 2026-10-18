@@ -56,7 +56,7 @@ Tests (faux fichiers, doublures de `spawn` et `fetch`, jamais les vrais secrets)
 
 Un domaine personnalisé doit viser un Worker qui existe déjà. La doc du provider ne dit pas si un Worker créé par `cloudflare_worker`, mais jamais déployé, suffit. La séquence retenue évite la question, sans modifier le code :
 
-1. `npm run infra:tf -- apply -target=module.contact_form.cloudflare_worker.contact -target=module.contact_form.cloudflare_turnstile_widget.contact -target=module.resend_domain` : Worker sans code, widget, import des enregistrements Resend, sans le domaine.
+1. `npm run infra:tf -- apply '-target=module.contact_form.cloudflare_worker.contact' '-target=module.contact_form.cloudflare_turnstile_widget.contact' '-target=module.resend_domain'` : Worker sans code, widget, import des enregistrements Resend, sans le domaine. Les guillemets sont nécessaires sous PowerShell, qui coupe un argument `-target=a.b` non cité au premier point.
 2. `npm --prefix worker run deploy`, avec le token Cloudflare dans `CLOUDFLARE_API_TOKEN` : première version du code.
 3. `npm run infra:worker-secrets` : secrets du Worker.
 4. `npm run infra:tf -- apply` (complet) : le domaine `contact.paulperigault.dev`. Le plan ne doit plus montrer que lui.

@@ -46,6 +46,7 @@ describe('tf', () => {
 describe('pushWorkerSecrets', () => {
   it('envoie les deux secrets par stdin à wrangler, rien sur la console', () => {
     const { calls, lines, deps } = setup([{ status: 0, stdout: 'fake-turnstile' }, { status: 0 }]);
+    const envBefore = { ...process.env };
     expect(pushWorkerSecrets(deps)).toBe(0);
     const [output, wrangler] = calls;
     expect(output.args.slice(1)).toEqual(['output', '-raw', 'contact_form_turnstile_secret']);
@@ -58,7 +59,7 @@ describe('pushWorkerSecrets', () => {
     expect(wrangler.options.env).toMatchObject({ CLOUDFLARE_API_TOKEN: 'fake-cf' });
     expect(wrangler.options.env).not.toHaveProperty('TF_VAR_resend_api_key');
     expect(lines.join('\n')).not.toMatch(/fake-/);
-    expect(process.env.CLOUDFLARE_API_TOKEN).toBeUndefined();
+    expect(process.env).toEqual(envBefore);
   });
 
   it('s’arrête sans appeler wrangler si le secret Turnstile est indisponible', () => {

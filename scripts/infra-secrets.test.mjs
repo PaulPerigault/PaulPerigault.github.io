@@ -76,10 +76,11 @@ describe('childEnv', () => {
 
   it('ajoute les secrets à une copie de l’environnement, jamais au processus courant', () => {
     const base = { PATH: '/bin', TF_SECRETS_FILE: '/s' };
+    const envBefore = { ...process.env };
     const env = childEnv(['TF_VAR_cloudflare_api_token'], { env: base, readFile, root: '/d' });
     expect(env).toEqual({ ...base, TF_VAR_cloudflare_api_token: 'fake-token' });
     expect(base).not.toHaveProperty('TF_VAR_cloudflare_api_token');
-    expect(process.env.TF_VAR_cloudflare_api_token).toBeUndefined();
+    expect(process.env).toEqual(envBefore);
   });
 
   it('signale un fichier de secrets introuvable', () => {

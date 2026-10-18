@@ -1,8 +1,6 @@
 import type { APIRoute } from 'astro';
-import { SITE } from '@/config/site';
+import { textResponse } from '@/lib/http';
 import { buildRobots } from '@/lib/robots';
+import { absoluteUrl } from '@/lib/seo';
 
-export const GET: APIRoute = () =>
-  new Response(buildRobots(`${SITE.domain}/sitemap-index.xml`), {
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-  });
+export const GET: APIRoute = () => textResponse(buildRobots(absoluteUrl('/sitemap-index.xml')));

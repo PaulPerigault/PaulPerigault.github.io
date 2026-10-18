@@ -89,5 +89,12 @@ test.describe('robots et fichiers pour les IA', () => {
       await expect(alternate).toHaveAttribute('href', `/${lang}/index.md`);
       expect((await request.get(`/${lang}/index.md`)).status()).toBe(200);
     });
+
+    test(`la page légale ${lang} n’annonce pas de version Markdown inexistante`, async ({
+      page,
+    }) => {
+      await page.goto(`/${lang}/legal/`);
+      await expect(page.locator('link[rel="alternate"][type="text/markdown"]')).toHaveCount(0);
+    });
   }
 });

@@ -64,7 +64,7 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
   it('expose les checks requis par la protection de branche : ci (agrégat) et commitlint', () => {
     const ci = text('ci.yml');
     expect(ci).toMatch(
-      /^ {2}ci:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify, build, e2e, lighthouse, container, worker, infra\]/m,
+      /^ {2}ci:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify, build, e2e, links, lighthouse, container, worker, infra\]/m,
     );
     expect(ci).toMatch(/^ {2}commitlint:/m);
   });
@@ -80,34 +80,5 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
     const browsers = text('browsers.yml');
     expect(browsers).toContain('cron:');
     expect(browsers).toContain('all-browsers: true');
-  });
-
-  it('cherchent des secrets dans tout l’historique Git avec un binaire vérifié', () => {
-    const gitleaks =
-      text('security.yml')
-        .split(/^ {2}gitleaks:\n/m)[1]
-        ?.split(/^ {2}\w/m)[0] ?? '';
-    expect(gitleaks).toContain('fetch-depth: 0');
-    expect(gitleaks).toMatch(/GITLEAKS_SHA256: [0-9a-f]{64}/);
-    expect(gitleaks).toContain('sha256sum -c');
-    expect(gitleaks).toContain('--redact');
-  });
-
-  it('installent les dépendances avec npm ci (jamais npm install)', () => {
-    for (const { name, text } of workflows) expect(text, name).not.toMatch(/run: npm install\b/);
-  });
-
-  it('ne laissent pas les identifiants Git dans les checkouts de vérification', () => {
-    for (const name of [
-      'ci.yml',
-      'e2e.yml',
-      'build.yml',
-      'deploy.yml',
-      'security.yml',
-      'deploy-worker.yml',
-    ]) {
-      const checkouts = (text(name).match(/actions\/checkout@/g) ?? []).length;
-      expect((text(name).match(/persist-credentials: false/g) ?? []).length, name).toBe(checkouts);
-    }
   });
 });

@@ -11,9 +11,11 @@ interface Props {
   description: string;
   /** Graphe JSON-LD déjà construit (voir lib/build-json-ld.ts). */
   jsonLd?: object | undefined;
+  /** La page a une version Markdown servie à `<chemin>index.md` (route `[lang]/index.md.ts`). */
+  markdown?: boolean | undefined;
 }
 
-const { lang, title, description, jsonLd } = Astro.props;
+const { lang, title, description, jsonLd, markdown = false } = Astro.props;
 const path = Astro.url.pathname;
 const { property, name } = socialTags({ lang, path, title, description });
 const links = [SITE.githubUrl, SITE.linkedinUrl];
@@ -38,7 +40,7 @@ const verification = verificationTags(import.meta.env);
 {links.map((href) => (
   <link rel="me" href={href} />
 ))}
-<link rel="alternate" type="text/markdown" href={`${path}index.md`} />
+{markdown && <link rel="alternate" type="text/markdown" href={`${path}index.md`} />}
 {verification.map((tag) => (
   <meta name={tag.name} content={tag.content} />
 ))}

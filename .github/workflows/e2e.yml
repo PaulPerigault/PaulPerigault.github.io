@@ -19,6 +19,12 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Deux machines se partagent les tests (`--shard`) : Playwright domine le chemin critique de la
+    # CI (build → e2e) ; mesures dans docs/perf-report.md.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     env:
       PW_ALL_BROWSERS: ${{ inputs.all-browsers && '1' || '0' }}
     steps:
@@ -39,11 +45,11 @@ jobs:
         run: node scripts/indexnow.mjs --dry-run
       - name: Installer les navigateurs Playwright
         run: npx playwright install --with-deps ${{ inputs.all-browsers && 'chromium firefox webkit' || 'chromium' }}
-      - run: npm run e2e
+      - run: npm run e2e -- --shard=${{ matrix.shard }}/2
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: ${{ !cancelled() }}
         with:
-          name: playwright-${{ inputs.all-browsers && 'all-browsers' || 'chromium' }}
+          name: playwright-${{ inputs.all-browsers && 'all-browsers' || 'chromium' }}-${{ matrix.shard }}
           path: |
             playwright-report/
             test-results/

@@ -85,3 +85,7 @@ crash.log
 
 # Mesures locales de npm run bench
 /bench-results.json
+
+# Claude Code : réglages locaux (plugins désactivés, règles personnelles) et worktrees
+.claude/settings.local.json
+.claude/worktrees/

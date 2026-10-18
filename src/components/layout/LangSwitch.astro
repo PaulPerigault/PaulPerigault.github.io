@@ -1,5 +1,6 @@
 ---
 import type { Lang } from '@/domain/lang';
+import VisuallyHidden from '@/components/ui/VisuallyHidden.astro';
 import { useTranslations } from '@/lib/i18n';
 
 interface Props {
@@ -17,10 +18,11 @@ const href = Astro.url.pathname.replace(`/${lang}/`, `/${other}/`);
   hreflang={other}
   lang={other}
   data-lang-switch={other}
-  aria-label={t(`lang.${other}`)}
   class="border-control hover:border-accent hover:text-accent rounded-sm border px-2 py-1 text-sm font-semibold uppercase transition-colors duration-(--pp-duration)"
 >
-  {other}
+  <!-- Nom accessible « en English » : il commence par le texte visible (WCAG 2.5.3). -->
+  <span>{other}</span>
+  <VisuallyHidden>{t(`lang.${other}`)}</VisuallyHidden>
 </a>
 
 <script>

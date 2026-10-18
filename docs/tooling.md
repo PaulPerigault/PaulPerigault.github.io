@@ -20,7 +20,7 @@ Règle : un outil natif n'entre dans le dépôt que si une mesure (`npm run benc
 - **Fichiers** : `lychee.toml` (options communes), `scripts/check-links.mjs` (point d'entrée), `scripts/lib/links.mjs` (arguments, testés par `scripts/check-links.test.mjs`), `.github/actions/setup-lychee/action.yml` (binaire officiel épinglé, SHA-256 vérifié), job `links` de `ci.yml`.
 - **Installation locale** : `brew install lychee` ou `cargo binstall lychee` (version de la CI : 0.24.2).
 - **Mise à jour** : changer `version` et `sha256` dans `setup-lychee` (somme publiée avec la release, fichier `lychee-x86_64-unknown-linux-gnu.tar.gz.sha256`) ; Dependabot ne voit pas ce binaire.
-- **Retrait** : supprimer les fichiers ci-dessus, le script `check:links` de `package.json`, `lychee` de `ignoreBinaries` (`knip.json`), le job `links` de `ci.yml` (et de l'agrégat `ci`), le job `links-external` de `browsers.yml`, l'assertion correspondante de `scripts/workflows.test.mjs`.
+- **Retrait** : supprimer les fichiers ci-dessus, le script `check:links` de `package.json`, `lychee` de `ignoreBinaries` (`knip.json`), le job `links` de `ci.yml` (et de l'agrégat `ci`), le job `links-external` de `browsers.yml`, l'assertion correspondante de `scripts/workflows-supply-chain.test.mjs`.
 
 ### hyperfine : mesures
 

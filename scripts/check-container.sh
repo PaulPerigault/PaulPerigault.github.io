@@ -33,12 +33,18 @@ done
 if echo "$headers" | grep -qi "^x-xss-protection"; then echo "X-XSS-Protection obsolète présent"; exit 1; fi
 if echo "$headers" | grep -qi "^server: .*/"; then echo "Version du serveur exposée"; exit 1; fi
 
-curl -fsS "http://127.0.0.1:$PORT/en/" | grep -q "content-security-policy"
-asset=$(curl -fsS "http://127.0.0.1:$PORT/fr/" | grep -o "/_astro/[^\"]*\.woff2" | head -1)
+# Pages lues en entier avant d'être filtrées : sous `pipefail`, un `grep -q` ou un `head` qui ferme
+# le tube tôt fait échouer curl (code 23) de façon intermittente.
+en_page=$(curl -fsS "http://127.0.0.1:$PORT/en/")
+grep -q "content-security-policy" <<<"$en_page"
+fr_page=$(curl -fsS "http://127.0.0.1:$PORT/fr/")
+asset=$(grep -o "/_astro/[^\"]*\.woff2" <<<"$fr_page" | sed -n 1p)
 [ -n "$asset" ] || { echo "Aucune ressource versionnée (/_astro/*.woff2) dans /fr/"; exit 1; }
-curl -fsSI "http://127.0.0.1:$PORT$asset" | tr -d "\r" | grep -qi "^cache-control: max-age=31536000"
-curl -fsSI "http://127.0.0.1:$PORT$asset" | tr -d "\r" | grep -qi "^x-content-type-options: nosniff"
+asset_headers=$(curl -fsSI "http://127.0.0.1:$PORT$asset" | tr -d '\r')
+grep -qi "^cache-control: max-age=31536000" <<<"$asset_headers"
+grep -qi "^x-content-type-options: nosniff" <<<"$asset_headers"
 [ "$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/introuvable/")" = "404" ]
-curl -fsSI "http://127.0.0.1:$PORT/en/index.md" | tr -d '\r' | grep -qi "^content-type: text/markdown"
+md_headers=$(curl -fsSI "http://127.0.0.1:$PORT/en/index.md" | tr -d '\r')
+grep -qi "^content-type: text/markdown" <<<"$md_headers"
 [ "$(docker exec "$NAME" id -u)" != "0" ] || { echo "Le conteneur tourne en root"; exit 1; }
 echo "Conteneur OK : en-têtes, pages, 404, Markdown, utilisateur non-root."

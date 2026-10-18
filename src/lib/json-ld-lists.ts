@@ -1,5 +1,6 @@
 import { SITE } from '@/config/site';
 import type { JsonLdInput } from './json-ld';
+import { absoluteUrl } from './seo';
 
 type Node = Record<string, unknown>;
 
@@ -15,7 +16,7 @@ const listNode = (name: string, pageUrl: string, key: string, items: Node[]): No
 });
 
 export const certificationsNode = ({ path, certifications }: JsonLdInput): Node[] => {
-  const pageUrl = `${SITE.domain}${path}`;
+  const pageUrl = absoluteUrl(path);
   const items = certifications.map((cert) => ({
     '@type': 'EducationalOccupationalCredential',
     '@id': `${pageUrl}#certification-${cert.id}`,
@@ -27,7 +28,7 @@ export const certificationsNode = ({ path, certifications }: JsonLdInput): Node[
 };
 
 export const projectsNode = ({ path, projectNames }: JsonLdInput): Node[] => {
-  const pageUrl = `${SITE.domain}${path}`;
+  const pageUrl = absoluteUrl(path);
   const items = projectNames.map((name) => ({
     '@type': 'SoftwareSourceCode',
     '@id': `${pageUrl}#project-${name}`,

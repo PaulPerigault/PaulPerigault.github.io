@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { LANGS } from '@/domain/lang';
+import { textResponse } from '@/lib/http';
 import { llmsFull } from '@/lib/llms';
 import { getSiteData } from '@/services/site-data';
 
@@ -10,7 +11,5 @@ export const GET: APIRoute = async () => {
       return { lang, ...portfolio, projects };
     }),
   );
-  return new Response(llmsFull(profiles), {
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-  });
+  return textResponse(llmsFull(profiles));
 };

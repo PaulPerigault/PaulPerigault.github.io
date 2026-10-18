@@ -1,5 +1,6 @@
 ---
 import SeoHead from '@/components/layout/SeoHead.astro';
+import { SITE } from '@/config/site';
 import { scriptHash } from '@/lib/csp';
 import { ROOT_REDIRECT_SCRIPT } from '@/lib/root-redirect';
 
@@ -12,7 +13,7 @@ Astro.csp?.insertScriptHash(scriptHash(ROOT_REDIRECT_SCRIPT));
     <meta charset="utf-8" />
     <meta http-equiv="refresh" content="0; url=/fr/" />
     {/* Pas de noindex : avec le canonical, il enverrait deux signaux contraires à Google. */}
-    <SeoHead kind="alias" title="Paul Perigault" canonicalPath="/fr/" />
+    <SeoHead kind="alias" title={SITE.name} canonicalPath="/fr/" />
     <script is:inline set:html={ROOT_REDIRECT_SCRIPT} />
   </head>
   <body>

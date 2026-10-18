@@ -80,9 +80,6 @@ crash.log
 # Wrangler (dev local du Worker)
 .wrangler/
 
-# Reste de l'ancienne version Angular
-.angular/
-
 # Mesures locales de npm run bench
 /bench-results.json
 

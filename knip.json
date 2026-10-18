@@ -2,7 +2,6 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": [
     "scripts/check-*.mjs",
-    "scripts/serve-dist.mjs",
     "scripts/generate-og-image.mjs",
     "scripts/guard-secret-files.mjs"
   ],

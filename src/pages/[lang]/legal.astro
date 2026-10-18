@@ -1,6 +1,7 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import LegalDocument from '@/components/sections/LegalDocument.astro';
+import { SITE } from '@/config/site';
 import { LANGS, type Lang } from '@/domain/lang';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getSiteData } from '@/services/site-data';
@@ -13,6 +14,6 @@ const { portfolio } = await getSiteData(lang);
 const { legal } = portfolio;
 ---
 
-<BaseLayout lang={lang} title={`${legal.title} — Paul Perigault`} description={legal.description}>
+<BaseLayout lang={lang} title={`${legal.title} — ${SITE.name}`} description={legal.description}>
   <LegalDocument lang={lang} document={legal} />
 </BaseLayout>

@@ -31,6 +31,5 @@ worker
 
 # Outillage local
 .claude
-.angular
 .idea
 .vscode

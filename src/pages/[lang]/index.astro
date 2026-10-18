@@ -10,13 +10,13 @@ import Formation from '@/components/sections/Formation.astro';
 import Hero from '@/components/sections/Hero.astro';
 import Projects from '@/components/sections/Projects.astro';
 import Skills from '@/components/sections/Skills.astro';
-import { SITE } from '@/config/site';
 import { LANGS, type Lang } from '@/domain/lang';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { useTranslations } from '@/lib/i18n';
 import { buildJsonLd } from '@/lib/build-json-ld';
 import { allowContactForm } from '@/lib/contact-csp';
 import { turnstileSiteKey } from '@/lib/contact-form';
+import { absoluteUrl } from '@/lib/seo';
 import { getSiteData } from '@/services/site-data';
 
 export const getStaticPaths = (() =>
@@ -37,7 +37,7 @@ const jsonLd = buildJsonLd({
   description: t('seo.description'),
   jobTitle: t('hero.role'),
   summary: t('hero.summary'),
-  imageUrl: `${SITE.domain}${image.src}`,
+  imageUrl: absoluteUrl(image.src),
   skills: portfolio.skills.flatMap((category) => category.items),
   certifications: portfolio.certifications,
   projectNames: projects.projects.map((project) => project.name),

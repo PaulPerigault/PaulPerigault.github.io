@@ -1,6 +1,7 @@
 // Garde-fou : aucun fichier source ne dépasse MAX_FILE_LINES lignes.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { reportAndExit } from './lib/report.mjs';
 import { walk } from './lib/walk.mjs';
 
 export const MAX_FILE_LINES = 120;
@@ -25,10 +26,8 @@ export function run(root = process.cwd(), max = MAX_FILE_LINES) {
 }
 
 if (import.meta.main) {
-  const offenders = run();
-  for (const { file, lines } of offenders) {
-    console.error(`${file}: ${lines} lignes (max ${MAX_FILE_LINES})`);
-  }
-  if (offenders.length > 0) process.exit(1);
-  console.log(`check-file-size: OK (max ${MAX_FILE_LINES} lignes)`);
+  const problems = run().map(
+    ({ file, lines }) => `${file}: ${lines} lignes (max ${MAX_FILE_LINES})`,
+  );
+  reportAndExit('check-file-size', problems, `check-file-size: OK (max ${MAX_FILE_LINES} lignes)`);
 }

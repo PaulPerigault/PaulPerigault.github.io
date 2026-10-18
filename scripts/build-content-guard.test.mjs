@@ -1,8 +1,8 @@
-import { cpSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
-import { buildSite } from './lib/astro-build.mjs';
+import { describe, expect, it, onTestFinished } from 'vitest';
+import { buildSite, disposeBuild } from './lib/astro-build.mjs';
 
 const BUILD_TIMEOUT_MS = 120_000;
 
@@ -11,7 +11,12 @@ async function buildWith(mutate) {
   const dir = mkdtempSync(join(tmpdir(), 'content-'));
   cpSync('src/content', dir, { recursive: true });
   mutate(dir);
-  return buildSite({ env: { CONTENT_DIR: dir } });
+  const result = await buildSite({ env: { CONTENT_DIR: dir } });
+  onTestFinished(() => {
+    disposeBuild(result.outDir);
+    rmSync(dir, { recursive: true, force: true });
+  });
+  return result;
 }
 
 describe('le build protège la qualité du contenu', () => {

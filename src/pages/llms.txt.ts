@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
+import { textResponse } from '@/lib/http';
 import { llmsIndex } from '@/lib/llms';
 
-export const GET: APIRoute = () =>
-  new Response(llmsIndex(), { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+export const GET: APIRoute = () => textResponse(llmsIndex());

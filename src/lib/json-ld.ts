@@ -1,6 +1,7 @@
 import { SITE } from '@/config/site';
 import type { Certification } from '@/domain/certification';
-import type { Lang } from '@/domain/lang';
+import { LANGS, type Lang } from '@/domain/lang';
+import { absoluteUrl } from './seo';
 
 export interface JsonLdInput {
   lang: Lang;
@@ -31,8 +32,8 @@ export const personNode = (input: JsonLdInput): Node => ({
   description: input.summary,
   email: `mailto:${SITE.email}`,
   hasOccupation: { '@type': 'Occupation', name: input.jobTitle },
-  knowsLanguage: ['fr', 'en'],
-  mainEntityOfPage: `${SITE.domain}${input.path}`,
+  knowsLanguage: LANGS,
+  mainEntityOfPage: absoluteUrl(input.path),
   image: input.imageUrl,
   sameAs: [SITE.githubUrl, SITE.linkedinUrl],
   worksFor: organization('Organization', SITE.employer),
@@ -45,12 +46,12 @@ export const websiteNode = (): Node => ({
   '@id': id('website'),
   url: SITE.domain,
   name: SITE.name,
-  inLanguage: ['fr', 'en'],
+  inLanguage: LANGS,
   publisher: ref('person'),
 });
 
 export const profilePageNode = ({ lang, path, title, description }: JsonLdInput): Node => {
-  const url = `${SITE.domain}${path}`;
+  const url = absoluteUrl(path);
   return {
     '@type': 'ProfilePage',
     '@id': `${url}#profile`,

@@ -16,21 +16,41 @@ const reply = (status, headers = {}, body = '') => ({
   text: async () => body,
 });
 
+const NOW = Date.parse('2026-10-14T00:00:00Z');
+const securityTxt = (expires) => `Contact: mailto:a@example.fr\nExpires: ${expires}\n`;
+
 const healthy = async (url) => {
   const { pathname, search, hostname, protocol } = new URL(url);
   if (protocol === 'http:' || hostname !== 'example.fr') {
     return reply(301, { location: `https://example.fr${pathname}${search}` });
   }
   if (pathname === '/introuvable/') return reply(404);
+  if (pathname.endsWith('security.txt'))
+    return reply(200, SECURE, securityTxt('2027-04-01T00:00:00Z'));
   return reply(200, SECURE, 'Sitemap: https://example.fr/sitemap-index.xml');
 };
 
-const run = (fetchFn) => runChecks(buildChecks(SITES), fetchFn);
+const run = (fetchFn) => runChecks(buildChecks(SITES, NOW), fetchFn);
 const failing = (results) => results.filter((r) => r.problems.length > 0).map((r) => r.name);
 
 describe('check-live', () => {
   it('valide un site correctement configuré', async () => {
     expect(failing(await run(healthy))).toEqual([]);
+  });
+
+  it('détecte security.txt absent de /.well-known/ (artefact Pages sans dossiers cachés)', async () => {
+    const hidden = async (url) =>
+      new URL(url).pathname.startsWith('/.well-known/') ? reply(404) : healthy(url);
+    expect(failing(await run(hidden))).toEqual(['security.txt (/.well-known/, fait foi)']);
+  });
+
+  it('détecte un security.txt qui expire dans moins de 30 jours', async () => {
+    const stale = async (url) =>
+      new URL(url).pathname === '/.well-known/security.txt'
+        ? reply(200, SECURE, securityTxt('2026-10-20T00:00:00Z'))
+        : healthy(url);
+    const [result] = (await run(stale)).filter((r) => r.problems.length > 0);
+    expect(result?.problems).toEqual(['Expires à moins de 30 jours']);
   });
 
   it('détecte un alias qui ne redirige pas', async () => {

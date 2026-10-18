@@ -8,6 +8,7 @@ import type { ProjectsSnapshot } from '@/domain/project';
 import { formatYearMonth } from '@/lib/format-date';
 import { useTranslations } from '@/lib/i18n';
 import { toYearMonth, visibleTopics } from '@/lib/projects';
+import { SEPARATOR } from '@/lib/typography';
 
 interface Props {
   lang: Lang;
@@ -44,7 +45,7 @@ const month = (isoDate: string) => formatYearMonth(toYearMonth(isoDate), lang);
               {t('projects.updated')} {month(project.updated_at)}
               {project.homepage && (
                 <span>
-                  {' · '}
+                  {SEPARATOR}
                   <ExternalLink href={project.homepage} newTabLabel={newTab}>
                     {t('projects.view_demo')}
                   </ExternalLink>

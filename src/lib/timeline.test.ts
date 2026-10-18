@@ -58,7 +58,7 @@ describe('experienceEntries', () => {
   it('compose titre, sous-titre, période localisée et date machine', () => {
     expect(entries[0]).toMatchObject({
       title: 'Apprenti',
-      subtitle: 'WeVii · Bordeaux',
+      subtitle: 'WeVii · Bordeaux',
       period: 'Sep 2023 — Present',
       dateTime: '2023-09',
     });
@@ -75,7 +75,7 @@ describe('formationEntries', () => {
     expect(entries.map((entry) => entry.id)).toEqual(['esiea', 'iut']);
     expect(entries[0]).toMatchObject({
       title: 'Cycle',
-      subtitle: 'ESIEA · DevOps',
+      subtitle: 'ESIEA · DevOps',
       period: 'sept. 2024 — août 2027',
     });
     expect(entries[0]?.tags).toEqual([]);

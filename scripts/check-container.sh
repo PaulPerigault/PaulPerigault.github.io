@@ -34,7 +34,8 @@ if echo "$headers" | grep -qi "^x-xss-protection"; then echo "X-XSS-Protection o
 if echo "$headers" | grep -qi "^server: .*/"; then echo "Version du serveur exposée"; exit 1; fi
 
 curl -fsS "http://127.0.0.1:$PORT/en/" | grep -q "content-security-policy"
-asset=$(curl -fsS "http://127.0.0.1:$PORT/fr/" | grep -o "/_astro/[^\"]*\.css" | head -1)
+asset=$(curl -fsS "http://127.0.0.1:$PORT/fr/" | grep -o "/_astro/[^\"]*\.woff2" | head -1)
+[ -n "$asset" ] || { echo "Aucune ressource versionnée (/_astro/*.woff2) dans /fr/"; exit 1; }
 curl -fsSI "http://127.0.0.1:$PORT$asset" | tr -d "\r" | grep -qi "^cache-control: max-age=31536000"
 curl -fsSI "http://127.0.0.1:$PORT$asset" | tr -d "\r" | grep -qi "^x-content-type-options: nosniff"
 [ "$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/introuvable/")" = "404" ]

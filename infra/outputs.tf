@@ -4,7 +4,7 @@ output "contact_form_turnstile_sitekey" {
 }
 
 output "contact_form_turnstile_secret" {
-  description = "Secret Turnstile du Worker. Lu uniquement par contact-form-secrets.ps1 (stdin), jamais affiché."
+  description = "Secret Turnstile du Worker. Lu uniquement par npm run infra:worker-secrets (stdin), jamais affiché."
   value       = module.contact_form.turnstile_secret
   sensitive   = true
 }

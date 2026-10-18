@@ -1,5 +1,5 @@
 variable "cloudflare_api_token" {
-  description = "Token API Cloudflare « terraform-portfolio » (TF_VAR_cloudflare_api_token, chargé par tf.ps1)."
+  description = "Token API Cloudflare « terraform-portfolio » (TF_VAR_cloudflare_api_token, chargé par npm run infra:tf)."
   type        = string
   sensitive   = true
 }

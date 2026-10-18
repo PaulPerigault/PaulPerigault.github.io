@@ -2,9 +2,13 @@
 
 Évolutions envisagées au-delà du travail courant. Cadrage uniquement : rien n'est implémenté tant qu'un point n'a pas été repris dans une issue.
 
-## En attente de décision du propriétaire
+## Chantier d'optimisation (octobre 2026)
 
-- **En-têtes de sécurité réels pour le site GitHub Pages** : mettre un proxy qui sait poser des en-têtes devant Pages (Cloudflare Transform Rules ou Worker) pour `frame-ancestors`, HSTS, COOP/CORP… Voir ADR-0004 et la section Sécurité de `CLAUDE.md`. Décision d'infrastructure (DNS, tiers).
+Lots #172 à #180 et #161 (label `agent`), actions du propriétaire dans #181 (label `owner`), design system à cadrer après la migration (#182).
+
+## Infrastructure et actions du propriétaire
+
+- **Hébergement sur Cloudflare** (décidé le 2026-10-18) : code, en-têtes de sécurité (`frame-ancestors`, HSTS, COOP/CORP…) et runbook préparés sans rien appliquer (#179) ; les étapes réelles (DNS, `apply`) sont dans l'issue « Actions manuelles » (#181).
 - **Actions GEO manuelles** : Search Console, Bing Webmaster, alignement des profils LinkedIn/GitHub, contrôles mensuels auprès des assistants (`docs/geo-checklist.md`).
 
 ## Formulaire de contact (épic #133) : état au 2026-10-13
@@ -21,26 +25,21 @@ Fait :
 
 Reste :
 
-- **Portage des helpers PowerShell en Node** (#161), priorité basse.
+- **Portage des helpers PowerShell en Node** (#161) : lot 4 du chantier d'optimisation.
 
 ## Infrastructure : suites possibles
 
 - **Durcir DMARC sur `paulperigault.dev`** : l'enregistrement `_dmarc` est en mode observation (`v=DMARC1; p=none; rua=mailto:contact@paulperigault.fr`, module `resend-domain`, #156), et `paulperigault.fr` autorise la réception des rapports (TXT chez OVH, fait). Lire les rapports agrégés reçus sur `contact@paulperigault.fr`. Après quelques semaines de rapports propres (tous les envois légitimes alignés SPF/DKIM via Resend, aucune source inconnue), passer à `p=quarantine`, puis, après une nouvelle période propre, à `p=reject`. Chaque étape = une modification de `dmarc_policy` dans `infra/main.tf`, un `plan` relu, un `apply`.
 - **Secrets Store de Cloudflare (option C de l'ADR-0007)** : un secret « en écriture seule », géré par Terraform (`cloudflare_secrets_store_secret`) et lié au Worker par un binding `secrets_store_secret`, indépendant des versions du code. Cela rendrait les secrets déclaratifs sans les rejouer contre `wrangler deploy`. Nécessite les permissions _Secrets Store_ sur le token et une vérification de la façon dont la valeur est conservée dans le state.
-- **`plan` Terraform en CI** avec un token Cloudflare en lecture seule dédié (issue à ouvrir) ; aujourd'hui seulement `fmt` et `validate`.
+- **`plan` OpenTofu en CI** (bascule Terraform → OpenTofu au lot #179) avec un token Cloudflare en lecture seule dédié (issue à ouvrir) ; aujourd'hui seulement `fmt` et `validate`.
 
 ## Maintenance manuelle
 
 - **gitleaks est épinglé à la main** (`security.yml`, variables `GITLEAKS_VERSION` et `GITLEAKS_SHA256`) : Dependabot ne voit pas un binaire téléchargé. À mettre à jour régulièrement (par exemple à chaque trimestre) : prendre la dernière release de `gitleaks/gitleaks`, recopier la somme SHA-256 de l'archive `linux_x64` depuis son fichier `checksums.txt`, vérifier que le job reste vert.
 
-## Pipeline d'images Docker (suite de #24)
+## Docker : abandonné (décision du 2026-10-18)
 
-Le `Dockerfile` (image `nginx-unprivileged`, non-root) et `scripts/check-container.sh` (job CI `container`) existent. Reste :
-
-- build et push de l'image vers un registre (GHCR) sur chaque release taguée ;
-- scan de vulnérabilités (Trivy) dans la CI ;
-- tags cohérents avec release-please (`:1.2.0`, `:latest`) et images de base épinglées par digest ;
-- déploiement vers une cible cloud si le site quitte GitHub Pages.
+La piste GHCR + Trivy de #24 est abandonnée : l'hébergement part sur Cloudflare. Les en-têtes de sécurité aujourd'hui testés dans `nginx.conf` seront d'abord portés vers le futur hébergement et testés, puis le `Dockerfile`, `nginx.conf`, `docker-compose.yml`, `scripts/check-container.sh` et le job CI `container` seront supprimés (#179).
 
 ## Contenu géré hors dépôt (suite de #25)
 

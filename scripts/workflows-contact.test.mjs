@@ -20,19 +20,18 @@ describe('CI du formulaire de contact', () => {
     expect(worker).toContain('run: npm run verify');
   });
 
-  it('vérifie Terraform sans backend ni secret : fmt, validate et tests des helpers', () => {
+  it('vérifie Terraform sans backend ni secret : fmt et validate (helpers testés par Vitest)', () => {
     const infra = job('ci.yml', 'infra');
     expect(infra).toContain('terraform fmt -check -recursive infra');
     expect(infra).toContain('init -backend=false');
     expect(infra).toContain('validate');
-    expect(infra).toContain('infra/tests/*.test.ps1');
     expect(infra).not.toMatch(/\$\{\{\s*secrets\./);
   });
 
   it('n’applique jamais Terraform dans aucun workflow', () => {
     for (const name of readdirSync(DIR).filter((file) => file.endsWith('.yml'))) {
       expect(text(name), name).not.toMatch(/terraform[^\n]*\b(apply|destroy)\b/);
-      expect(text(name), name).not.toMatch(/tf\.ps1/);
+      expect(text(name), name).not.toMatch(/infra(?:-tf\.mjs|:tf)/);
     }
   });
 

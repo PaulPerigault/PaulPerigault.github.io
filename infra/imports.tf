@@ -1,5 +1,5 @@
 # Enregistrements DNS existants (créés à la main pour Resend), importés et non recréés.
-# Identifiants relevés le 2026-10-13 avec `dns-records.ps1` (lecture seule).
+# Identifiants relevés le 2026-10-13 avec le relevé DNS en lecture seule (aujourd'hui `npm run infra:dns`).
 # Format d'import du provider v5 : "<zone_id>/<dns_record_id>".
 # Une fois l'import appliqué, ces blocs peuvent rester : ils deviennent sans effet.
 

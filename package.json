@@ -35,7 +35,11 @@
     "verify:worker": "npm --prefix worker run verify",
     "check:links": "node scripts/check-links.mjs",
     "bench": "node scripts/bench.mjs",
-    "check:seo": "playwright test e2e/seo.spec.ts e2e/crawl-files.spec.ts e2e/geo-files.spec.ts e2e/sitemap.spec.ts"
+    "check:seo": "playwright test e2e/seo.spec.ts e2e/crawl-files.spec.ts e2e/geo-files.spec.ts e2e/sitemap.spec.ts",
+    "infra:tf": "node scripts/infra-tf.mjs",
+    "infra:dns": "node scripts/infra-dns.mjs",
+    "infra:r2-check": "node scripts/infra-r2-check.mjs",
+    "infra:worker-secrets": "node scripts/infra-worker-secrets.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

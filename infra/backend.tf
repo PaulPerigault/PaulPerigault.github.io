@@ -1,7 +1,7 @@
 # State dans le bucket R2 `tfstate-portfolio` (créé à la main, hors Terraform), via l'API S3 de R2.
 # Le state contient des secrets (clé Turnstile, bindings du Worker) : il ne quitte jamais R2.
 # Identifiants : AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY = clés S3 du bucket R2 (pas de compte AWS),
-# chargées par `tf.ps1`. Pas de verrou de state : un seul opérateur, et aucun `apply` en CI.
+# chargées par `npm run infra:tf`. Pas de verrou de state : un seul opérateur, et aucun `apply` en CI.
 terraform {
   backend "s3" {
     bucket = "tfstate-portfolio"

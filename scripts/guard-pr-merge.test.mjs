@@ -51,14 +51,49 @@ describe('mergeRefusal', () => {
     const neverCalled = () => {
       throw new Error('readBase ne doit pas être appelé');
     };
-    expect(mergeRefusal('git status && npm test', neverCalled)).toBeNull();
+    for (const command of [
+      'git status && npm test',
+      'git commit -m "docs: expliquer le garde-fou gh pr merge"',
+      'grep -rn "gh pr merge" scripts',
+      'echo gh pr merge 165',
+    ]) {
+      expect(mergeRefusal(command, neverCalled), command).toBeNull();
+    }
+  });
+
+  it('lit --repo placé avant merge, sous toutes ses formes', () => {
+    const seen = [];
+    const spy = (pr, repo) => (seen.push(repo), 'main');
+    for (const command of [
+      'gh pr --repo o/r merge 165',
+      'gh pr -R o/r merge 165',
+      'gh pr -Ro/r merge 165',
+      'gh pr merge 165 --repo=o/r',
+    ]) {
+      expect(mergeRefusal(command, spy), command).toMatch(/#165/);
+    }
+    expect(seen).toEqual(['o/r', 'o/r', 'o/r', 'o/r']);
+  });
+
+  it('contrôle aussi une fusion passée à un shell imbriqué', () => {
+    for (const command of [
+      'bash -c "gh pr merge 165 --squash"',
+      "pwsh -Command 'gh pr merge 165'",
+      'FOO=1 gh pr merge 165',
+    ]) {
+      expect(mergeRefusal(command, readBase), command).toMatch(/#165/);
+    }
   });
 });
 
 describe('parseMerge et prNumber', () => {
   it('ignore la valeur des options et lit --repo', () => {
-    expect(parseMerge('-t titre --repo o/r 42 --squash')).toEqual({ selector: '42', repo: 'o/r' });
-    expect(parseMerge('--repo=o/r 7')).toEqual({ selector: '7', repo: 'o/r' });
+    const args = (text) => text.split(' ');
+    expect(parseMerge(args('-t titre --repo o/r 42 --squash'))).toEqual({
+      selector: '42',
+      repo: 'o/r',
+    });
+    expect(parseMerge(args('--repo=o/r 7'))).toEqual({ selector: '7', repo: 'o/r' });
   });
 
   it('extrait le numéro d’un sélecteur, sinon null', () => {

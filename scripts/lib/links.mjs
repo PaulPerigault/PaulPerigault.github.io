@@ -1,5 +1,3 @@
-import { join } from 'node:path';
-
 const SITEMAP_LINE = /^Sitemap:\s*(https:\/\/[^/\s]+)\//m;
 
 /**
@@ -30,5 +28,6 @@ export const lycheeArgs = ({ distDir, origin, external = false }) => [
   '--remap',
   `^${escapeRegex(origin)}/(.*)$ file://${distDir}/$1`,
   ...(external ? [] : ['--offline']),
-  join(distDir, '**', '*.html'),
+  // Motif glob : toujours des « / », y compris sous Windows.
+  `${distDir}/**/*.html`,
 ];

@@ -140,13 +140,6 @@ jobs:
       - run: terraform fmt -check -recursive infra
       - run: terraform -chdir=infra init -backend=false -input=false
       - run: terraform -chdir=infra validate
-      - name: Tests des helpers PowerShell (faux secrets, doublures)
-        shell: pwsh
-        run: |
-          foreach ($test in Get-ChildItem infra/tests/*.test.ps1) {
-            pwsh -NoProfile -File $test.FullName
-            if ($LASTEXITCODE -ne 0) { exit 1 }
-          }
 
   # Point de contrôle unique (check requis `ci`) : vert seulement si TOUT le reste est vert.
   ci:

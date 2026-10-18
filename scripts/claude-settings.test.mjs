@@ -23,8 +23,10 @@ const FORBIDDEN = [
   'terraform -chdir=infra apply -auto-approve',
   'tofu destroy',
   'terraform import cloudflare_dns_record.x id',
-  '.\\infra\\tf.ps1 apply',
-  './infra/contact-form-secrets.ps1',
+  'npm run infra:tf -- apply',
+  'node scripts/infra-tf.mjs destroy',
+  'npm run infra:worker-secrets',
+  'node scripts/infra-worker-secrets.mjs',
   'wrangler deploy',
   'npx wrangler secret put RESEND_API_KEY',
   'npx --prefix worker wrangler deploy',
@@ -43,6 +45,8 @@ const FORBIDDEN = [
 
 const ALLOWED = [
   'terraform plan',
+  'npm run infra:tf -- plan',
+  'git add scripts/infra-worker-secrets.mjs',
   'terraform fmt -check',
   'git push origin feat/173-claude-config',
   'git push -u origin fix/180-domain',

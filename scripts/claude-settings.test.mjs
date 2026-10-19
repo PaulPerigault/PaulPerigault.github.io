@@ -42,6 +42,8 @@ const FORBIDDEN = [
   'npm run infra:tf -- output -raw contact_form_turnstile_secret',
   'npm run infra:tf -- state list',
   'gh pr merge 165 --squash',
+  'gh -R o/r pr merge 165',
+  'gh --repo=o/r pr merge 165 --squash',
   'gh api -X PATCH repos/o/r',
   'gh api repos/o/r/pages -F https_enforced=true',
   'gh repo edit --enable-auto-merge',
@@ -61,6 +63,7 @@ const ALLOWED = [
   'gh api repos/o/r/pages --jq .build_type',
   'npx wrangler dev',
   'gh pr view 165',
+  'gh -R o/r pr view 165',
 ];
 
 describe('.claude/settings.json', () => {

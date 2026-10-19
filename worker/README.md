@@ -14,13 +14,13 @@ Brique autonome : un Worker Cloudflare joignable sur `contact.paulperigault.dev`
 | ------------------------------------------------------------ | ------ | ---------------------------------------------------------- |
 | Envoyé (ou champ piège `website` rempli : rien n'est envoyé) | 200    | `{ "ok": true }`                                           |
 | Preflight `OPTIONS` d'une origine autorisée                  | 204    | —                                                          |
-| JSON invalide ou champs invalides                            | 400    | `{ "ok": false, "error": "invalid", "fields": ["email"] }` |
+| JSON invalide, flux du corps interrompu ou champs invalides  | 400    | `{ "ok": false, "error": "invalid", "fields": ["email"] }` |
 | Origine absente ou non autorisée                             | 403    | `{ "ok": false, "error": "forbidden" }`                    |
 | Jeton Turnstile refusé                                       | 403    | `{ "ok": false, "error": "challenge" }`                    |
 | Autre méthode                                                | 405    | `{ "ok": false, "error": "method" }` + `Allow`             |
 | Corps > 32 Ko                                                | 413    | `{ "ok": false, "error": "too_large" }`                    |
 | Pas du JSON                                                  | 415    | `{ "ok": false, "error": "unsupported" }`                  |
-| Turnstile ou Resend injoignable / en erreur                  | 502    | `{ "ok": false, "error": "unavailable" }`                  |
+| Turnstile ou Resend injoignable, en erreur ou > 5 s          | 502    | `{ "ok": false, "error": "unavailable" }`                  |
 
 Les erreurs sont génériques : un code stable que le formulaire traduit, jamais l'écho des valeurs reçues ni un détail interne. Longueurs maximales : `src/limits.ts` (le site applique les mêmes).
 
@@ -28,6 +28,8 @@ Les erreurs sont génériques : un code stable que le formulaire traduit, jamais
 
 - **CORS strict** : origines exactes lues dans `ALLOWED_ORIGINS` (`wrangler.toml`), jamais `*` (une valeur `*` est ignorée). `www.paulperigault.fr` redirige vers l'apex : non autorisé. `localhost` seulement via `.dev.vars`.
 - **Ordre des contrôles** (`src/handler.ts`) : méthode, origine, type, taille (en flux, sans faire confiance à `Content-Length`), JSON, piège, champs, Turnstile, envoi. Le piège répond 200 pour ne rien apprendre au robot.
+- **Champs** : aucun caractère de contrôle (Unicode Cc) dans le nom ni dans l'adresse ; le nom, repris dans le sujet, refuse aussi les caractères de mise en forme invisibles (Cf : inversion de sens, largeur nulle) et les séparateurs Unicode de ligne ou de paragraphe.
+- **Turnstile** : seul un refus explicite (`success: false`) donne `challenge` ; une erreur HTTP de `siteverify` est un service indisponible (502). Appels sortants bornés à 5 s (`UPSTREAM_TIMEOUT_MS`).
 - **Minimisation** : `siteverify` sans `remoteip` ; message en texte brut (rien à échapper) ; `reply_to` = visiteur ; `observability` désactivée ; aucun `console`.
 - **Dépendances injectées** : `createHandler({ fetch })` ; seul `src/index.ts` branche le vrai `fetch`. Les tests utilisent un faux `fetch` (`src/test/fakes.ts`), sans réseau.
 

@@ -6,7 +6,7 @@ Filet du futur design system (#182, #201) : chaque changement de rendu des pages
 
 `e2e/visual.spec.ts` : `/fr/`, `/en/` et la page 404, pleine page, en clair et en sombre (`prefers-color-scheme` émulé), sur desktop (1280 × 800) et sur mobile (390 × 844), soit 12 références dans `e2e/__snapshots__/visual.spec.ts/`. Mouvements réduits, animations figées, curseur masqué, polices chargées avant la capture. Tolérance : 0,1 % de pixels différents.
 
-La section Projets est masquée pendant la capture (`e2e/visual-volatile.css`) : elle affiche des données GitHub récupérées au build (étoiles, descriptions, dates) qui changent sans commit. Son rendu reste couvert par les tests fonctionnels (`projects.spec.ts`).
+La section Projets est masquée pendant la capture (`e2e/visual-volatile.css`) : elle affiche des données GitHub récupérées au build (étoiles, descriptions, dates) qui changent sans commit. Son rendu reste couvert par les tests fonctionnels (`projects.spec.ts`). La mention « © année » du pied de page est masquée (rectangle uni) : calculée au build, elle changerait toutes les références chaque janvier.
 
 ## Où ça tourne
 

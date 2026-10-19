@@ -35,6 +35,8 @@ for (const { path, name } of PAGES) {
           animations: 'disabled',
           caret: 'hide',
           stylePath: STYLE_PATH,
+          // Année calculée au build : sans masque, toutes les références casseraient chaque janvier.
+          mask: [page.getByText(/^© \d{4} /)],
           maxDiffPixelRatio: 0.001,
         });
       });

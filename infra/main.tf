@@ -33,9 +33,11 @@ module "resend_domain" {
   }
 }
 
-# Hébergement du site (ADR-0008) : projet Pages préparé, domaines ajoutés après la bascule DNS.
+# Hébergement du site (ADR-0008). Domaines servis une fois `paulperigault.fr` chez Cloudflare
+# (runbook §4) ; leurs CNAME vers `paulperigault.pages.dev` se créent à la main (zone hors IaC).
 module "pages_site" {
   source = "./modules/pages-site"
 
-  account_id = var.account_id
+  account_id     = var.account_id
+  custom_domains = ["paulperigault.fr", "www.paulperigault.fr"]
 }

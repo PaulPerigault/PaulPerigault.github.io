@@ -189,7 +189,7 @@ Vérification : `check:dns -- --expect=cloudflare` code 0 (les deux noms) ; `che
 
 ## 6. Fin de GitHub Pages
 
-1. L'assistant ouvre une PR : `deploy.yml` envoie l'artefact testé vers Pages (`wrangler pages deploy`) au lieu de GitHub Pages ; secret `CLOUDFLARE_API_TOKEN_PAGES` à créer par le propriétaire.
+1. Créer le secret `CLOUDFLARE_API_TOKEN_PAGES` (token _Cloudflare Pages : Edit_). Les jobs `pages` (`deploy.yml`) et `pages-preview` (`ci.yml`), préparés par #207, l'utilisent dès qu'il existe ; le nettoyage de GitHub Pages est préparé par #208.
 2. Après un déploiement réussi par la CI : _Settings → Pages_ du dépôt → désactiver GitHub Pages.
 
 Vérification : `npm run check:live` reste vert ; `npm run check:dns -- --expect=cloudflare` code 0.

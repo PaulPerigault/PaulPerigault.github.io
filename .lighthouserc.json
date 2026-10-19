@@ -3,7 +3,7 @@
     "collect": {
       "staticDistDir": "./dist",
       "url": ["/fr/", "/en/", "/fr/legal/", "/en/legal/"],
-      "numberOfRuns": 1,
+      "numberOfRuns": 2,
       "settings": {
         "preset": "desktop"
       }

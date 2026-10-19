@@ -149,6 +149,7 @@ Everything is in `.github/workflows/`; the site is **built once** and the **same
 | `browsers.yml` | weekly cron, manual | e2e on Chromium + Firefox + WebKit, `check:links -- --external` |
 | `security.yml` | PR + push + weekly | `npm audit`, CodeQL, SBOM, `gitleaks` |
 | `scorecard.yml` | push develop, weekly, branch-protection change | OpenSSF Scorecard (pinned, `publish_results`, SARIF → Security tab, README badge); single job, no global `env`/`defaults` (Scorecard's own check) |
+| `gitleaks-watch.yml` | weekly cron, manual | opens one issue when a gitleaks release is newer than the pinned one, with version + SHA-256 to copy (`scripts/gitleaks-watch.mjs`, #204) |
 | `release.yml` | push `main` | release-please |
 | `dependabot-auto-merge.yml` | Dependabot PRs | auto-merge patch/minor, **except the infra provider** (`opentofu` ecosystem: read changelog, update lock, plan) |
 

@@ -138,7 +138,7 @@ jobs:
       - run: npm ci
       - run: npm run verify
 
-  # Terraform sans secret ni backend : format et validité. Jamais de plan ni d'apply en CI.
+  # OpenTofu sans secret ni backend : format et validité. Jamais de plan ni d'apply en CI.
   infra:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -146,13 +146,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
         with:
-          terraform_version: 1.15.8
-          terraform_wrapper: false
-      - run: terraform fmt -check -recursive infra
-      - run: terraform -chdir=infra init -backend=false -input=false
-      - run: terraform -chdir=infra validate
+          tofu_version: 1.13.1
+          tofu_wrapper: false
+      - run: tofu fmt -check -recursive infra
+      - run: tofu -chdir=infra init -backend=false -input=false
+      - run: tofu -chdir=infra validate
 
   # Audit statique des workflows et actions (injections, permissions, épinglage, Dependabot).
   # Version de zizmor figée (la plus récente connue de l'action v0.6.4) : un nouvel audit arrive

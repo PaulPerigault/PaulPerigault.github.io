@@ -60,9 +60,9 @@ updates:
         update-types:
           - version-update:semver-major
 
-  # Fournisseur Terraform (Cloudflare) : jamais fusionné automatiquement (voir
+  # Fournisseur Cloudflare (OpenTofu, registry.opentofu.org) : jamais fusionné automatiquement (voir
   # dependabot-auto-merge.yml) ; relire le changelog, mettre à jour le lock, lancer un plan.
-  - package-ecosystem: terraform
+  - package-ecosystem: opentofu
     directory: /infra
     schedule:
       interval: weekly

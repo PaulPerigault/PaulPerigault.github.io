@@ -33,7 +33,7 @@ describe('secretOutputRefusal', () => {
 });
 
 describe('tf et les commandes qui affichent le secret', () => {
-  it('refuse avant de lire les secrets ou de lancer terraform', () => {
+  it('refuse avant de lire les secrets ou de lancer OpenTofu', () => {
     const deps = {
       env: {},
       root: '/depot',
@@ -41,7 +41,7 @@ describe('tf et les commandes qui affichent le secret', () => {
         throw new Error('les secrets ne doivent pas être lus');
       },
       spawn: () => {
-        throw new Error('terraform ne doit pas être lancé');
+        throw new Error('OpenTofu ne doit pas être lancé');
       },
     };
     expect(() => tf(['output', '-raw', 'contact_form_turnstile_secret'], deps)).toThrow(/secret/);

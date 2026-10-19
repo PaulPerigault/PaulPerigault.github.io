@@ -1,6 +1,6 @@
 // Commandes Terraform/OpenTofu qui afficheraient le secret Turnstile gardé dans le state : `show`,
 // `console`, `state show|pull`, `output` sans nom, en JSON ou d'une sortie nommée « secret ».
-// Logique pure : `infra-tf.mjs` refuse avant de lire les secrets ou de lancer Terraform.
+// Logique pure : `infra-tf.mjs` refuse avant de lire les secrets ou de lancer OpenTofu.
 
 const SECRET_NAME = /secret/i;
 const ALWAYS = new Set(['show', 'console']);
@@ -15,7 +15,7 @@ const leaksOutput = (rest) => {
   return rest.includes('-json') || names.length === 0 || names.some((n) => SECRET_NAME.test(n));
 };
 
-/** @param {string[]} args arguments passés à terraform @returns {string | null} raison du refus */
+/** @param {string[]} args arguments passés à tofu @returns {string | null} raison du refus */
 export function secretOutputRefusal(args) {
   const positional = args.filter((arg) => !arg.startsWith('-'));
   const [command, sub] = positional;

@@ -29,10 +29,11 @@ jobs:
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
 
-      # Jamais pour Terraform : une mise à jour du fournisseur peut changer le plan de l'infra réelle.
+      # Jamais pour l'infra (OpenTofu) : une mise à jour du fournisseur peut changer le plan réel.
       - name: Approve and enable auto-merge for patch/minor updates
         if: |
-          steps.metadata.outputs.package-ecosystem != 'terraform' && (
+          steps.metadata.outputs.package-ecosystem != 'terraform' &&
+          steps.metadata.outputs.package-ecosystem != 'opentofu' && (
             steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
             steps.metadata.outputs.update-type == 'version-update:semver-minor'
           )

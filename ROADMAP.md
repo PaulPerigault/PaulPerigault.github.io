@@ -35,7 +35,7 @@ Reste :
 
 ## Maintenance manuelle
 
-- **gitleaks est épinglé à la main** (`security.yml`, variables `GITLEAKS_VERSION` et `GITLEAKS_SHA256`) : Dependabot ne voit pas un binaire téléchargé. À mettre à jour régulièrement (par exemple à chaque trimestre) : prendre la dernière release de `gitleaks/gitleaks`, recopier la somme SHA-256 de l'archive `linux_x64` depuis son fichier `checksums.txt`, vérifier que le job reste vert.
+- **gitleaks est épinglé à la main** (`security.yml`, variables `GITLEAKS_VERSION` et `GITLEAKS_SHA256`) : Dependabot ne voit pas un binaire téléchargé. Le workflow hebdomadaire `gitleaks-watch.yml` (#204) ouvre une issue dès qu'une version plus récente sort, avec le bloc à recopier (version et SHA-256 de l'archive `linux_x64`) ; vérifier ensuite que le job `gitleaks` reste vert.
 
 ## Docker : supprimé (décision du 2026-10-18, fait au lot 9, #179)
 

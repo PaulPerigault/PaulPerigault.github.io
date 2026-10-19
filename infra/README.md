@@ -1,4 +1,4 @@
-# Infrastructure (Terraform)
+# Infrastructure (OpenTofu)
 
 Services du portfolio hébergés chez Cloudflare, sur la zone `paulperigault.dev`. Le domaine canonique `paulperigault.fr` reste chez OVH et n'est pas géré ici. Un **module par service**, composé par la racine (`main.tf`) :
 
@@ -9,32 +9,32 @@ Services du portfolio hébergés chez Cloudflare, sur la zone `paulperigault.dev
 
 Ajouter un service = un nouveau dossier `modules/<service>` (variables, outputs, README) et un bloc `module` dans `main.tf`, sans toucher aux autres.
 
-**Répartition Terraform / Wrangler (option A, ADR-0007)** :
+**Répartition OpenTofu / Wrangler (option A, ADR-0007)** :
 
-- Terraform gère le Worker en tant que service, son domaine et le widget Turnstile.
+- OpenTofu gère le Worker en tant que service, son domaine et le widget Turnstile.
 - Wrangler gère le **code** (`wrangler deploy`) et les **secrets** du Worker (`npm run infra:worker-secrets`).
 - Pourquoi : le provider v5 n'a pas de ressource de secret autonome. Un secret y serait un binding d'une version du code, donc rejoué contre chaque `wrangler deploy` et stocké dans le state.
-- Conséquence : la clé Resend n'entre jamais dans le state. Seul le secret du widget Turnstile y est, parce que Terraform crée le widget.
+- Conséquence : la clé Resend n'entre jamais dans le state. Seul le secret du widget Turnstile y est, parce qu'OpenTofu crée le widget.
 
 ## Prérequis
 
-- Terraform **1.15.x** (`versions.tf`) et provider Cloudflare **5.27.x**, empreintes figées dans `.terraform.lock.hcl` pour Windows, Linux et macOS (`terraform providers lock -platform=…` pour en ajouter).
+- OpenTofu **1.13.x** (`versions.tf`, ADR-0008 ; Windows : `winget install OpenTofu.Tofu`, macOS : `brew install opentofu`) et provider Cloudflare **5.27.x** de `registry.opentofu.org`, empreintes figées dans `.terraform.lock.hcl` pour Windows, Linux et macOS (`tofu providers lock -platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64 -platform=darwin_arm64`).
 - Node 24 (`.nvmrc`) et `npm ci` à la racine ; `npm ci` dans `worker/` pour Wrangler.
-- `infra/.secrets.env` (ignoré par Git **et** par Docker), quatre lignes `NOM=valeur`, guillemets englobants acceptés :
+- `infra/.secrets.env` (ignoré par Git), quatre lignes `NOM=valeur`, guillemets englobants acceptés :
   - `TF_VAR_cloudflare_api_token` : token « terraform-portfolio » ;
   - `TF_VAR_resend_api_key` : clé Resend (accès _Sending_, domaine `paulperigault.dev`), lue seulement par `npm run infra:worker-secrets` ;
-  - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` : clés **S3** du bucket R2 du state. Ce sont l'_Access Key ID_ (32 caractères hexadécimaux) et la _Secret Access Key_ (64), pas la valeur du token R2 ; une confusion donne `SignatureDoesNotMatch`. Les noms `AWS_*` sont imposés par le backend `s3` de Terraform ; il n'y a aucun compte AWS.
+  - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` : clés **S3** du bucket R2 du state. Ce sont l'_Access Key ID_ (32 caractères hexadécimaux) et la _Secret Access Key_ (64), pas la valeur du token R2 ; une confusion donne `SignatureDoesNotMatch`. Les noms `AWS_*` sont imposés par le backend `s3` d'OpenTofu ; il n'y a aucun compte AWS.
 
 ## Usage
 
-Toujours passer par ces commandes (`scripts/infra-*.mjs`, chargeur `scripts/lib/infra-secrets.mjs`). Chacune charge **seulement** les variables dont elle a besoin, dans l'environnement du seul processus enfant (`terraform`, Wrangler), jamais dans le shell courant. Une variable inconnue dans le fichier fait échouer. Aucune valeur n'est jamais affichée.
+Toujours passer par ces commandes (`scripts/infra-*.mjs`, chargeur `scripts/lib/infra-secrets.mjs`). Chacune charge **seulement** les variables dont elle a besoin, dans l'environnement du seul processus enfant (`tofu`, Wrangler), jamais dans le shell courant. Une variable inconnue dans le fichier fait échouer. Aucune valeur n'est jamais affichée.
 
-| Commande                       | Variables chargées                                                            |
-| ------------------------------ | ----------------------------------------------------------------------------- |
-| `npm run infra:tf`             | token Cloudflare, clés S3 du state                                            |
-| `npm run infra:dns`            | token Cloudflare                                                              |
-| `npm run infra:r2-check`       | token Cloudflare                                                              |
-| `npm run infra:worker-secrets` | les quatre (token pour Wrangler, clé Resend, clés S3 pour `terraform output`) |
+| Commande                       | Variables chargées                                                       |
+| ------------------------------ | ------------------------------------------------------------------------ |
+| `npm run infra:tf`             | token Cloudflare, clés S3 du state                                       |
+| `npm run infra:dns`            | token Cloudflare                                                         |
+| `npm run infra:r2-check`       | token Cloudflare                                                         |
+| `npm run infra:worker-secrets` | les quatre (token pour Wrangler, clé Resend, clés S3 pour `tofu output`) |
 
 ```shell
 npm run infra:tf -- init               # première fois : backend R2
@@ -46,11 +46,20 @@ npm run infra:r2-check                 # lecture seule : aucun accès public au 
 npm run infra:worker-secrets           # pose RESEND_API_KEY et TURNSTILE_SECRET sur le Worker (stdin)
 ```
 
-Ne jamais lancer `terraform show`, `state show`, ni `output` sans nom de sortie : le secret Turnstile y apparaîtrait. `output contact_form_turnstile_sitekey` (publique) est sans risque.
+Ne jamais lancer `tofu show`, `state show|pull`, `console`, ni `output` sans nom de sortie ou en JSON : le secret Turnstile y apparaîtrait. `npm run infra:tf` les refuse lui-même (`scripts/lib/tf-args.mjs`). `output contact_form_turnstile_sitekey` (publique) est sans risque.
 
-Sans secrets (CI, vérification locale) : `terraform -chdir=infra init -backend=false`, puis `terraform -chdir=infra validate` et `terraform fmt -recursive -check infra`.
+Sans secrets (CI, vérification locale) : `tofu -chdir=infra init -backend=false`, puis `tofu -chdir=infra validate` et `tofu fmt -recursive -check infra`.
 
 Tests (faux fichiers, doublures de `spawn` et `fetch`, jamais les vrais secrets) : `scripts/infra-secrets.test.mjs` et `scripts/infra-commands.test.mjs`, lancés par `npm test`.
+
+## Bascule Terraform → OpenTofu (propriétaire, une fois, avant tout changement DNS)
+
+Le state actuel a été écrit par Terraform 1.15 ; OpenTofu 1.13 lit ce format (v4). Rien n'est appliqué par cette étape.
+
+1. `tofu version` affiche `OpenTofu v1.13.x`.
+2. `npm run infra:tf -- init -reconfigure` : réinitialise `infra/.terraform` avec le provider de `registry.opentofu.org` (empreintes vérifiées contre `.terraform.lock.hcl`) et le même backend R2.
+3. `npm run infra:tf -- plan` : résultat attendu « No changes. Your infrastructure matches the configuration. »
+4. Si le plan montre un changement : ne rien appliquer, le noter dans l'issue « Actions manuelles » ; retour arrière possible en revenant au commit précédent de `infra/` avec Terraform 1.15 (le state n'a pas été modifié).
 
 ## Premier déploiement (propriétaire)
 
@@ -66,7 +75,7 @@ Ensuite, la CI déploie le code ; les secrets ne bougent qu'à une rotation (ét
 
 ## State
 
-Backend `s3` vers R2 (`backend.tf`) : bucket `tfstate-portfolio`, créé à la main et **non géré par Terraform**. Le state contient un secret, celui du widget Turnstile ; la clé Resend n'y entre pas. Il reste dans R2 et n'est jamais dans le dépôt. `*.tfstate*` et `*.tfplan` sont ignorés : un plan enregistré contient aussi les secrets en clair. Pas de verrou de state : un seul opérateur, aucun `apply` automatique.
+Backend `s3` vers R2 (`backend.tf`) : bucket `tfstate-portfolio`, créé à la main et **non géré par OpenTofu**. Le state contient un secret, celui du widget Turnstile ; la clé Resend n'y entre pas. Il reste dans R2 et n'est jamais dans le dépôt. `*.tfstate*` et `*.tfplan` sont ignorés : un plan enregistré contient aussi les secrets en clair. Pas de verrou de state : un seul opérateur, aucun `apply` automatique.
 
 ### Accès au state (prérequis avant tout `apply`)
 
@@ -76,7 +85,7 @@ Le state contient le secret Turnstile en clair : le bucket ne doit être joignab
 - Contrôle manuel dans le dashboard Cloudflare, **R2 → `tfstate-portfolio` → Settings** :
   1. **Public Development URL** (`r2.dev`) : **Disabled** ;
   2. **Custom Domains** : **aucun** domaine connecté ;
-  3. **CORS Policy** : vide, puisque le bucket n'est lu que par Terraform via l'API S3 ;
+  3. **CORS Policy** : vide, puisque le bucket n'est lu que par OpenTofu via l'API S3 ;
   4. **R2 → Manage API tokens** : les clés S3 du state sont limitées à ce bucket (_Object Read & Write_, bucket `tfstate-portfolio` seulement) ;
   5. facultatif : une **Bucket lock rule** ou le versionnement des objets, pour pouvoir revenir à un state précédent en cas de corruption.
 
@@ -88,7 +97,7 @@ Le state contient le secret Turnstile en clair : le bucket ne doit être joignab
 4. Clé Resend renouvelée, ou widget Turnstile recréé : relancer `npm run infra:worker-secrets` (nouvelle version du Worker, même code).
 5. Révoquer l'ancien token.
 
-Permissions du token Terraform :
+Permissions du token « terraform-portfolio » (nom conservé, utilisé par OpenTofu) :
 
 - Turnstile, Workers Scripts, Workers Routes et DNS sont nécessaires ici ; les autres (R2, KV, D1, Queues) servent aux services futurs.
 - Turnstile et Workers Scripts sont des permissions **de compte** : le token doit inclure le compte, pas seulement la zone.

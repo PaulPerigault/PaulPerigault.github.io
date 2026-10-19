@@ -20,17 +20,19 @@ describe('CI du formulaire de contact', () => {
     expect(worker).toContain('run: npm run verify');
   });
 
-  it('vérifie Terraform sans backend ni secret : fmt et validate (helpers testés par Vitest)', () => {
+  it('vérifie OpenTofu sans backend ni secret : fmt et validate (helpers testés par Vitest)', () => {
     const infra = job('ci.yml', 'infra');
-    expect(infra).toContain('terraform fmt -check -recursive infra');
+    expect(infra).toContain('tofu fmt -check -recursive infra');
+    expect(infra).toMatch(/opentofu\/setup-opentofu@[0-9a-f]{40} # v\d/);
     expect(infra).toContain('init -backend=false');
     expect(infra).toContain('validate');
+    expect(infra).toContain('run: tofu -chdir=infra test');
     expect(infra).not.toMatch(/\$\{\{\s*secrets\./);
   });
 
-  it('n’applique jamais Terraform dans aucun workflow', () => {
+  it('n’applique jamais OpenTofu ni Terraform dans aucun workflow', () => {
     for (const name of readdirSync(DIR).filter((file) => file.endsWith('.yml'))) {
-      expect(text(name), name).not.toMatch(/terraform[^\n]*\b(apply|destroy)\b/);
+      expect(text(name), name).not.toMatch(/(?:terraform|tofu)[^\n]*\b(apply|destroy)\b/);
       expect(text(name), name).not.toMatch(/infra(?:-tf\.mjs|:tf)/);
     }
   });
@@ -45,10 +47,10 @@ describe('CI du formulaire de contact', () => {
     );
   });
 
-  it('ne fusionne jamais automatiquement le fournisseur Terraform', () => {
-    expect(text('dependabot-auto-merge.yml')).toContain("package-ecosystem != 'terraform'");
+  it('ne fusionne jamais automatiquement le fournisseur de l’infra (OpenTofu)', () => {
+    expect(text('dependabot-auto-merge.yml')).toContain("package-ecosystem != 'opentofu'");
     const dependabot = readFileSync('.github/dependabot.yml', 'utf8');
     expect(dependabot).toMatch(/package-ecosystem: npm\n\s+directory: \/worker/);
-    expect(dependabot).toMatch(/package-ecosystem: terraform\n\s+directory: \/infra/);
+    expect(dependabot).toMatch(/package-ecosystem: opentofu\n\s+directory: \/infra/);
   });
 });

@@ -1,4 +1,4 @@
-// Lance Terraform dans infra/ avec les secrets du provider (token Cloudflare) et du backend (clés S3
+// Lance OpenTofu dans infra/ avec les secrets du provider (token Cloudflare) et du backend (clés S3
 // du bucket R2), le temps de la commande et dans son seul environnement. Pas la clé Resend : elle est
 // posée sur le Worker par infra-worker-secrets.mjs et n'entre jamais dans le state.
 //   npm run infra:tf -- init | plan | output contact_form_turnstile_sitekey
@@ -11,14 +11,15 @@ import { secretOutputRefusal } from './lib/tf-args.mjs';
 
 const NAMES = ['TF_VAR_cloudflare_api_token', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'];
 
-/** @returns {number} code de sortie de Terraform */
+/** @returns {number} code de sortie d'OpenTofu */
 export function tf(args, deps) {
   const refusal = secretOutputRefusal(args);
   if (refusal) throw new Error(refusal);
   const env = childEnv(NAMES, deps);
   const chdir = `-chdir=${join(deps.root, 'infra')}`;
-  const result = deps.spawn('terraform', [chdir, ...args], { env, stdio: 'inherit' });
-  if (result.error) throw new Error(`terraform introuvable : ${result.error.message}`);
+  const result = deps.spawn('tofu', [chdir, ...args], { env, stdio: 'inherit' });
+  if (result.error)
+    throw new Error(`tofu introuvable (OpenTofu 1.13, infra/README.md) : ${result.error.message}`);
   return result.status ?? 1;
 }
 

@@ -37,9 +37,9 @@ Reste :
 
 - **gitleaks est épinglé à la main** (`security.yml`, variables `GITLEAKS_VERSION` et `GITLEAKS_SHA256`) : Dependabot ne voit pas un binaire téléchargé. À mettre à jour régulièrement (par exemple à chaque trimestre) : prendre la dernière release de `gitleaks/gitleaks`, recopier la somme SHA-256 de l'archive `linux_x64` depuis son fichier `checksums.txt`, vérifier que le job reste vert.
 
-## Docker : abandonné (décision du 2026-10-18)
+## Docker : supprimé (décision du 2026-10-18, fait au lot 9, #179)
 
-La piste GHCR + Trivy de #24 est abandonnée : l'hébergement part sur Cloudflare. Les en-têtes de sécurité aujourd'hui testés dans `nginx.conf` seront d'abord portés vers le futur hébergement et testés, puis le `Dockerfile`, `nginx.conf`, `docker-compose.yml`, `scripts/check-container.sh` et le job CI `container` seront supprimés (#179).
+La piste GHCR + Trivy de #24 est abandonnée : l'hébergement part sur Cloudflare Pages (ADR-0008). Les en-têtes de sécurité de `nginx.conf` ont été portés dans `public/_headers` et testés (`scripts/pages-headers.test.mjs`), puis le `Dockerfile`, `nginx.conf`, `docker-compose.yml`, `.dockerignore`, le script de contrôle du conteneur, le job CI `container` et l'entrée Dependabot Docker ont été supprimés.
 
 ## Contenu géré hors dépôt (suite de #25)
 

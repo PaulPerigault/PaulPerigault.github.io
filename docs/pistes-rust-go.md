@@ -61,7 +61,7 @@
 
 ## 4. Futur backend auto-hébergé en Go
 
-- Cohérent avec l'existant : `Dockerfile` multi-étapes, `docker-compose.yml`, image non-root.
+- Le dépôt n'a plus d'image Docker (supprimée au lot 9, ADR-0008) : un service Go en apporterait une, propre à sa brique.
 - Un service Go se compile en **binaire statique unique**, servi par une image minimale (`scratch` ou `distroless/static`). Moins de surface d'attaque, démarrage immédiat, pas de dépendances d'exécution.
 - Non mesuré : aucun service Go n'existe, et Docker n'était pas lancé sur la machine de mesure. À mesurer au moment du choix : taille d'image, mémoire au repos, temps de démarrage, face à l'équivalent Node.
 - **Conclusion** : bonne piste **si** un service à état apparaît (stockage, file d'attente, API privée) et doit tourner hors de Cloudflare. Pour le formulaire actuel, sans état, le Worker suffit (ADR-0007).

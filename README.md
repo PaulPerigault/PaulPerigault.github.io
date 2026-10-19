@@ -9,7 +9,7 @@ Portfolio personnel — Paul Perigault, Alternant DevOps Cloud.
 - Effect (logique de données au build)
 - Vitest · Playwright (e2e)
 - GitHub Actions · Lighthouse CI · CodeQL · Dependabot
-- Docker · Nginx · GitHub Pages
+- GitHub Pages (aujourd'hui) · Cloudflare Pages préparé (ADR-0008) · OpenTofu
 
 ## Lancer en local
 
@@ -21,10 +21,6 @@ Portfolio personnel — Paul Perigault, Alternant DevOps Cloud.
 
     npm run verify   # lint + format + types + unitaires + build
     npm run build && npm run e2e
-
-## Docker
-
-    docker compose up
 
 ## Architecture
 
@@ -52,12 +48,12 @@ Le site est construit **une seule fois** (`build.yml`) ; cet artefact est testé
 
 | Workflow | Déclencheur | Action |
 |---|---|---|
-| ci.yml | PR | commitlint, guard/lint/types/tests, build, e2e, Lighthouse strict, image Docker ; check requis `ci` |
+| ci.yml | PR | commitlint, guard/lint/types/tests, build, e2e, Lighthouse strict, zizmor, OpenTofu ; check requis `ci` |
 | deploy.yml | push main + chaque lundi | build → e2e → GitHub Pages → IndexNow |
 | browsers.yml | chaque dimanche | e2e Chromium + Firefox + WebKit |
 | security.yml | PR + hebdo | npm audit + CodeQL + SBOM |
 | release.yml | push main | CHANGELOG + tag semver |
 
-## Déploiement alternatif
+## Hébergement Cloudflare (préparé)
 
-Dockerfile multi-stage — déploiement sur Cloud Run, ECS ou Kubernetes sans modification du code.
+Module OpenTofu `infra/modules/pages-site` et en-têtes `public/_headers` ; procédure de bascule : `docs/runbook-cloudflare.md`.

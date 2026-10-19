@@ -31,11 +31,11 @@ const setup = (responses = []) => {
 };
 
 describe('tf', () => {
-  it('lance terraform dans infra/ avec les seuls secrets du provider et du backend', () => {
+  it('lance OpenTofu dans infra/ avec les seuls secrets du provider et du backend', () => {
     const { calls, deps } = setup([{ status: 3 }]);
     expect(tf(['plan'], deps)).toBe(3);
     const [{ command, args, options }] = calls;
-    expect(command).toBe('terraform');
+    expect(command).toBe('tofu');
     expect(args.at(-1)).toBe('plan');
     expect(args[0].replaceAll('\\', '/')).toBe('-chdir=/depot/infra');
     expect(options.env).toMatchObject({ TF_VAR_cloudflare_api_token: 'fake-cf', PATH: '/bin' });
@@ -49,6 +49,7 @@ describe('pushWorkerSecrets', () => {
     const envBefore = { ...process.env };
     expect(pushWorkerSecrets(deps)).toBe(0);
     const [output, wrangler] = calls;
+    expect(output.command).toBe('tofu');
     expect(output.args.slice(1)).toEqual(['output', '-raw', 'contact_form_turnstile_secret']);
     expect(wrangler.args.slice(1, 3)).toEqual(['secret', 'bulk']);
     expect(JSON.parse(wrangler.options.input)).toEqual({

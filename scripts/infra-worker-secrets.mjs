@@ -1,7 +1,7 @@
 // Pose les secrets du Worker du formulaire (RESEND_API_KEY, TURNSTILE_SECRET) avec
 // `wrangler secret bulk`, sans jamais afficher une valeur ni l'écrire dans un fichier :
 // - RESEND_API_KEY vient de infra/.secrets.env (TF_VAR_resend_api_key) ;
-// - TURNSTILE_SECRET vient de `terraform output -raw` (sortie sensible, capturée en mémoire) ;
+// - TURNSTILE_SECRET vient de `tofu output -raw` (sortie sensible, capturée en mémoire) ;
 // - les deux partent ensemble, en JSON, sur l'entrée standard de Wrangler (aucun argument visible
 //   dans la liste des processus) ; Wrangler s'authentifie avec CLOUDFLARE_API_TOKEN.
 // À lancer après le premier `wrangler deploy`, puis à chaque rotation de la clé Resend ou du widget.
@@ -24,7 +24,7 @@ const turnstileSecret = (deps, env) => {
     '-raw',
     'contact_form_turnstile_secret',
   ];
-  const result = deps.spawn('terraform', args, {
+  const result = deps.spawn('tofu', args, {
     env,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'inherit'],

@@ -60,9 +60,9 @@ updates:
         update-types:
           - version-update:semver-major
 
-  # Fournisseur Terraform (Cloudflare) : jamais fusionné automatiquement (voir
+  # Fournisseur Cloudflare (OpenTofu, registry.opentofu.org) : jamais fusionné automatiquement (voir
   # dependabot-auto-merge.yml) ; relire le changelog, mettre à jour le lock, lancer un plan.
-  - package-ecosystem: terraform
+  - package-ecosystem: opentofu
     directory: /infra
     schedule:
       interval: weekly
@@ -88,19 +88,3 @@ updates:
       actions:
         patterns: ["*"]
 
-  # Images de base du Dockerfile (node, nginx-unprivileged).
-  - package-ecosystem: docker
-    directory: /
-    schedule:
-      interval: weekly
-      day: monday
-      time: "08:00"
-    cooldown:
-      default-days: 7
-    labels:
-      - dependencies
-    # Le stage de build doit rester sur la version de `.nvmrc` (LTS) : pas de saut de majeure automatique.
-    ignore:
-      - dependency-name: "node"
-        update-types:
-          - version-update:semver-major

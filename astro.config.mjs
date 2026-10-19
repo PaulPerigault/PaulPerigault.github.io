@@ -29,7 +29,7 @@ export default defineConfig({
   security: {
     // CSP par balise <meta> (GitHub Pages ne sait pas envoyer d'en-têtes) : Astro calcule les
     // hashes des scripts/styles ; tout le reste est interdit par défaut. `frame-ancestors`
-    // n'existe qu'en en-tête HTTP (voir nginx.conf). `connect-src 'self'` (même origine seulement) :
+    // n'existe qu'en en-tête HTTP (voir public/_headers). `connect-src 'self'` (même origine seulement) :
     // Lighthouse lit robots.txt par un fetch depuis la page ; aucun script du site n'appelle fetch.
     csp: {
       algorithm: 'SHA-256',

@@ -1,4 +1,4 @@
-// Vérifie, en lecture seule, que le bucket R2 du state Terraform n'est joignable par aucun accès
+// Vérifie, en lecture seule, que le bucket R2 du state OpenTofu n'est joignable par aucun accès
 // public : ni sous-domaine `r2.dev`, ni domaine personnalisé. Le state contient le secret Turnstile.
 // N'affiche que des booléens et des noms de domaine ; code de sortie 1 si un accès public existe.
 //   npm run infra:r2-check

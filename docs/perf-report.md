@@ -90,3 +90,34 @@ Décisions :
 - **Photo en haute densité** : la source fait 200 × 200 px ; un `srcset` 2x/3x demande une photo plus grande (action du propriétaire, #181).
 - **WCAG 2.2 au-delà d'axe** (mesuré à 320 px) : aucune cible sous 24 × 24 px (2.5.8), aucun défilement horizontal, y compris avec l'espacement de texte imposé (1.4.10, 1.4.12), titres des sections visibles sous la barre collante après une ancre (2.4.11). Le doublon `unique-landmark` de `html-validate` n'est pas corrigé : le `<dialog>` fermé est absent de l'arbre d'accessibilité et, ouvert en modal, rend le reste inerte ; un lecteur d'écran ne voit jamais les deux repères ensemble.
 - **SEO technique** : titres de 43 à 56 caractères, descriptions de 71 à 160, canonique sur soi-même, `hreflang` fr/en/x-default et `lang` corrects sur les 4 pages indexables ; rien à corriger.
+
+## Chantier CI et outillage (lot 7, #177)
+
+Mesures du 2026-10-19. Durée CI = workflow `ci` de bout en bout (début du run → dernière tâche), runners GitHub `ubuntu-latest`.
+
+| Mesure | Avant | Après |
+| --- | --- | --- |
+| Durée `ci`, médiane de 3 runs | 129 s (192, 123, 129 : pushes `develop` bc5e966, 02505c0, f9f6f4a) | 105 s (97, 105, 108 : run 39227506130, 3 essais) |
+| Chemin critique | e2e shard 1 (84 s) après build (25 s) ; Lighthouse 81 s | Lighthouse par page ≈ 42–58 s, e2e ≈ 46 s par shard |
+| e2e en CI (par shard) | 84 s / 62 s | 46 s / 47 s (4 workers, navigateurs en cache, sans `apt` pour Chromium) |
+| `npm test` (local, macOS M-series) | 11,6 s (médiane de 3, 365 tests) | inchangé : chemin critique = 6 vrais builds Astro (`build-projects`, `build-content-guard`), gardés (seule preuve de bout en bout du mode strict/tolérant) |
+| `npm run e2e` (local, Chromium) | 34,4 s (272 tests) | inchangé (workers locaux par défaut) |
+| zizmor 1.30.1 (sévérité ≥ moyenne) | 2 hauts, 5 moyens | 0 (job `zizmor` bloquant dans `ci`) |
+
+**Essais abandonnés ou corrigés** : Lighthouse en un seul passage par page (TBT bruité à 174 ms sur un run, échec) → 2 passages, meilleur retenu, puis une tâche par page. Filtres `paths` : non retenus, les checks requis `ci` et `commitlint` doivent toujours être rapportés et le site est court à vérifier.
+
+**Constats zizmor hauts, contre-vérifiés par un sous-agent distinct avant correction** : `bot-conditions` (auto-merge conditionné à `github.actor`, usurpable ; non exploitable depuis un fork car `fetch-metadata` revérifie l'auteur) → condition sur l'auteur de la PR et le dépôt d'origine, droits d'écriture au niveau du job ; `github-env` (écriture dans `$GITHUB_PATH` d'une valeur du runner : faux positif) → binaire installé dans `/usr/local/bin`, plus aucune écriture. Moyens : `cooldown` Dependabot de 7 jours.
+
+### Mutation testing (mewt 4.0.0, Trail of Bits)
+
+Briques critiques seulement. Commandes : `vitest run src/lib src/services` pour `src/`, `vitest run` dans `worker/`.
+
+| Brique | Mutants testés | Score avant | Score après | Hauts détectés |
+| --- | --- | --- | --- | --- |
+| `src/lib/` | 440 | 81,9 % | 82,2 % | 100 % |
+| `src/services/` | 128 | 62,6 % | 76,6 % | 100 % |
+| `worker/src/` | 333 | 79,5 % | 79,5 % (+ 10 tests au lot 8) | 100 % |
+
+Survivants traités par des tests : `github-failure.ts` (raisons et erreurs transitoires), cache de `site-data.ts`, valeur vide de `placeholders.ts`. Survivants justifiés (équivalents) : `??` → `||` sur des valeurs jamais vides par schéma (`chronology`, `contrast`, `config` du Worker), `===` → `==` sur des chaînes, contrôles redondants avec la lecture du corps en flux (`body.ts`, `handler.ts`), point d'entrée `worker/src/index.ts` (câblage seul). Les survivants de sévérité faible restants (opérateurs) sont consignés sans action.
+
+**Défaut trouvé en chemin** : depuis un worktree, le hook `pre-push` exporte un `GIT_DIR` absolu ; les dépôts Git de test l'héritaient et commitaient dans le vrai dépôt (6 commits parasites poussés puis retirés, `core.bare=true` écrit dans la configuration). Corrigé : `scripts/lib/git-env.mjs` + test de régression ; ESLint ignore aussi `.claude/` (worktrees).

@@ -33,7 +33,7 @@ GitHub Pages ne sait pas envoyer d'en-têtes ; Cloudflare les ajoute. **Rules �
 | `Content-Security-Policy`    | `frame-ancestors 'none'` (le reste de la CSP est dans la balise `<meta>`) |
 | `Cross-Origin-Opener-Policy` | `same-origin`                                                             |
 
-Tant que le site est sur GitHub Pages. Après la bascule vers Cloudflare Pages (ADR-0008, `docs/runbook-cloudflare.md`), ces en-têtes viennent de `public/_headers` (testé) et cette règle est supprimée. HSTS sans `includeSubDomains` dans `public/_headers` : tous les sous-domaines du `.fr` (OVH) ne sont pas en HTTPS. N'ajouter `preload` à HSTS qu'une fois tout stable (l'inscription à la liste de préchargement est difficile à défaire).
+Tant que le site est sur GitHub Pages. Après la bascule vers Cloudflare Pages (ADR-0008, `docs/runbook-cloudflare.md`), ces en-têtes viennent de `public/_headers` (testé) et cette règle est supprimée. HSTS dans `public/_headers` : `max-age=63072000; includeSubDomains; preload` (#210), après plusieurs semaines sans incident ; risques et règle pour tout nouveau sous-domaine : ADR-0009, contrôle `npm run check:hsts`. Inscription sur hstspreload.org par le propriétaire.
 
 **À désactiver dans Cloudflare** (sinon ils cassent le site ou ses garanties) :
 

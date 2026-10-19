@@ -1,5 +1,7 @@
 # paulperigault.fr
 
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/PaulPerigault/PaulPerigault.github.io/badge)](https://scorecard.dev/viewer/?uri=github.com/PaulPerigault/PaulPerigault.github.io)
+
 Portfolio personnel — Paul Perigault, Alternant DevOps Cloud.
 
 ## Stack

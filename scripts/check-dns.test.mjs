@@ -27,6 +27,11 @@ describe('hostingOf', () => {
     expect(hostingOf(records({ cname: ['paulperigault.pages.dev'] }))).toBe('cloudflare');
   });
 
+  it('garde github-pages pour un CNAME github.io, même dans une zone déléguée à Cloudflare', () => {
+    const cf = ['ada.ns.cloudflare.com', 'bob.ns.cloudflare.com'];
+    expect(hostingOf(records({ ns: cf, cname: ['paulperigault.github.io'] }))).toBe('github-pages');
+  });
+
   it('ne conclut rien d’un mélange ou d’une adresse inconnue', () => {
     expect(hostingOf(records({ a: ['192.0.2.1'] }))).toBe('inconnu');
     expect(hostingOf(records({ a: [GITHUB_PAGES_IPV4[0], '192.0.2.1'] }))).toBe('inconnu');
@@ -56,5 +61,21 @@ describe('checkDns', () => {
     const resolver = fakeResolver(zone);
     expect(await checkDns({ resolver, expect: 'cloudflare', log })).toBe(1);
     expect(await checkDns({ resolver, expect: 'github-pages', log })).toBe(0);
+  });
+
+  it('juge un sous-domaine proxifié (ni NS ni CNAME propres) par les NS de sa zone', async () => {
+    const cf = ['ada.ns.cloudflare.com', 'bob.ns.cloudflare.com'];
+    const proxied = {
+      'paulperigault.fr': { ns: cf, a: ['104.21.0.1'] },
+      'www.paulperigault.fr': { a: ['104.21.0.1'] },
+    };
+    const lines = [];
+    const code = await checkDns({
+      resolver: fakeResolver(proxied),
+      expect: 'cloudflare',
+      log: (l) => lines.push(l),
+    });
+    expect(lines.join('\n')).not.toContain('inconnu');
+    expect(code).toBe(0);
   });
 });

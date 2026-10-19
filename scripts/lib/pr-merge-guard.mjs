@@ -3,12 +3,15 @@
 // Seule une sous-commande qui commence par `gh pr … merge` est une fusion : le même texte entre
 // guillemets (message de commit, grep) n'en est pas une, sauf passé à un shell (`bash -c "…"`).
 // La lecture de la base est injectée (`readBase`) : la logique reste pure et testable.
+import { segmentsOf, wordsOf } from './shell-segments.mjs';
 
-const SEPARATOR = /[;&|\n]/;
-const TOKEN = /"([^"]*)"|'([^']*)'|(\S+)/g;
-const GH = /^gh(?:\.exe)?$/i;
+// `gh` par son nom ou son chemin (`/opt/homebrew/bin/gh`, `C:\\…\\gh.exe`).
+const GH = /(?:^|[\\/])gh(?:\.exe)?$/i;
 const SHELL = /^(?:bash|sh|zsh|pwsh|powershell|cmd)(?:\.exe)?$/i;
-const ASSIGNMENT = /^\w+=/;
+const ASSIGNMENT = /^(\w+)=(.*)$/;
+// Lanceurs qui exécutent la commande qui les suit (`env gh …`, `sudo gh …`), et `$` d'un `$(…)`.
+const LAUNCHERS = new Set(['env', 'command', 'exec', 'time', 'sudo', 'nohup', '$']);
+const PR_URL = /github\.com\/([^/\s]+\/[^/\s]+)\/pull\/\d+/;
 // `-Ro/r`, `-R=o/r`, `--repo=o/r` : options de dépôt collées à leur valeur.
 const GLUED_REPO = /^(?:-R=?|--repo=)(.+)$/;
 const REPO_FLAGS = new Set(['-R', '--repo']);
@@ -19,23 +22,6 @@ const VALUE_FLAGS = new Set([
 ]);
 const ALLOWED_BASE = 'develop';
 
-/** Sous-commandes séparées par `;`, `&`, `|` ou un saut de ligne situés hors guillemets. */
-const segmentsOf = (command) => {
-  const segments = [];
-  let quote = null;
-  let start = 0;
-  for (let i = 0; i < command.length; i += 1) {
-    const char = command[i];
-    if (quote) quote = char === quote ? null : quote;
-    else if (char === '"' || char === "'") quote = char;
-    else if (SEPARATOR.test(char)) {
-      segments.push(command.slice(start, i));
-      start = i + 1;
-    }
-  }
-  return [...segments, command.slice(start)];
-};
-
 /** `--repo=o/r` devient `--repo o/r` : une seule forme à analyser ensuite. */
 const expandGlued = (tokens) =>
   tokens.flatMap((token) => {
@@ -43,8 +29,7 @@ const expandGlued = (tokens) =>
     return glued ? ['--repo', glued[1]] : [token];
   });
 
-const tokensOf = (segment) =>
-  expandGlued([...segment.matchAll(TOKEN)].map((m) => m[1] ?? m[2] ?? m[3]));
+const tokensOf = (segment) => expandGlued(wordsOf(segment));
 
 /**
  * Arguments d'une fusion, ou null si ce n'en est pas une. `--repo` peut précéder `pr` ou `merge`
@@ -63,14 +48,29 @@ const mergeArgs = (tokens) => {
   return rest[0] === 'pr' && rest[1] === 'merge' ? [...repo, ...rest.slice(2)] : null;
 };
 
+/**
+ * Retire en tête les affectations et les lanceurs (`env`, `sudo`…). `GH_REPO=o/r gh …` change le
+ * dépôt visé : il est renvoyé comme un `--repo` à placer devant les arguments.
+ */
+const stripPrefix = (tokens) => {
+  let ghRepo = [];
+  for (let head = tokens[0]; head !== undefined; head = tokens[0]) {
+    const assignment = ASSIGNMENT.exec(head);
+    if (!assignment && !LAUNCHERS.has(head)) break;
+    if (assignment?.[1] === 'GH_REPO') ghRepo = ['--repo', assignment[2]];
+    tokens.shift();
+  }
+  return ghRepo;
+};
+
 /** Invocations de fusion d'une commande, réduites à leurs arguments (shells imbriqués compris). */
 const mergeInvocations = (command) =>
   segmentsOf(command).flatMap((segment) => {
     const tokens = tokensOf(segment);
-    while (ASSIGNMENT.test(tokens[0] ?? '')) tokens.shift();
+    const ghRepo = stripPrefix(tokens);
     if (SHELL.test(tokens[0] ?? '')) return tokens.slice(1).flatMap(mergeInvocations);
     const args = mergeArgs(tokens);
-    return args ? [args] : [];
+    return args ? [[...ghRepo, ...args]] : [];
   });
 
 /** Lit le sélecteur de PR et l'option `--repo` des arguments d'une fusion. */
@@ -101,7 +101,10 @@ export function prNumber(selector) {
  */
 export function mergeRefusal(command, readBase) {
   for (const args of mergeInvocations(command)) {
-    const { selector, repo } = parseMerge(args);
+    const parsed = parseMerge(args);
+    const selector = parsed.selector;
+    // Une URL de PR désigne son propre dépôt, quel que soit le répertoire courant.
+    const repo = PR_URL.exec(selector ?? '')?.[1] ?? parsed.repo;
     const pr = prNumber(selector);
     if (!pr) return 'Fusion refusée : `gh pr merge` doit citer un numéro de PR explicite.';
     const base = readBase(pr, repo);

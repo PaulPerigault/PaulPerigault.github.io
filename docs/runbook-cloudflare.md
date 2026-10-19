@@ -56,11 +56,12 @@ Vérification : la réponse contient `strict-transport-security: max-age=6307200
 4. OVH : _Serveurs DNS_ → remplacer par les deux serveurs `*.ns.cloudflare.com` indiqués par Cloudflare.
 
 ```powershell
-npm run check:dns -- --expect=cloudflare     # code 0 quand la délégation est visible (jusqu'à 24 h)
+Resolve-DnsName paulperigault.fr -Type NS -Server 1.1.1.1   # les deux *.ns.cloudflare.com (jusqu'à 24 h)
+npm run check:dns
 Resolve-DnsName paulperigault.fr -Type MX -Server 1.1.1.1
 ```
 
-Vérification : `check:dns` affiche `cloudflare` pour les deux noms ; les MX iCloud répondent ; un e-mail de test envoyé à l'adresse du `.fr` arrive.
+Vérification : les serveurs de noms sont ceux de Cloudflare ; `check:dns` affiche `paulperigault.fr : cloudflare` et, à ce stade, `www.paulperigault.fr : github-pages` (son `CNAME` vise encore `github.io` : `--expect=cloudflare` ne passera qu'à l'étape 5) ; les MX iCloud répondent ; un e-mail de test envoyé à l'adresse du `.fr` arrive.
 
 ## 5. Domaines personnalisés sur Pages
 
@@ -73,7 +74,7 @@ npm run check:live
 curl.exe -sI https://paulperigault.fr/fr/
 ```
 
-Vérification : `check:live` vert ; les en-têtes de l'étape 3 arrivent sur `https://paulperigault.fr`.
+Vérification : `npm run check:dns -- --expect=cloudflare` code 0 (les deux noms) ; `check:live` vert ; les en-têtes de l'étape 3 arrivent sur `https://paulperigault.fr`.
 
 ## 6. Fin de GitHub Pages
 

@@ -31,6 +31,39 @@ describe('mergeRefusal et le dépôt', () => {
   });
 });
 
+describe('fusions masquées (revue finale, #180)', () => {
+  const calls = [];
+  const spy = (pr, repo) => (calls.push([pr, repo]), 'main');
+
+  it('lit le dépôt d’une URL de PR d’un autre dépôt, pas celui du répertoire courant', () => {
+    calls.length = 0;
+    const command = 'gh pr merge https://github.com/autre/depot/pull/5 --squash';
+    expect(mergeRefusal(command, spy)).toMatch(/#5/);
+    expect(calls).toEqual([['5', 'autre/depot']]);
+  });
+
+  it('lit GH_REPO placé en préfixe de la commande', () => {
+    calls.length = 0;
+    expect(mergeRefusal('GH_REPO=autre/depot gh pr merge 5', spy)).toMatch(/#5/);
+    expect(mergeRefusal('env GH_REPO=autre/depot gh pr merge 6', spy)).toMatch(/#6/);
+    expect(calls).toEqual([
+      ['5', 'autre/depot'],
+      ['6', 'autre/depot'],
+    ]);
+  });
+
+  it.each([
+    '/opt/homebrew/bin/gh pr merge 165',
+    '& "C:\\Program Files\\GitHub CLI\\gh.exe" pr merge 165',
+    'env gh pr merge 165',
+    'command gh pr merge 165',
+    'sudo gh pr merge 165',
+    'echo $(gh pr merge 165)',
+  ])('reconnaît gh appelé par son chemin ou via un lanceur : %s', (command) => {
+    expect(mergeRefusal(command, () => 'main')).toMatch(/#165/);
+  });
+});
+
 describe('parseMerge et prNumber', () => {
   it('ignore la valeur des options et lit --repo', () => {
     const args = (text) => text.split(' ');

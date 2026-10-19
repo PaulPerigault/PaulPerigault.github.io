@@ -11,13 +11,22 @@ const DEV_VARS = /^\.dev\.vars(?:[.*?~][\w.*?~-]*)?$/;
 const TEMPLATE = /\.example$/;
 // Identifiants de code qui finissent par `.env` sans être des fichiers.
 const CODE_IDENTIFIERS = /^(?:process|import\.meta|Bun|Deno)\.env(?:\.|$)/;
+// Décomposition JavaScript (`{ ...env }`, `...process.env`) : seuls un identifiant ou un code
+// connu après `...` sont du code ; `....env` ou `...secrets.env` restent des noms de fichiers.
+const SPREAD = /^\.\.\.(?=[A-Za-z_$])/;
+const JS_IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
+
+const isCode = (token) => {
+  const code = token.replace(SPREAD, '');
+  return CODE_IDENTIFIERS.test(code) || (code !== token && JS_IDENTIFIER.test(code));
+};
 
 // Segments vides ignorés : un `\` d'échappement final (`\`infra/.secrets.env\``) ne masque pas le nom.
 const basename = (token) => token.split(/[/\\]/).filter(Boolean).pop() ?? '';
 
 // Comparaison sans casse : un nom en majuscules ouvre le même fichier sur APFS (macOS) et NTFS.
 const isSecretFile = (token) => {
-  if (CODE_IDENTIFIERS.test(token)) return false;
+  if (isCode(token)) return false;
   const name = basename(token).toLowerCase();
   return !TEMPLATE.test(name) && (ENV_FILE.test(name) || DEV_VARS.test(name));
 };

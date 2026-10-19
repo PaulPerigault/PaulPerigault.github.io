@@ -46,6 +46,10 @@ const FORBIDDEN = [
   'tofu con' + 'sole',
   'gh pr merge 165 --squash',
   'gh -R o/r pr merge 165',
+  'gh pr ready 206',
+  'gh pr ready',
+  'gh -R o/r pr ready 206',
+  'gh --repo o/r pr ready 206 --undo',
   'gh --repo=o/r pr merge 165 --squash',
   'gh api -X PATCH repos/o/r',
   'gh api repos/o/r/pages -F https_enforced=true',
@@ -67,6 +71,7 @@ const ALLOWED = [
   'npx wrangler dev',
   'gh pr view 165',
   'gh -R o/r pr view 165',
+  'gh pr create --draft --base develop --title x',
 ];
 
 describe('.claude/settings.json', () => {

@@ -14,6 +14,8 @@ export default tseslint.config(
       'playwright-report/**',
       'test-results/**',
       'worker/**',
+      // Worktrees de l'assistant (.claude/worktrees/) : autres copies du dépôt, chacune lintée chez elle.
+      '.claude/**',
     ],
   },
   js.configs.recommended,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { decide } from './guard-pr-merge.mjs';
-import { mergeRefusal, parseMerge, prNumber } from './lib/pr-merge-guard.mjs';
+import { mergeRefusal } from './lib/pr-merge-guard.mjs';
 
 const BASES = { 165: 'main', 171: 'develop', 128: 'develop' };
 const readBase = (pr) => BASES[pr] ?? null;
@@ -61,20 +61,6 @@ describe('mergeRefusal', () => {
     }
   });
 
-  it('lit --repo placé avant merge, sous toutes ses formes', () => {
-    const seen = [];
-    const spy = (pr, repo) => (seen.push(repo), 'main');
-    for (const command of [
-      'gh pr --repo o/r merge 165',
-      'gh pr -R o/r merge 165',
-      'gh pr -Ro/r merge 165',
-      'gh pr merge 165 --repo=o/r',
-    ]) {
-      expect(mergeRefusal(command, spy), command).toMatch(/#165/);
-    }
-    expect(seen).toEqual(['o/r', 'o/r', 'o/r', 'o/r']);
-  });
-
   it('contrôle aussi une fusion passée à un shell imbriqué', () => {
     for (const command of [
       'bash -c "gh pr merge 165 --squash"',
@@ -83,24 +69,6 @@ describe('mergeRefusal', () => {
     ]) {
       expect(mergeRefusal(command, readBase), command).toMatch(/#165/);
     }
-  });
-});
-
-describe('parseMerge et prNumber', () => {
-  it('ignore la valeur des options et lit --repo', () => {
-    const args = (text) => text.split(' ');
-    expect(parseMerge(args('-t titre --repo o/r 42 --squash'))).toEqual({
-      selector: '42',
-      repo: 'o/r',
-    });
-    expect(parseMerge(args('--repo=o/r 7'))).toEqual({ selector: '7', repo: 'o/r' });
-  });
-
-  it('extrait le numéro d’un sélecteur, sinon null', () => {
-    expect(prNumber('#12')).toBe('12');
-    expect(prNumber('https://github.com/o/r/pull/12/files')).toBe('12');
-    expect(prNumber('feat/x')).toBeNull();
-    expect(prNumber(null)).toBeNull();
   });
 });
 

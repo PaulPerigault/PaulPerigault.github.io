@@ -46,16 +46,21 @@ const expandGlued = (tokens) =>
 const tokensOf = (segment) =>
   expandGlued([...segment.matchAll(TOKEN)].map((m) => m[1] ?? m[2] ?? m[3]));
 
-/** Arguments d'une fusion (`--repo` placé avant `merge` compris), ou null si ce n'en est pas une. */
+/**
+ * Arguments d'une fusion, ou null si ce n'en est pas une. `--repo` peut précéder `pr` ou `merge`
+ * (`gh -R o/r pr merge 1` est accepté par gh) : il est mis de côté jusqu'à `pr merge`.
+ */
 const mergeArgs = (tokens) => {
-  if (!GH.test(tokens[0] ?? '') || tokens[1] !== 'pr') return null;
+  if (!GH.test(tokens[0] ?? '')) return null;
   const repo = [];
-  for (let i = 2; i < tokens.length; i += 2) {
-    if (tokens[i] === 'merge') return [...repo, ...tokens.slice(i + 1)];
-    if (!REPO_FLAGS.has(tokens[i])) return null;
-    repo.push(tokens[i], tokens[i + 1]);
+  const rest = [];
+  for (let i = 1; i < tokens.length; i += 1) {
+    if (rest.length < 2 && REPO_FLAGS.has(tokens[i])) {
+      repo.push(tokens[i], tokens[i + 1]);
+      i += 1;
+    } else rest.push(tokens[i]);
   }
-  return null;
+  return rest[0] === 'pr' && rest[1] === 'merge' ? [...repo, ...rest.slice(2)] : null;
 };
 
 /** Invocations de fusion d'une commande, réduites à leurs arguments (shells imbriqués compris). */

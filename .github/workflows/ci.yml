@@ -77,10 +77,19 @@ jobs:
       # Aucun `npm ci` : le script n'utilise que Node et scripts/lib.
       - run: npm run check:links
 
+  # Une page par job (en parallèle) : le chemin critique ne dépend plus du nombre de pages.
   lighthouse:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { page: /fr/, name: fr }
+          - { page: /en/, name: en }
+          - { page: /fr/legal/, name: fr-legal }
+          - { page: /en/legal/, name: en-legal }
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -93,8 +102,12 @@ jobs:
         uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12
         with:
           uploadArtifacts: true
+          artifactName: lighthouse-${{ matrix.name }}
           temporaryPublicStorage: true
           configPath: .lighthouserc.json
+        # Remplace la liste `collect.url` du fichier (variables LHCI_* prioritaires sur la config).
+        env:
+          LHCI_COLLECT__URL: ${{ matrix.page }}
 
   container:
     runs-on: ubuntu-latest

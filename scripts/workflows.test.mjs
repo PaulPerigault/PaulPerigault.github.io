@@ -77,6 +77,15 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
     expect(ci).toMatch(/^ {2}commitlint:/m);
   });
 
+  it('passe chaque page budgétée de Lighthouse dans sa propre tâche, sans en oublier', () => {
+    const pages = JSON.parse(readFileSync('.lighthouserc.json', 'utf8')).ci.collect.url;
+    const matrix = [...text('ci.yml').matchAll(/- \{ page: (\S+), name: [\w-]+ \}/g)].map(
+      (m) => m[1],
+    );
+    expect(matrix).toEqual(pages);
+    expect(text('ci.yml')).toContain('LHCI_COLLECT__URL: ${{ matrix.page }}');
+  });
+
   it('redéploie chaque semaine sans commit et à la demande', () => {
     const deploy = text('deploy.yml');
     expect(deploy).toMatch(/schedule:\n\s+- cron: '\d+ \d+ \* \* 1'/);

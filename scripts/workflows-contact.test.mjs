@@ -26,6 +26,7 @@ describe('CI du formulaire de contact', () => {
     expect(infra).toMatch(/opentofu\/setup-opentofu@[0-9a-f]{40} # v\d/);
     expect(infra).toContain('init -backend=false');
     expect(infra).toContain('validate');
+    expect(infra).toContain('run: tofu -chdir=infra test');
     expect(infra).not.toMatch(/\$\{\{\s*secrets\./);
   });
 

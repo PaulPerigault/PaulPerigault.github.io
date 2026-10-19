@@ -153,6 +153,8 @@ jobs:
       - run: tofu fmt -check -recursive infra
       - run: tofu -chdir=infra init -backend=false -input=false
       - run: tofu -chdir=infra validate
+      # Modules avec un provider simulé (infra/tests/*.tftest.hcl) : aucun appel à Cloudflare.
+      - run: tofu -chdir=infra test
 
   # Audit statique des workflows et actions (injections, permissions, épinglage, Dependabot).
   # Version de zizmor figée (la plus récente connue de l'action v0.6.4) : un nouvel audit arrive

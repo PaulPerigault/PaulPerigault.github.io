@@ -32,3 +32,10 @@ module "resend_domain" {
     rsend = "rsend-euw1.forge.rmta.net"
   }
 }
+
+# Hébergement du site (ADR-0008) : projet Pages préparé, domaines ajoutés après la bascule DNS.
+module "pages_site" {
+  source = "./modules/pages-site"
+
+  account_id = var.account_id
+}

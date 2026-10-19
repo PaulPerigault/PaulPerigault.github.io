@@ -18,3 +18,8 @@ output "contact_form_worker_name" {
   description = "Nom du Worker, déployé par `wrangler deploy` (name de worker/wrangler.toml)."
   value       = module.contact_form.worker_name
 }
+
+output "pages_site_url" {
+  description = "Adresse *.pages.dev du site sur Cloudflare Pages (avant domaine personnalisé)."
+  value       = module.pages_site.pages_dev_url
+}

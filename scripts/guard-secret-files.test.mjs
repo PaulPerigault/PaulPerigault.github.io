@@ -15,6 +15,14 @@ describe('secretFilesIn : fichiers de secrets cités par une commande', () => {
     ['head .env.local', '.env.local'],
     ["sed -n 1p '*.env'", '*.env'],
     ['node -e "t = \\`infra/.secrets.env\\`"', '.secrets.env'],
+    // Jokers en fin de nom et casse (APFS et NTFS ignorent la casse) : accidents réalistes.
+    ['cat .env*', '.env*'],
+    ["find . -name '.env.*'", '.env.*'],
+    ['cat infra/.secrets.env*', '.secrets.env*'],
+    ['ls worker/.dev.vars?', '.dev.vars?'],
+    ['cat .env~', '.env~'],
+    ['cat infra/.SECRETS.ENV', '.SECRETS.ENV'],
+    ['Get-Content worker\\.Dev.Vars', '.Dev.Vars'],
   ])('repère « %s »', (command, name) => {
     expect(secretFilesIn(command).some((token) => token.includes(name))).toBe(true);
   });

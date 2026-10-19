@@ -1,0 +1,77 @@
+name: Registrar drift
+
+# Plan quotidien de infra/registrar/ (délégation de paulperigault.fr chez OVH) avec le compte de
+# service OVH en LECTURE SEULE et les clés R2 en lecture seule (infra/identity/). Jamais d'apply ni
+# de verrou. Un écart entre le code et le registrar ouvre une issue (une seule à la fois). Sans ces
+# secrets, le job reste vert et le dit (#181).
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Secrets en lecture seule présents ?
+        id: gate
+        env:
+          HAS_SECRETS: ${{ secrets.OVH_READ_CLIENT_ID != '' && secrets.OVH_READ_CLIENT_SECRET != '' && secrets.TFSTATE_R2_READ_ACCESS_KEY_ID != '' && secrets.TFSTATE_R2_READ_SECRET_KEY != '' }}
+        run: |
+          echo "ready=$HAS_SECRETS" >> "$GITHUB_OUTPUT"
+          if [ "$HAS_SECRETS" != true ]; then
+            echo "::notice::plan du registrar sauté : secrets en lecture seule absents (création : infra/identity, #181)."
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          persist-credentials: false
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          tofu_version: 1.13.1
+          tofu_wrapper: false
+      - name: tofu plan (lecture seule)
+        id: plan
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          OVH_ENDPOINT: ovh-eu
+          OVH_CLIENT_ID: ${{ secrets.OVH_READ_CLIENT_ID }}
+          OVH_CLIENT_SECRET: ${{ secrets.OVH_READ_CLIENT_SECRET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.TFSTATE_R2_READ_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TFSTATE_R2_READ_SECRET_KEY }}
+        run: |
+          tofu -chdir=infra/registrar init -input=false -lockfile=readonly
+          set +e
+          tofu -chdir=infra/registrar plan -input=false -lock=false -no-color -detailed-exitcode > plan.txt 2>&1
+          code=$?
+          set -e
+          { echo '### tofu plan (registrar)'; echo '```'; tail -n 100 plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          if [ "$code" = 1 ]; then exit 1; fi
+      - name: Issue en cas de dérive
+        if: steps.plan.outputs.code == '2'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title='Dérive du registrar : délégation de paulperigault.fr différente du code'
+          open=$(gh issue list --state open --search "in:title \"$title\"" --json number --jq 'length')
+          if [ "$open" = 0 ]; then
+            { echo "Le plan quotidien de \`infra/registrar/\` montre un écart avec OVH (serveurs de noms ou DS)."
+              echo; echo "Plan : $RUN_URL"; echo
+              echo "Ne rien appliquer sans lire le plan ; runbook : \`docs/runbook-cloudflare.md\` §4.7."; } > body.md
+            gh issue create --title "$title" --body-file body.md
+          else
+            echo "::notice::Issue de dérive déjà ouverte."
+          fi

@@ -14,6 +14,8 @@ La limitation de débit du formulaire est dans `modules/contact-form` (seule rè
 
 **Bascule pilotée par deux variables** (`variables.tf`), changées par une PR à l'étape voulue du runbook, jamais en ligne de commande : `fr_dnssec` (`false`, puis `true` au §4.5) et `fr_site_host` (`github-pages`, puis `cloudflare-pages` au §5 : domaines Pages, `CNAME` proxifiés, enregistrements GitHub supprimés dans le même `apply`).
 
+**Délégation chez OVH** : `infra/registrar/` (brique séparée, son propre state) gère les serveurs de noms et le DS de `paulperigault.fr` (`infra/registrar/README.md`), avec les contrôles `npm run check:dnssec`.
+
 **Jetons** : `infra/identity/` (brique séparée, son propre state) crée les jetons Cloudflare limités et les comptes de service OVH, avec les seuls jetons d'amorçage ; `infra/` n'utilise ensuite que le jeton limité « terraform » (`infra/identity/README.md`).
 
 Ajouter un service = un nouveau dossier `modules/<service>` (variables, outputs, README) et un bloc `module` dans `main.tf`, sans toucher aux autres.

@@ -1,0 +1,48 @@
+name: DNSSEC check
+
+# Contrôles avant et après un changement de serveurs de noms ou de DS (docs/runbook-cloudflare.md
+# §4), dnsviz compris : dnsviz ne fonctionne que sous Linux, d'où ce job lancé à la demande
+# (`gh workflow run dnssec-check.yml -f phase=…`). Lecture seule, aucun secret.
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: 'avant-ns, apres-ns, avant-ds ou apres-ds'
+        required: true
+        type: choice
+        options: [avant-ns, apres-ns, avant-ds, apres-ds]
+      key_tag:
+        description: 'Key Tag attendu (apres-ds)'
+        required: false
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .nvmrc
+      # Version figée de dnsviz et de ses dépendances, dans un environnement isolé.
+      - run: |
+          python3 -m venv "$RUNNER_TEMP/dnsviz"
+          "$RUNNER_TEMP/dnsviz/bin/pip" install --quiet dnsviz==0.11.1 'dnspython<2.8' cryptography
+      # Aucun `npm ci` : la commande n'utilise que Node et scripts/lib.
+      - env:
+          PHASE: ${{ inputs.phase }}
+          KEY_TAG: ${{ inputs.key_tag }}
+        run: |
+          export DNSVIZ_BIN="$RUNNER_TEMP/dnsviz/bin/dnsviz"
+          node scripts/check-dnssec.mjs "--phase=$PHASE" ${KEY_TAG:+"--key-tag=$KEY_TAG"} --dnsviz

@@ -183,6 +183,10 @@ jobs:
       - run: tofu -chdir=infra/identity init -backend=false -input=false
       - run: tofu -chdir=infra/identity validate
       - run: tofu -chdir=infra/identity test
+      # Brique registrar (délégation chez OVH) : module testé avec un provider simulé.
+      - run: tofu -chdir=infra/registrar init -backend=false -input=false
+      - run: tofu -chdir=infra/registrar validate
+      - run: tofu -chdir=infra/registrar test
 
   # Plan OpenTofu (#203) contre l'infrastructure réelle, avec un token Cloudflare et des clés R2 en
   # LECTURE SEULE (#181). Jamais d'apply ni de verrou. Sans ces secrets (avant leur création, PR de

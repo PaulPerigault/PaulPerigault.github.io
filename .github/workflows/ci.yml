@@ -77,6 +77,40 @@ jobs:
       # Aucun `npm ci` : le script n'utilise que Node et scripts/lib.
       - run: npm run check:links
 
+  # Régression visuelle (#201, docs/visual-regression.md) : image Playwright épinglée par digest,
+  # la même que `npm run test:visual:update` (scripts/lib/visual-image.mjs). Une référence absente
+  # est écrite par Playwright et publiée en artefact `visual-snapshots`, à relire puis à commiter.
+  visual:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:7852dc5a7d72f5fe458a597d690f6c42fbc8e9e26ddfa95f8e6ef552558d9bbf
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: site
+          path: dist
+      - run: npx playwright test e2e/visual.spec.ts
+        env:
+          VISUAL: '1'
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: ${{ failure() }}
+        with:
+          name: visual-snapshots
+          path: |
+            e2e/__snapshots__/
+            test-results/
+          retention-days: 7
+
   # Une page par job (en parallèle) : le chemin critique ne dépend plus du nombre de pages.
   lighthouse:
     needs: build
@@ -166,7 +200,7 @@ jobs:
   # Point de contrôle unique (check requis `ci`) : vert seulement si TOUT le reste est vert.
   ci:
     if: ${{ always() }}
-    needs: [verify, build, e2e, links, lighthouse, worker, infra, zizmor]
+    needs: [verify, build, e2e, links, lighthouse, visual, worker, infra, zizmor]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

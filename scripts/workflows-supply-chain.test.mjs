@@ -81,4 +81,10 @@ describe('chaîne d’approvisionnement de la CI', () => {
     const ecosystems = config.match(/- package-ecosystem:/g) ?? [];
     expect(config.match(/cooldown:\n {6}default-days: 7\n/g) ?? []).toHaveLength(ecosystems.length);
   });
+
+  it('ne donnent aucun droit au GITHUB_TOKEN de la release : release-please utilise son propre jeton', () => {
+    const release = text('release.yml');
+    expect(release).toContain('token: ${{ secrets.TOKEN }}');
+    expect(release).toMatch(/^permissions: \{\}$/m);
+  });
 });

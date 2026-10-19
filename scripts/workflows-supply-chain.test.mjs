@@ -97,4 +97,21 @@ describe('chaîne d’approvisionnement de la CI', () => {
     expect(audit).toContain('npm audit --audit-level=moderate');
     expect(audit).not.toContain('--audit-level=high');
   });
+
+  it('publient le score OpenSSF Scorecard avec une action épinglée et des droits limités au job', () => {
+    const scorecard = text('scorecard.yml');
+    expect(scorecard).toMatch(/ossf\/scorecard-action@[0-9a-f]{40} # v\d/);
+    expect(scorecard).toContain('publish_results: true');
+    expect(scorecard).toMatch(/^permissions: \{\}$/m);
+    expect(scorecard).not.toMatch(/^(?:env|defaults):/m);
+    expect(readFileSync('README.md', 'utf8')).toContain('api.scorecard.dev/projects/github.com/');
+  });
+
+  it('attestent la provenance de l’artefact déployé, signée par OIDC', () => {
+    const deploy = text('deploy.yml').split(/^ {2}deploy:\n/m)[1] ?? '';
+    expect(deploy).toMatch(/actions\/attest-build-provenance@[0-9a-f]{40} # v\d/);
+    expect(deploy).toContain("subject-path: 'dist/**'");
+    expect(deploy).toContain('attestations: write');
+    expect(deploy.indexOf('attest-build-provenance')).toBeLessThan(deploy.indexOf('deploy-pages@'));
+  });
 });

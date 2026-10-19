@@ -87,4 +87,14 @@ describe('chaîne d’approvisionnement de la CI', () => {
     expect(release).toContain('token: ${{ secrets.TOKEN }}');
     expect(release).toMatch(/^permissions: \{\}$/m);
   });
+
+  it('auditent les dépendances du site et du Worker dès la sévérité modérée', () => {
+    const audit =
+      text('security.yml')
+        .split(/^ {2}audit:\n/m)[1]
+        ?.split(/^ {2}\w/m)[0] ?? '';
+    expect(audit).toMatch(/directory: \[\.?, ?worker\]|directory: \[root, worker\]/);
+    expect(audit).toContain('npm audit --audit-level=moderate');
+    expect(audit).not.toContain('--audit-level=high');
+  });
 });

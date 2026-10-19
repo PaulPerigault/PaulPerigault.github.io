@@ -16,9 +16,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Site et Worker (deux lockfiles), dès la sévérité modérée (constat S8 du lot 8). `npm audit` lit
+  # le lockfile : aucune installation ni script de paquet n'est nécessaire.
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        directory: [., worker]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -26,8 +32,8 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version-file: .nvmrc
-      - run: npm ci
-      - run: npm audit --audit-level=high
+      - run: npm audit --audit-level=moderate
+        working-directory: ${{ matrix.directory }}
 
   # Tout l'historique Git (secretlint, dans `npm run guard`, ne voit que l'arbre courant).
   # Binaire officiel vérifié par sa somme SHA-256 : pas d'action tierce, aucun droit d'écriture.

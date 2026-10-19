@@ -50,4 +50,35 @@ describe('chaîne d’approvisionnement de la CI', () => {
       expect((text(name).match(/persist-credentials: false/g) ?? []).length, name).toBe(checkouts);
     }
   });
+
+  it('auditent workflows et actions avec zizmor épinglé, bloquant dès la sévérité moyenne', () => {
+    const zizmor =
+      text('ci.yml')
+        .split(/^ {2}zizmor:\n/m)[1]
+        ?.split(/^ {2}\w/m)[0] ?? '';
+    expect(zizmor).toMatch(/zizmorcore\/zizmor-action@[0-9a-f]{40} # v\d/);
+    expect(zizmor).toMatch(/version: \d+\.\d+\.\d+\n/);
+    expect(zizmor).toContain('min-severity: medium');
+  });
+
+  it('n’écrivent jamais dans GITHUB_ENV ni GITHUB_PATH (zizmor github-env)', () => {
+    const lychee = readFileSync('.github/actions/setup-lychee/action.yml', 'utf8');
+    for (const [name, body] of [...workflows.map((w) => [w.name, w.text]), ['lychee', lychee]]) {
+      expect(body, name).not.toMatch(/>>\s*"?\$\{?GITHUB_(?:ENV|PATH)/);
+    }
+  });
+
+  it('réservent l’auto-merge aux PR dont l’auteur est Dependabot, pas à l’acteur', () => {
+    const autoMerge = text('dependabot-auto-merge.yml');
+    expect(autoMerge).not.toContain('github.actor');
+    expect(autoMerge).toContain("github.event.pull_request.user.login == 'dependabot[bot]'");
+    expect(autoMerge).toContain('head.repo.full_name == github.repository');
+    expect(autoMerge).toMatch(/^permissions:\n {2}contents: read\n\n/m);
+  });
+
+  it('attendent 7 jours avant de proposer une nouvelle version (Dependabot cooldown)', () => {
+    const config = readFileSync('.github/dependabot.yml', 'utf8');
+    const ecosystems = config.match(/- package-ecosystem:/g) ?? [];
+    expect(config.match(/cooldown:\n {6}default-days: 7\n/g) ?? []).toHaveLength(ecosystems.length);
+  });
 });

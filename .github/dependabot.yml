@@ -1,4 +1,6 @@
 version: 2
+# `cooldown` : une version doit avoir 7 jours avant d'être proposée (paquet compromis retiré
+# entre-temps). Les mises à jour de sécurité ne l'attendent pas.
 updates:
   - package-ecosystem: npm
     directory: /
@@ -6,6 +8,8 @@ updates:
       interval: weekly
       day: monday
       time: "08:00"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     labels:
       - dependencies
@@ -43,6 +47,8 @@ updates:
       interval: weekly
       day: monday
       time: "08:00"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 3
     labels:
       - dependencies
@@ -62,6 +68,8 @@ updates:
       interval: weekly
       day: monday
       time: "08:00"
+    cooldown:
+      default-days: 7
     labels:
       - dependencies
       - infra
@@ -72,6 +80,8 @@ updates:
       interval: weekly
       day: monday
       time: "08:00"
+    cooldown:
+      default-days: 7
     labels:
       - dependencies
     groups:
@@ -85,6 +95,8 @@ updates:
       interval: weekly
       day: monday
       time: "08:00"
+    cooldown:
+      default-days: 7
     labels:
       - dependencies
     # Le stage de build doit rester sur la version de `.nvmrc` (LTS) : pas de saut de majeure automatique.

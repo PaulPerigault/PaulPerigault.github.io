@@ -43,8 +43,24 @@ jobs:
           path: dist
       - name: Charge utile IndexNow (simulation)
         run: node scripts/indexnow.mjs --dry-run
+      # Navigateurs en cache, clé = version exacte de Playwright : seul le premier run d'une version
+      # les télécharge. Chromium n'a pas besoin de dépendances système (apt) sur ubuntu-latest ;
+      # Firefox et WebKit (workflow hebdomadaire) les installent.
+      - name: Version de Playwright
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache des navigateurs Playwright
+        id: browsers
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-${{ inputs.all-browsers && 'all' || 'chromium' }}
       - name: Installer les navigateurs Playwright
-        run: npx playwright install --with-deps ${{ inputs.all-browsers && 'chromium firefox webkit' || 'chromium' }}
+        if: steps.browsers.outputs.cache-hit != 'true'
+        run: npx playwright install ${{ inputs.all-browsers && 'chromium firefox webkit' || 'chromium' }}
+      - name: Dépendances système de Firefox et WebKit
+        if: ${{ inputs.all-browsers }}
+        run: npx playwright install-deps firefox webkit
       - run: npm run e2e -- --shard=${{ matrix.shard }}/2
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: ${{ !cancelled() }}

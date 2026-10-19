@@ -8,6 +8,11 @@ permissions:
   contents: write
   pull-requests: write
 
+# Jamais annulé en cours : release-please pourrait laisser un tag sans release.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   release:
     runs-on: ubuntu-latest

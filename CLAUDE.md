@@ -116,6 +116,7 @@ Senior, maintainable code made of independent bricks.
 ## Git workflow
 
 - `main` — production, protected, PR only (`ci` + `commitlint`); a push triggers `deploy.yml` and `release.yml`. `develop` — default/integration branch, protected the same way.
+- Git commands run from scripts/tests strip inherited `GIT_*` variables (`scripts/lib/git-env.mjs`): a hook in a worktree exports an absolute `GIT_DIR`, and test repos would otherwise write into the real one.
 - **Epic branches** `feat/<epic>` from `develop`; **issue branches** `feat|fix|chore|docs|ci|test/<issue-n°>-<slug>` from the epic, PR into the epic with `Closes #n`, squash-merge with a Conventional Commit title; the epic reaches `develop` by one PR. Small standalone work may branch from `develop`.
 - PRs follow `.github/PULL_REQUEST_TEMPLATE.md`; issues carry context, acceptance criteria and a test plan. Conventional Commits (`commitlint.config.mjs`) drive release-please.
 
@@ -138,8 +139,8 @@ Everything is in `.github/workflows/`; the site is **built once** and the **same
 | Workflow | Trigger | What it does |
 | --- | --- | --- |
 | `build.yml` | reusable (`ref`) | The only `npm run build` (strict GitHub data, `GITHUB_TOKEN`) → artifact `site` |
-| `e2e.yml` | reusable | Downloads `site`, IndexNow dry-run, `npm run e2e` in **2 shards**; `all-browsers` adds Firefox + WebKit |
-| `ci.yml` | PR (main, develop, feat/\*\*), push develop | `commitlint`, `verify`, `build` → `e2e`, `links` (lychee via `.github/actions/setup-lychee`), `lighthouse`; `container`, `worker`, `infra` (fmt/init/validate, **never plan/apply**; infra commands are tested by Vitest in `verify`); aggregate **`ci`** |
+| `e2e.yml` | reusable | Downloads `site`, IndexNow dry-run, `npm run e2e` in **2 shards** × 4 workers, Playwright browsers cached per version (no apt for Chromium); `all-browsers` adds Firefox + WebKit |
+| `ci.yml` | PR (main, develop, feat/\*\*), push develop | `commitlint`, `verify`, `build` → `e2e`, `links` (lychee via `.github/actions/setup-lychee`), `lighthouse` (one job per page, 2 runs, best kept); `container`, `worker`, `infra` (fmt/init/validate, **never plan/apply**; infra commands are tested by Vitest in `verify`), `zizmor` (zizmor-action v0.6.4 pinned, zizmor 1.30.1, fails from medium severity); aggregate **`ci`** |
 | `deploy-worker.yml` | push `main` touching `worker/`, manual | Worker `verify` then `wrangler deploy` with `CLOUDFLARE_API_TOKEN_DEPLOY` (_Workers Scripts: Edit_ only); code only |
 | `deploy.yml` | push `main`, **weekly cron**, manual | `build` → `e2e` → GitHub Pages (same artifact) → IndexNow. Weekly commit-less rebuild refreshes GitHub data and `security.txt` (sitemap `lastmod` does not change: it comes from Git) |
 | `browsers.yml` | weekly cron, manual | e2e on Chromium + Firefox + WebKit, `check:links -- --external` |
@@ -147,6 +148,7 @@ Everything is in `.github/workflows/`; the site is **built once** and the **same
 | `release.yml` | push `main` | release-please |
 | `dependabot-auto-merge.yml` | Dependabot PRs | auto-merge patch/minor, **except the Terraform provider** (read changelog, update lock, plan) |
 
+- Every triggered workflow has `concurrency` (release never cancelled); Dependabot `cooldown` 7 days; the auto-merge job checks the PR **author** and head repo, never `github.actor`.
 - Required checks stay `ci` and `commitlint`; `scripts/workflows.test.mjs` asserts them, the single build, pinned actions, permissions, weekly redeploy.
 - Lighthouse budgets (`.lighthouserc.json`, desktop, `/fr/`, `/en/` and both legal pages): performance ≥ 0.98, accessibility = 1, best-practices = 1, SEO = 1, JS ≤ 6 KB, weight ≤ 90 KB, ≤ 12 requests, LCP ≤ 800 ms, TBT ≤ 50 ms, CLS ≤ 0.01 (measured 2026-10-19: 100 everywhere, LCP ≈ 370 ms, 59 KB, 4.3 KB JS). CSS is inlined in each page (`build.inlineStylesheets: always`, LCP −41 % on throttled mobile); Astro hashes it into the CSP.
 - Dependabot groups npm (astro, effect, tailwind, tooling), `/worker`, `/infra` (never auto-merged), github-actions, Docker base images; npm majors and the Docker `node` major are ignored (build stage follows `.nvmrc`).

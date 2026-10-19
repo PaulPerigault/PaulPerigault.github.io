@@ -33,6 +33,14 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
     }
   });
 
+  it('sérialisent chaque workflow déclenché (concurrency), hors workflows réutilisables', () => {
+    const missing = workflows
+      .filter(({ text }) => !/^on:\n {2}workflow_call:/m.test(text))
+      .filter(({ text }) => !/^concurrency:\n {2}group: /m.test(text))
+      .map((w) => w.name);
+    expect(missing).toEqual([]);
+  });
+
   it('bornent la durée de chaque job qui exécute du code', () => {
     const unbounded = workflows.flatMap(({ name, text }) => {
       const jobs = text.split(/^jobs:\n/m)[1] ?? '';
@@ -64,9 +72,18 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
   it('expose les checks requis par la protection de branche : ci (agrégat) et commitlint', () => {
     const ci = text('ci.yml');
     expect(ci).toMatch(
-      /^ {2}ci:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify, build, e2e, links, lighthouse, container, worker, infra\]/m,
+      /^ {2}ci:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify, build, e2e, links, lighthouse, container, worker, infra, zizmor\]/m,
     );
     expect(ci).toMatch(/^ {2}commitlint:/m);
+  });
+
+  it('passe chaque page budgétée de Lighthouse dans sa propre tâche, sans en oublier', () => {
+    const pages = JSON.parse(readFileSync('.lighthouserc.json', 'utf8')).ci.collect.url;
+    const matrix = [...text('ci.yml').matchAll(/- \{ page: (\S+), name: [\w-]+ \}/g)].map(
+      (m) => m[1],
+    );
+    expect(matrix).toEqual(pages);
+    expect(text('ci.yml')).toContain('LHCI_COLLECT__URL: ${{ matrix.page }}');
   });
 
   it('redéploie chaque semaine sans commit et à la demande', () => {

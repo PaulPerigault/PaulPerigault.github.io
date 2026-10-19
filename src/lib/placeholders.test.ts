@@ -9,4 +9,8 @@ describe('fillPlaceholders', () => {
   it('laisse une clé inconnue visible plutôt que de l’effacer', () => {
     expect(fillPlaceholders('écrire à {email}', {})).toBe('écrire à {email}');
   });
+
+  it('remplace par une valeur vide connue (clé connue ≠ clé inconnue)', () => {
+    expect(fillPlaceholders('a{x}b', { x: '' })).toBe('ab');
+  });
 });

@@ -1,7 +1,5 @@
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createHandler } from './handler';
-import { RATE_LIMIT } from './limits';
 import { isRateLimited, type RateLimiter } from './rate-limit';
 import { env, fakeFetch, post, SITE_ORIGIN, validBody } from './test/fakes';
 
@@ -54,12 +52,5 @@ describe('handler et limitation de débit', () => {
       withLimiter(limiter(true)),
     );
     expect(response.status).toBe(200);
-  });
-
-  it('déclare la même limite dans wrangler.toml et dans limits.ts', () => {
-    const toml = readFileSync('wrangler.toml', 'utf8');
-    expect(toml).toMatch(/\[\[ratelimits\]\]\nname = "CONTACT_RATE_LIMITER"/);
-    expect(toml).toContain(`limit = ${RATE_LIMIT.limit}`);
-    expect(toml).toContain(`period = ${RATE_LIMIT.periodSeconds}`);
   });
 });

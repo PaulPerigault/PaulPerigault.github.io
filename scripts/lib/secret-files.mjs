@@ -1,6 +1,6 @@
 // Fichiers de secrets locaux qu'aucune commande de l'assistant ne doit citer (lecture, copie, édition).
 // Garde-fou contre les accidents, pas contre un adversaire : un joker (`infra/.sec*`) passe.
-// La vraie protection reste que ces fichiers ne quittent pas la machine (.gitignore, .dockerignore).
+// La vraie protection reste que ces fichiers ne quittent pas la machine (.gitignore).
 
 const SEPARATORS = /[\s"'`()[\]{};|&<>=,]+/;
 // `.env`, `foo.env`, `.env.local`, `.secrets.env`… mais pas les modèles `*.example`. Un suffixe de

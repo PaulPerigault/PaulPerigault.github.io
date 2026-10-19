@@ -31,6 +31,7 @@
     "check:matrix": "node scripts/check-test-matrix.mjs",
     "check:docs": "node scripts/check-docs.mjs",
     "check:live": "node scripts/check-live.mjs",
+    "check:dns": "node scripts/check-dns.mjs",
     "check:secrets": "secretlint \"**/*\"",
     "verify:worker": "npm --prefix worker run verify",
     "check:links": "node scripts/check-links.mjs",

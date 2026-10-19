@@ -20,7 +20,7 @@ Ajouter un service = un nouveau dossier `modules/<service>` (variables, outputs,
 
 - OpenTofu **1.13.x** (`versions.tf`, ADR-0008 ; Windows : `winget install OpenTofu.Tofu`, macOS : `brew install opentofu`) et provider Cloudflare **5.27.x** de `registry.opentofu.org`, empreintes figées dans `.terraform.lock.hcl` pour Windows, Linux et macOS (`tofu providers lock -platform=windows_amd64 -platform=linux_amd64 -platform=darwin_amd64 -platform=darwin_arm64`).
 - Node 24 (`.nvmrc`) et `npm ci` à la racine ; `npm ci` dans `worker/` pour Wrangler.
-- `infra/.secrets.env` (ignoré par Git **et** par Docker), quatre lignes `NOM=valeur`, guillemets englobants acceptés :
+- `infra/.secrets.env` (ignoré par Git), quatre lignes `NOM=valeur`, guillemets englobants acceptés :
   - `TF_VAR_cloudflare_api_token` : token « terraform-portfolio » ;
   - `TF_VAR_resend_api_key` : clé Resend (accès _Sending_, domaine `paulperigault.dev`), lue seulement par `npm run infra:worker-secrets` ;
   - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` : clés **S3** du bucket R2 du state. Ce sont l'_Access Key ID_ (32 caractères hexadécimaux) et la _Secret Access Key_ (64), pas la valeur du token R2 ; une confusion donne `SignatureDoesNotMatch`. Les noms `AWS_*` sont imposés par le backend `s3` d'OpenTofu ; il n'y a aucun compte AWS.

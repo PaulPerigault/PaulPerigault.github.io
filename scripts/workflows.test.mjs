@@ -72,7 +72,7 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
   it('expose les checks requis par la protection de branche : ci (agrégat) et commitlint', () => {
     const ci = text('ci.yml');
     expect(ci).toMatch(
-      /^ {2}ci:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify, build, e2e, links, lighthouse, container, worker, infra, zizmor\]/m,
+      /^ {2}ci:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify, build, e2e, links, lighthouse, worker, infra, zizmor\]/m,
     );
     expect(ci).toMatch(/^ {2}commitlint:/m);
   });

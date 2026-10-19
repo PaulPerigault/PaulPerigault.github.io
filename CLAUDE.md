@@ -6,7 +6,7 @@ Guidance for Claude Code (claude.ai/code) in this repository.
 
 Personal portfolio for Paul Perigault (paulperigault.fr): **Astro 7** static site (`output: 'static'`, zero JS by default), Tailwind CSS v4, TypeScript `strictest`, FR/EN routes (`/fr/`, `/en/`), deployed to GitHub Pages. Data logic runs **at build time only** with [Effect](https://effect.website).
 
-Migrated from Angular 22 to Astro (epic [#64](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/64)); reasoning and before/after measures in `docs/adr/` (ADR-0001 to 0005). ADR-0006 = visual identity, ADR-0007 = contact form (Worker + Turnstile + Resend + Terraform, option A ownership split).
+Migrated from Angular 22 to Astro (epic [#64](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/64)); reasoning and before/after measures in `docs/adr/` (ADR-0001 to 0005). ADR-0006 = visual identity, ADR-0007 = contact form (Worker + Turnstile + Resend + Terraform, option A ownership split), ADR-0008 = OpenTofu, Cloudflare Pages hosting prepared, Docker removed.
 
 ## Commands
 
@@ -19,6 +19,7 @@ npm run format:check   # prettier --check (src, e2e, scripts, root ts/mjs/json; 
 npm test               # vitest run (unit)
 npm run e2e            # Playwright against dist/ served by scripts/serve-dist.mjs (build first; contact-form specs need a build with PUBLIC_TURNSTILE_SITEKEY, e.g. Cloudflare's test key 1x00000000000000000000AA)
 npm run check:live     # checks the PRODUCTION site (redirects, headers, robots, AI bots) — see docs/infra.md
+npm run check:dns      # public DNS of paulperigault.fr/www, read-only (`-- --expect=cloudflare|github-pages`)
 npm run check:secrets  # secretlint on every non-ignored file (masked output)
 npm run guard          # check:secrets + check:size + check:layers + check:design + check:matrix + check:docs + knip
 npm run verify         # guard + lint + format:check + check + test + build + verify:worker (also the pre-push hook)
@@ -43,12 +44,12 @@ npm run bench          # hyperfine medians of lint/format/check/knip/build/test 
 - `src/content/{fr,en}/` — **all** content: `skills|experience|formation|certifications|projects-config.json` (validated by `domain/` at build), `ui.json` (UI strings), `legal.json`. FR and EN keep the same ids/dates/keys/list sizes (`portfolio.test.ts`, `i18n.test.ts`, `scripts/build-content-guard.test.mjs` which builds broken content for real). English is genuinely translated (no French accents outside proper nouns like « École 42 »).
 - `src/lib/i18n.ts` — `useTranslations(lang)` → `t(key)`; keys are dotted paths derived from `fr/ui.json` (unknown key = compile error), EN must match FR's shape (`satisfies`). New UI string → both `ui.json`; new content item → same `id` in both languages. Never fetch content in the browser.
 
-### Infrastructure (`infra/`, Terraform)
+### Infrastructure (`infra/`, OpenTofu)
 
-- Cloudflare services on the `paulperigault.dev` zone (the canonical `.fr` stays at OVH, never managed here). `infra/main.tf` composes `modules/contact-form` (Turnstile widget, code-less `cloudflare_worker`, custom domain `contact.paulperigault.dev`) and `modules/resend-domain` (DKIM + return-path CNAMEs, **imported** via `infra/imports.tf`, never recreated). Terraform 1.15.x, provider Cloudflare 5.27.x pinned, `.terraform.lock.hcl` committed (Windows/Linux/macOS hashes). State in R2 bucket `tfstate-portfolio` (S3 backend, hand-made); it holds the Turnstile secret.
-- **Option A (ADR-0007)**: Terraform owns service, domain and widget; Wrangler owns the Worker **code** and **secrets** (provider v5 has no standalone secret resource). `npm run infra:worker-secrets` (owner only) pushes secrets (`wrangler secret bulk` on stdin; Resend key from the local secrets file, Turnstile secret from `terraform output -raw`), so the Resend key never enters the state.
+- Cloudflare services on the `paulperigault.dev` zone (the canonical `.fr` stays at OVH, never managed here). `infra/main.tf` composes `modules/contact-form` (Turnstile widget, code-less `cloudflare_worker`, custom domain `contact.paulperigault.dev`) and `modules/resend-domain` (DKIM + return-path CNAMEs, **imported** via `infra/imports.tf`, never recreated) and `modules/pages-site` (Cloudflare Pages project, direct upload, `custom_domains` empty until the DNS switch; `tofu test` with a mock provider in `infra/tests/`). OpenTofu 1.13.x (ADR-0008), provider Cloudflare 5.27.x from `registry.opentofu.org` pinned, `.terraform.lock.hcl` committed (Windows/Linux/macOS hashes, `tofu providers lock`). State in R2 bucket `tfstate-portfolio` (S3 backend, hand-made); it holds the Turnstile secret.
+- **Option A (ADR-0007)**: OpenTofu owns service, domain and widget; Wrangler owns the Worker **code** and **secrets** (provider v5 has no standalone secret resource). `npm run infra:worker-secrets` (owner only) pushes secrets (`wrangler secret bulk` on stdin; Resend key from the local secrets file, Turnstile secret from `tofu output -raw`), so the Resend key never enters the state.
 - Infra commands (`scripts/infra-*.mjs`, Node, no PowerShell) load the local secrets file into the **child process environment only** and only the variables they need (`scripts/lib/infra-secrets.mjs`: unknown variable → error, values never printed): `npm run infra:tf -- <args>` (refuses `show`, `console`, `state show|pull` and secret `output` itself, `scripts/lib/tf-args.mjs`), `infra:dns` and `infra:r2-check` (read-only), `infra:worker-secrets`. Tests with fake files and injected `spawn`/`fetch`: `scripts/infra-secrets.test.mjs`, `scripts/infra-commands.test.mjs`.
-- **Never `apply`/`destroy` from CI or the assistant**: the owner applies after reading the `plan`. Never run `terraform show`, `state show` or a bare `output` (they print the Turnstile secret). First-deploy sequence: `infra/README.md`.
+- **Never `apply`/`destroy` from CI or the assistant**: the owner applies after reading the `plan`. Never run `tofu show`, `state show|pull`, `console` or a bare/JSON `output` (they print the Turnstile secret). First-deploy sequence: `infra/README.md`; OpenTofu then Cloudflare Pages switch: `docs/runbook-cloudflare.md` (owner, Windows).
 
 ### Contact Worker (`worker/`)
 
@@ -141,29 +142,29 @@ Everything is in `.github/workflows/`; the site is **built once** and the **same
 | --- | --- | --- |
 | `build.yml` | reusable (`ref`) | The only `npm run build` (strict GitHub data, `GITHUB_TOKEN`) → artifact `site` |
 | `e2e.yml` | reusable | Downloads `site`, IndexNow dry-run, `npm run e2e` in **2 shards** × 4 workers, Playwright browsers cached per version (no apt for Chromium); `all-browsers` adds Firefox + WebKit |
-| `ci.yml` | PR (main, develop, feat/\*\*), push develop | `commitlint`, `verify`, `build` → `e2e`, `links` (lychee via `.github/actions/setup-lychee`), `lighthouse` (one job per page, 2 runs, best kept); `container`, `worker`, `infra` (fmt/init/validate, **never plan/apply**; infra commands are tested by Vitest in `verify`), `zizmor` (zizmor-action v0.6.4 pinned, zizmor 1.30.1, fails from medium severity); aggregate **`ci`** |
+| `ci.yml` | PR (main, develop, feat/\*\*), push develop | `commitlint`, `verify`, `build` → `e2e`, `links` (lychee via `.github/actions/setup-lychee`), `lighthouse` (one job per page, 2 runs, best kept); `worker`, `infra` (OpenTofu fmt/init/validate/test, **never plan/apply**; infra commands are tested by Vitest in `verify`), `zizmor` (zizmor-action v0.6.4 pinned, zizmor 1.30.1, fails from medium severity); aggregate **`ci`** |
 | `deploy-worker.yml` | push `main` touching `worker/`, manual | Worker `verify` then `wrangler deploy` with `CLOUDFLARE_API_TOKEN_DEPLOY` (_Workers Scripts: Edit_ only); code only |
 | `deploy.yml` | push `main`, **weekly cron**, manual | `build` → `e2e` → GitHub Pages (same artifact) → IndexNow. Weekly commit-less rebuild refreshes GitHub data and `security.txt` (sitemap `lastmod` does not change: it comes from Git) |
 | `browsers.yml` | weekly cron, manual | e2e on Chromium + Firefox + WebKit, `check:links -- --external` |
 | `security.yml` | PR + push + weekly | `npm audit`, CodeQL, SBOM, `gitleaks` |
 | `release.yml` | push `main` | release-please |
-| `dependabot-auto-merge.yml` | Dependabot PRs | auto-merge patch/minor, **except the Terraform provider** (read changelog, update lock, plan) |
+| `dependabot-auto-merge.yml` | Dependabot PRs | auto-merge patch/minor, **except the infra provider** (`opentofu` ecosystem: read changelog, update lock, plan) |
 
 - Every triggered workflow has `concurrency` (release never cancelled); Dependabot `cooldown` 7 days; the auto-merge job checks the PR **author** and head repo, never `github.actor`.
 - Required checks stay `ci` and `commitlint`; `scripts/workflows.test.mjs` asserts them, the single build, pinned actions, permissions, weekly redeploy.
 - Lighthouse budgets (`.lighthouserc.json`, desktop, `/fr/`, `/en/` and both legal pages): performance ≥ 0.98, accessibility = 1, best-practices = 1, SEO = 1, JS ≤ 6 KB, weight ≤ 90 KB, ≤ 12 requests, LCP ≤ 800 ms, TBT ≤ 50 ms, CLS ≤ 0.01 (measured 2026-10-19: 100 everywhere, LCP ≈ 370 ms, 59 KB, 4.3 KB JS). CSS is inlined in each page (`build.inlineStylesheets: always`, LCP −41 % on throttled mobile); Astro hashes it into the CSP.
-- Dependabot groups npm (astro, effect, tailwind, tooling), `/worker`, `/infra` (never auto-merged), github-actions, Docker base images; npm majors and the Docker `node` major are ignored (build stage follows `.nvmrc`).
-- A multi-stage `Dockerfile` + `nginx.conf` deploy `dist/` elsewhere (`docker-compose.yml`).
+- Dependabot groups npm (astro, effect, tailwind, tooling), `/worker`, `/infra` (`opentofu`, never auto-merged), github-actions; npm majors are ignored.
+- No Docker, no nginx, no shell script (ADR-0008, `scripts/hosting.test.mjs`).
 - Schedules run from the **default branch** (`develop`), hence `ref: main` in `deploy.yml`.
 
 ## Security
 
 - **CSP** (Astro `security.csp`): every page has a build-generated `<meta http-equiv="content-security-policy">` with SHA-256 hashes: `default-src 'none'`, `connect-src 'self'` (Lighthouse fetches `robots.txt`), `base-uri/form-action/object-src 'none'`, `img-src/font-src/manifest-src 'self'`, no `unsafe-inline`/`unsafe-eval`. The only inline scripts (`HEAD_INIT_SCRIPT`, `ROOT_REDIRECT_SCRIPT`) are allowed via `Astro.csp.insertScriptHash(scriptHash(...))` (`lib/csp.ts`): the hash follows any change; **never add `'unsafe-inline'`**. `e2e/csp.spec.ts`: policy, exact hashes, injected-script canary, zero violations on full journeys.
 - **Contact form exception, per page**: `pages/[lang]/index.astro` calls `allowContactForm(Astro.csp)` (`lib/contact-csp.ts`) → `script-src`/`frame-src`/`connect-src` add `https://challenges.cloudflare.com` (+ Worker origin in `connect-src`). It must run in the **page** frontmatter (from a body component it comes after the `<meta>` and is silently ignored); `insertScriptResource` replaces Astro's default, hence `'self'` re-added. Other pages keep no `https:` source (`e2e/csp-contact-form.spec.ts`).
-- **GitHub Pages sets no response headers**: `frame-ancestors`, HSTS, COOP/CORP, `X-Frame-Options` exist only in the Docker/nginx deployment (unprivileged, non-root). nginx does not repeat script/style hashes (browsers intersect both policies) and uses `expires`, not `add_header`, inside locations (a location `add_header` drops server-level headers). `scripts/check-container.sh` (CI `container`) verifies headers, 404, Markdown MIME, cache, non-root. Real-site headers need a proxy (Cloudflare, `docs/infra.md`).
+- **GitHub Pages sets no response headers**, and `.fr` is not behind Cloudflare yet (OVH name servers, `npm run check:dns`): the live site has only the meta CSP until the switch (`docs/runbook-cloudflare.md`). For Cloudflare Pages, `public/_headers` carries `frame-ancestors`, HSTS (no `includeSubDomains`), COOP/CORP, `X-Frame-Options`, `Permissions-Policy`, cache (`/_astro/*` immutable) and the Markdown MIME type, without repeating script/style hashes (browsers intersect both policies); `scripts/pages-headers.test.mjs` applies Pages' matching rules (all matches combine, `! Name` detaches).
 - **Supply chain** (`scripts/workflows.test.mjs`, `scripts/workflows-supply-chain.test.mjs`): actions pinned by SHA with `# vN`, least-privilege `permissions`, `timeout-minutes`, `persist-credentials: false`, `npm ci` only.
 - `GITHUB_TOKEN` is read through `Config.redacted`; never log it.
-- **Local secret files** (`infra/.secrets.env`, `*.env`, `.env*`, `.dev.vars`) are git- **and** docker-ignored (`COPY . .`; `check-container.sh` asserts `infra/`, `worker/`, `.claude/` and env files are absent). `*.tfstate*`, `*.tfplan` ignored (secrets in clear). Only `*.example` templates are committed.
+- **Local secret files** (`infra/.secrets.env`, `*.env`, `.env*`, `.dev.vars`) are git-ignored. `*.tfstate*`, `*.tfplan` ignored (secrets in clear). Only `*.example` templates are committed.
 - **AI assistant guard** (`.claude/settings.json`, all asserted by `scripts/claude-settings.test.mjs`):
   - `attribution` empty: no tool signature in commits/PRs.
   - `deny`: `Read`/`Edit` on secret files; `Edit`/`Write` on `package-lock.json`, `.terraform.lock.hcl`, `CHANGELOG.md`; for Bash **and** PowerShell: terraform/tofu `apply|destroy|import` (incl. `npm run infra:tf`), the `show`/`state`/bare or `-json` `output` forms that would print the Turnstile secret, `npm run infra:worker-secrets`, `wrangler deploy|secret` (incl. npx, `npm exec` and any npm `deploy` script), any push to `main`, merging the release-please PR, `gh api` writes, `gh repo edit/delete`, `gh secret`/`gh variable` set.
@@ -198,7 +199,7 @@ Priority: search engines **and AI assistants must know Paul Perigault** — neve
 
 ## Documentation map
 
-`docs/ui.md` (primitives) · `docs/design-charter.md` · `docs/test-matrix.md` (feature → e2e spec) · `docs/geo-checklist.md` · `docs/compliance.md` (GDPR register, domains) · `docs/security-audit.md` (lot 8 findings, counter-verified) · `docs/audit-ia.md` (AI-generated-site defects audit, improvement plan) · `docs/seo.md` (SEO decisions, `SeoHead` contract) · `docs/infra.md` (DNS, HTTPS, `.dev` → `.fr`, Cloudflare headers, search consoles, `check:live`) · `docs/tooling.md` (native tools kept/rejected) · `docs/tooling-skills.md` (Claude Code plugins audit, assistant guardrails) · `docs/pistes-rust-go.md` · `docs/perf-baseline.md` / `docs/perf-report.md` (measurements) · `docs/adr/` · `infra/README.md` · `worker/README.md` · `ROADMAP.md`. `scripts/check-docs.mjs` (in `guard`) fails on a documented `npm run` script, repo path or relative link that no longer exists.
+`docs/ui.md` (primitives) · `docs/design-charter.md` · `docs/test-matrix.md` (feature → e2e spec) · `docs/geo-checklist.md` · `docs/compliance.md` (GDPR register, domains) · `docs/runbook-cloudflare.md` (owner switch to OpenTofu and Cloudflare Pages) · `docs/security-audit.md` (lot 8 findings, counter-verified) · `docs/audit-ia.md` (AI-generated-site defects audit, improvement plan) · `docs/seo.md` (SEO decisions, `SeoHead` contract) · `docs/infra.md` (DNS, HTTPS, `.dev` → `.fr`, Cloudflare headers, search consoles, `check:live`) · `docs/tooling.md` (native tools kept/rejected) · `docs/tooling-skills.md` (Claude Code plugins audit, assistant guardrails) · `docs/pistes-rust-go.md` · `docs/perf-baseline.md` / `docs/perf-report.md` (measurements) · `docs/adr/` · `infra/README.md` · `worker/README.md` · `ROADMAP.md`. `scripts/check-docs.mjs` (in `guard`) fails on a documented `npm run` script, repo path or relative link that no longer exists.
 
 ## Maintenance
 

@@ -88,19 +88,3 @@ updates:
       actions:
         patterns: ["*"]
 
-  # Images de base du Dockerfile (node, nginx-unprivileged).
-  - package-ecosystem: docker
-    directory: /
-    schedule:
-      interval: weekly
-      day: monday
-      time: "08:00"
-    cooldown:
-      default-days: 7
-    labels:
-      - dependencies
-    # Le stage de build doit rester sur la version de `.nvmrc` (LTS) : pas de saut de majeure automatique.
-    ignore:
-      - dependency-name: "node"
-        update-types:
-          - version-update:semver-major

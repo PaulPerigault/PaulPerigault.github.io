@@ -5,6 +5,9 @@ import { expect, test } from '@playwright/test';
 // (`npm run test:visual:update`, docs/visual-regression.md). Ailleurs (shards e2e, macOS, Windows),
 // le rendu des polices diffère : ces tests ne tournent qu'avec VISUAL=1.
 test.skip(process.env['VISUAL'] !== '1', 'régression visuelle : job CI `visual` uniquement');
+// La CSP du site bloquerait la feuille de masquage injectée pendant la capture (`stylePath`) ;
+// elle est testée par csp*.spec.ts, ici seul le rendu compte.
+test.use({ bypassCSP: true });
 
 const PAGES = [
   { path: '/fr/', name: 'fr' },
@@ -16,7 +19,7 @@ const VIEWPORTS = {
   mobile: { width: 390, height: 844 },
 };
 const SCHEMES = ['light', 'dark'] as const;
-// Feuille appliquée par Playwright pendant la capture (pas un <style> injecté : la CSP le bloque).
+// Feuille appliquée par Playwright pendant la capture.
 const STYLE_PATH = 'e2e/visual-volatile.css';
 
 for (const { path, name } of PAGES) {

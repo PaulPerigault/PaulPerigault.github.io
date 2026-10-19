@@ -1,4 +1,5 @@
 import type { MailConfig } from './config';
+import { UPSTREAM_TIMEOUT_MS } from './limits';
 import type { ContactMessage } from './validate';
 
 const RESEND_URL = 'https://api.resend.com/emails';
@@ -25,6 +26,7 @@ export async function sendEmail(
     method: 'POST',
     headers: { Authorization: `Bearer ${config.apiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(buildEmail(contact, config)),
+    signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
   });
   return response.ok;
 }

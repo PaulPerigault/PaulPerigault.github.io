@@ -26,13 +26,18 @@ interface Call {
 }
 
 /** Faux `fetch` : Turnstile et Resend répondent selon les options, chaque appel est enregistré. */
-export function fakeFetch(options: { human?: boolean; sent?: boolean; down?: boolean } = {}) {
+export function fakeFetch(
+  options: { human?: boolean; sent?: boolean; down?: boolean; verifyStatus?: number } = {},
+) {
   const calls: Call[] = [];
   const fetchFn = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = String(input);
     calls.push({ url, init });
     if (options.down) throw new TypeError('network down');
-    if (url.includes('turnstile')) return Response.json({ success: options.human ?? true });
+    if (url.includes('turnstile')) {
+      const status = options.verifyStatus ?? 200;
+      return Response.json({ success: options.human ?? true }, { status });
+    }
     return new Response('{}', { status: (options.sent ?? true) ? 200 : 500 });
   }) as typeof fetch;
   return { fetchFn, calls };

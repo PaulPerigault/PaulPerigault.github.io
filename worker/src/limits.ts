@@ -9,5 +9,8 @@ export const FIELD_LIMITS = {
   turnstileToken: 2048,
 } as const;
 
+/** Durée maximale d'un appel à Turnstile ou à Resend : au-delà, « service indisponible » (502). */
+export const UPSTREAM_TIMEOUT_MS = 5_000;
+
 /** Taille maximale du corps de requête, en octets (un message de 5000 caractères UTF-8 y tient). */
 export const MAX_BODY_BYTES = 32_768;

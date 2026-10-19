@@ -23,6 +23,20 @@ describe('validate', () => {
     expect(fieldsOf({})).toEqual(['name', 'email', 'message', 'turnstileToken']);
   });
 
+  it.each(['a\u0000@b.co', 'a\u007f@b.co', 'a\u0085@b.co'])(
+    'refuse un caractère de contrôle dans l’adresse (%j)',
+    (email) => {
+      expect(fieldsOf({ ...validBody, email })).toEqual(['email']);
+    },
+  );
+
+  it.each(['Ada\u202eecil', 'Ada\u200b', 'Ada\u2028x', 'Ada\u2029x'])(
+    'refuse un caractère de mise en forme ou un séparateur dans le nom, repris dans le sujet (%j)',
+    (name) => {
+      expect(fieldsOf({ ...validBody, name })).toEqual(['name']);
+    },
+  );
+
   it('refuse un champ qui n’est pas une chaîne', () => {
     expect(fieldsOf({ ...validBody, name: 42 })).toEqual(['name']);
   });

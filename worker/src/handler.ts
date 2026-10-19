@@ -35,7 +35,9 @@ export const createHandler =
 
 async function handlePost(request: Request, config: Config, deps: Deps, cors: ResponseHeaders) {
   if (!isJsonRequest(request)) return fail('unsupported', cors);
-  const text = await readLimitedText(request, MAX_BODY_BYTES);
+  // Flux interrompu (client parti en cours d'envoi) : réponse JSON normale, jamais une exception.
+  const text = await readLimitedText(request, MAX_BODY_BYTES).catch(() => undefined);
+  if (text === undefined) return fail('invalid', cors, ['body']);
   if (text === null) return fail('too_large', cors);
   const raw = parseJson(text);
   if (raw === undefined) return fail('invalid', cors, ['body']);

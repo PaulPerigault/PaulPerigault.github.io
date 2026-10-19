@@ -23,6 +23,10 @@ describe('secretFilesIn : fichiers de secrets cités par une commande', () => {
     ['cat .env~', '.env~'],
     ['cat infra/.SECRETS.ENV', '.SECRETS.ENV'],
     ['Get-Content worker\\.Dev.Vars', '.Dev.Vars'],
+    // Ni identifiant après la décomposition, ni code connu : un nom de fichier, refusé.
+    ['cat ....env', '....env'],
+    ['cat ..env', '..env'],
+    ['cat ...secrets.env', '...secrets.env'],
   ])('repère « %s »', (command, name) => {
     expect(secretFilesIn(command).some((token) => token.includes(name))).toBe(true);
   });
@@ -43,6 +47,9 @@ describe('secretFilesIn : fichiers de secrets cités par une commande', () => {
     'git status --short',
     'terraform -chdir=infra validate',
     'vi .envrc-notes.md',
+    // Décomposition JavaScript (#227) : `...env` est une variable, pas un fichier.
+    'node -e "f({ ...env, CI: 1 })"',
+    'node -e "spawn(cmd, { env: {...process.env} })"',
   ])('laisse passer « %s »', (command) => {
     expect(secretFilesIn(command)).toEqual([]);
   });

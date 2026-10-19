@@ -27,6 +27,13 @@ describe('secretFilesIn : fichiers de secrets cités par une commande', () => {
     expect(secretFilesIn(command).some((token) => token.includes(name))).toBe(true);
   });
 
+  it('analyse en temps linéaire une suite de jokers (pas de ReDoS)', () => {
+    const start = performance.now();
+    secretFilesIn(`cat .env${'*'.repeat(50_000)}!`);
+    secretFilesIn(`cat .dev.vars${'*'.repeat(50_000)}!`);
+    expect(performance.now() - start).toBeLessThan(500);
+  });
+
   it.each([
     'npm run verify',
     'node -e "console.log(process.env.CI)"',

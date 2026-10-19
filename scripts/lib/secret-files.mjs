@@ -5,8 +5,9 @@
 const SEPARATORS = /[\s"'`()[\]{};|&<>=,]+/;
 // `.env`, `foo.env`, `.env.local`, `.secrets.env`… mais pas les modèles `*.example`. Un suffixe de
 // joker ou de sauvegarde (`.env*`, `.env.*`, `.dev.vars?`, `.env~`) cite aussi le fichier.
-const ENV_FILE = /^[\w*.-]*\.env(?:[.*?~][\w*?~-]*)*$/;
-const DEV_VARS = /^\.dev\.vars(?:[.*?~][\w*?~-]*)*$/;
+// Un seul suffixe optionnel, sans quantificateurs imbriqués : aucun retour arrière exponentiel.
+const ENV_FILE = /^[\w*.-]*\.env(?:[.*?~][\w.*?~-]*)?$/;
+const DEV_VARS = /^\.dev\.vars(?:[.*?~][\w.*?~-]*)?$/;
 const TEMPLATE = /\.example$/;
 // Identifiants de code qui finissent par `.env` sans être des fichiers.
 const CODE_IDENTIFIERS = /^(?:process|import\.meta|Bun|Deno)\.env(?:\.|$)/;

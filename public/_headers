@@ -1,0 +1,23 @@
+# En-têtes HTTP du site sur Cloudflare Pages (ADR-0008 ; GitHub Pages ignore ce fichier).
+# La CSP complète (scripts, styles, hashes) est dans la balise meta de chaque page ; cet en-tête
+# n'ajoute que les directives qu'une balise meta ne peut pas porter (frame-ancestors).
+# Testé par scripts/pages-headers.test.mjs.
+/*
+  Content-Security-Policy: frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=63072000
+  Cache-Control: no-cache
+
+# Ressources versionnées par Astro (nom avec empreinte) : un an, jamais revalidées.
+/_astro/*
+  ! Cache-Control
+  Cache-Control: public, max-age=31536000, immutable
+
+# Versions Markdown des pages (lien alternate, llms.txt).
+/*/index.md
+  Content-Type: text/markdown; charset=utf-8

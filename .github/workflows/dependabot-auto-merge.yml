@@ -6,6 +6,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   # Auteur de la PR et dépôt d'origine, pas l'acteur (celui qui a déclenché l'événement,
   # usurpable : zizmor bot-conditions). fetch-metadata revérifie l'auteur et le 1er commit signé.

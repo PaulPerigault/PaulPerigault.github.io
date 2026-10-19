@@ -33,6 +33,14 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
     }
   });
 
+  it('sérialisent chaque workflow déclenché (concurrency), hors workflows réutilisables', () => {
+    const missing = workflows
+      .filter(({ text }) => !/^on:\n {2}workflow_call:/m.test(text))
+      .filter(({ text }) => !/^concurrency:\n {2}group: /m.test(text))
+      .map((w) => w.name);
+    expect(missing).toEqual([]);
+  });
+
   it('bornent la durée de chaque job qui exécute du code', () => {
     const unbounded = workflows.flatMap(({ name, text }) => {
       const jobs = text.split(/^jobs:\n/m)[1] ?? '';

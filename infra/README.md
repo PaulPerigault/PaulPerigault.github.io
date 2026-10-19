@@ -14,6 +14,8 @@ La limitation de débit du formulaire est dans `modules/contact-form` (seule rè
 
 **Bascule pilotée par deux variables** (`variables.tf`), changées par une PR à l'étape voulue du runbook, jamais en ligne de commande : `fr_dnssec` (`false`, puis `true` au §4.5) et `fr_site_host` (`github-pages`, puis `cloudflare-pages` au §5 : domaines Pages, `CNAME` proxifiés, enregistrements GitHub supprimés dans le même `apply`).
 
+**Jetons** : `infra/identity/` (brique séparée, son propre state) crée les jetons Cloudflare limités et les comptes de service OVH, avec les seuls jetons d'amorçage ; `infra/` n'utilise ensuite que le jeton limité « terraform » (`infra/identity/README.md`).
+
 Ajouter un service = un nouveau dossier `modules/<service>` (variables, outputs, README) et un bloc `module` dans `main.tf`, sans toucher aux autres.
 
 **Répartition OpenTofu / Wrangler (option A, ADR-0007)** :
@@ -37,13 +39,15 @@ Ajouter un service = un nouveau dossier `modules/<service>` (variables, outputs,
 
 Toujours passer par ces commandes (`scripts/infra-*.mjs`, chargeur `scripts/lib/infra-secrets.mjs`). Chacune charge **seulement** les variables dont elle a besoin, dans l'environnement du seul processus enfant (`tofu`, Wrangler), jamais dans le shell courant. Une variable inconnue dans le fichier fait échouer. Aucune valeur n'est jamais affichée.
 
-| Commande                       | Variables chargées                                                       |
-| ------------------------------ | ------------------------------------------------------------------------ |
-| `npm run infra:tf`             | token Cloudflare, clés S3 du state                                       |
-| `npm run infra:dns`            | token Cloudflare                                                         |
-| `npm run infra:r2-check`       | token Cloudflare                                                         |
-| `npm run infra:rulesets`       | token Cloudflare                                                         |
-| `npm run infra:worker-secrets` | les quatre (token pour Wrangler, clé Resend, clés S3 pour `tofu output`) |
+| Commande                       | Variables chargées                                                         |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| `npm run infra:tf`             | token Cloudflare, clés S3 du state                                         |
+| `npm run infra:dns`            | token Cloudflare                                                           |
+| `npm run infra:identity`       | jetons d'amorçage (`BOOTSTRAP_*`), clés S3 du state                        |
+| `npm run infra:identity-push`  | clés S3 du state (lit les sorties, écrit le fichier et les secrets GitHub) |
+| `npm run infra:r2-check`       | token Cloudflare                                                           |
+| `npm run infra:rulesets`       | token Cloudflare                                                           |
+| `npm run infra:worker-secrets` | les quatre (token pour Wrangler, clé Resend, clés S3 pour `tofu output`)   |
 
 ```shell
 npm run infra:tf -- init               # première fois : backend R2

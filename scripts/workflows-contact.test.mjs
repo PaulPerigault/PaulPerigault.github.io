@@ -27,6 +27,7 @@ describe('CI du formulaire de contact', () => {
     expect(infra).toContain('init -backend=false');
     expect(infra).toContain('validate');
     expect(infra).toContain('run: tofu -chdir=infra test');
+    expect(infra).toContain('run: tofu -chdir=infra/identity test');
     expect(infra).not.toMatch(/\$\{\{\s*secrets\./);
   });
 

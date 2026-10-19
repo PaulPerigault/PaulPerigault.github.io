@@ -1,14 +1,6 @@
 // Contrôles du site réellement en ligne : redirections, HTTPS, fichiers d'indexation, en-têtes.
 // Pur et déclaratif : `runChecks` reçoit un `fetch`, ce qui permet de le tester sans réseau.
 
-const SECURITY_HEADERS = [
-  ['strict-transport-security', /max-age=\d{7,}/],
-  ['x-content-type-options', /^nosniff$/i],
-  ['referrer-policy', /.+/],
-  ['permissions-policy', /.+/],
-  ['content-security-policy', /frame-ancestors\s+'none'/],
-];
-
 const isRedirect = (res, to) =>
   res.status === 301 && res.headers.get('location') === to ? null : `attendu 301 → ${to}`;
 
@@ -32,10 +24,11 @@ const securityTxtProblem = (body, now) => {
   return expires - now < MIN_VALIDITY_MS ? 'Expires à moins de 30 jours' : null;
 };
 
-const headerProblems = (res) =>
-  SECURITY_HEADERS.filter(([name, pattern]) => !pattern.test(res.headers.get(name) ?? '')).map(
-    ([name]) => `en-tête manquant ou invalide : ${name}`,
-  );
+/** En-têtes attendus (valeurs exactes de public/_headers, `expected-headers.mjs`). */
+const headerProblems = (expected) => (res) =>
+  [...expected]
+    .filter(([name, value]) => res.headers.get(name) !== value)
+    .map(([name]) => `en-tête manquant ou différent de public/_headers : ${name}`);
 
 const redirects = ({ domain, alias }) => {
   const site = `https://${domain}`;
@@ -82,11 +75,12 @@ const files = (site, now) => [
 ];
 
 /**
- * @param {{ domain: string, alias: string }} sites
+ * @param {{ domain: string, alias: string, expectedHeaders: Map<string, string> }} sites
  * @param {number} [now] instant de référence (ms), injectable pour les tests
  */
 export const buildChecks = (sites, now = Date.now()) => {
   const site = `https://${sites.domain}`;
+  const securityProblems = headerProblems(sites.expectedHeaders);
   return [
     ...redirects(sites),
     { name: 'page FR', url: `${site}/fr/`, test: (r) => status(r, 200) },
@@ -94,8 +88,8 @@ export const buildChecks = (sites, now = Date.now()) => {
     {
       name: 'en-têtes de sécurité',
       url: `${site}/fr/`,
-      test: (r) => headerProblems(r)[0] ?? null,
-      all: headerProblems,
+      test: (r) => securityProblems(r)[0] ?? null,
+      all: securityProblems,
     },
     ...crawlers(site),
     ...files(site, now),

@@ -21,6 +21,7 @@
 - Un outil de moins (Docker) et un job CI de moins ; plus aucun script shell, outillage identique sous Windows, macOS et Linux.
 - Tant que la bascule n'est pas faite, le site réel reste sur GitHub Pages **sans en-tête de sécurité HTTP** : le `.fr` n'est pas derrière Cloudflare (serveurs de noms OVH, `npm run check:dns`), donc la règle de `docs/infra.md` §3 ne peut pas s'appliquer ; `public/_headers` est publié sans effet. Seule la CSP en balise meta protège les pages d'ici là.
 - Le déploiement vers Pages (`wrangler pages deploy dist`, token limité à _Cloudflare Pages : Edit_) sera ajouté à `deploy.yml` après le premier `apply` du module, avec son test.
+- **Après la bascule (#208)** : GitHub Pages est retiré de `deploy.yml` ; la production ne passe plus que par le job `pages` (secret obligatoire) ; `check:live` exige les 8 en-têtes de `public/_headers` et tourne chaque semaine (`live.yml`) ; la redirection `www` → apex devient une règle de zone Cloudflare.
 
 ## Amendement du 2026-10-19 — zone `.fr` chez Cloudflare, en OpenTofu
 

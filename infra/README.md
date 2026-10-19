@@ -48,6 +48,8 @@ npm run infra:worker-secrets           # pose RESEND_API_KEY et TURNSTILE_SECRET
 
 Ne jamais lancer `tofu show`, `state show|pull`, `console`, ni `output` sans nom de sortie ou en JSON : le secret Turnstile y apparaîtrait. `npm run infra:tf` les refuse lui-même (`scripts/lib/tf-args.mjs`). `output contact_form_turnstile_sitekey` (publique) est sans risque.
 
+En CI, le job `tofu-plan` (#203) lance un vrai `plan` avec un token Cloudflare et des clés R2 **en lecture seule** (secrets `CLOUDFLARE_API_TOKEN_READONLY`, `TFSTATE_R2_READ_ACCESS_KEY_ID`, `TFSTATE_R2_READ_SECRET_KEY`), sans verrou ni apply ; sans ces secrets, il est sauté. Un écart avec l'infrastructure réelle est signalé dans le résumé du job, sans casser la CI.
+
 Sans secrets (CI, vérification locale) : `tofu -chdir=infra init -backend=false`, puis `tofu -chdir=infra validate` et `tofu fmt -recursive -check infra`.
 
 Tests (faux fichiers, doublures de `spawn` et `fetch`, jamais les vrais secrets) : `scripts/infra-secrets.test.mjs` et `scripts/infra-commands.test.mjs`, lancés par `npm test`.

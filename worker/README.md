@@ -20,6 +20,7 @@ Brique autonome : un Worker Cloudflare joignable sur `contact.paulperigault.dev`
 | Autre méthode                                                | 405    | `{ "ok": false, "error": "method" }` + `Allow`             |
 | Corps > 32 Ko                                                | 413    | `{ "ok": false, "error": "too_large" }`                    |
 | Pas du JSON                                                  | 415    | `{ "ok": false, "error": "unsupported" }`                  |
+| Plus de 5 envois par minute depuis la même adresse IP        | 429    | `{ "ok": false, "error": "rate_limited" }`                 |
 | Turnstile ou Resend injoignable, en erreur ou > 5 s          | 502    | `{ "ok": false, "error": "unavailable" }`                  |
 
 Les erreurs sont génériques : un code stable que le formulaire traduit, jamais l'écho des valeurs reçues ni un détail interne. Longueurs maximales : `src/limits.ts` (le site applique les mêmes).
@@ -27,7 +28,7 @@ Les erreurs sont génériques : un code stable que le formulaire traduit, jamais
 ## Choix
 
 - **CORS strict** : origines exactes lues dans `ALLOWED_ORIGINS` (`wrangler.toml`), jamais `*` (une valeur `*` est ignorée). `www.paulperigault.fr` redirige vers l'apex : non autorisé. `localhost` seulement via `.dev.vars`.
-- **Ordre des contrôles** (`src/handler.ts`) : méthode, origine, type, taille (en flux, sans faire confiance à `Content-Length`), JSON, piège, champs, Turnstile, envoi. Le piège répond 200 pour ne rien apprendre au robot.
+- **Ordre des contrôles** (`src/handler.ts`) : méthode, origine, débit (binding `CONTACT_RATE_LIMITER`, 5 envois par minute et par IP, `src/rate-limit.ts` ; sans binding, sans IP ou en erreur, rien n'est bloqué), type, taille (en flux, sans faire confiance à `Content-Length`), JSON, piège, champs, Turnstile, envoi. Le piège répond 200 pour ne rien apprendre au robot.
 - **Champs** : aucun caractère de contrôle (Unicode Cc) dans le nom ni dans l'adresse ; le nom, repris dans le sujet, refuse aussi les caractères de mise en forme invisibles (Cf : inversion de sens, largeur nulle) et les séparateurs Unicode de ligne ou de paragraphe.
 - **Turnstile** : seul un refus explicite (`success: false`) donne `challenge` ; une erreur HTTP de `siteverify` est un service indisponible (502). Appels sortants bornés à 5 s (`UPSTREAM_TIMEOUT_MS`).
 - **Minimisation** : `siteverify` sans `remoteip` ; message en texte brut (rien à échapper) ; `reply_to` = visiteur ; `observability` désactivée ; aucun `console`.

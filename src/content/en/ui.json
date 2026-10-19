@@ -79,6 +79,7 @@
       "invalid": "The message was not sent: please fix the highlighted fields.",
       "sent": "Message sent. I will reply to the address you gave.",
       "challenge": "The bot check did not complete. Wait a few seconds, then send the message again.",
+      "rate_limited": "Too many messages in a short time. Wait a minute before sending again.",
       "unavailable": "Sending failed. You can write to me directly at {email}."
     }
   },

@@ -3,7 +3,14 @@
  * et la liste des champs invalides, sans détail interne ni écho des valeurs reçues.
  */
 export type ErrorCode =
-  'invalid' | 'forbidden' | 'challenge' | 'method' | 'too_large' | 'unsupported' | 'unavailable';
+  | 'invalid'
+  | 'forbidden'
+  | 'challenge'
+  | 'method'
+  | 'too_large'
+  | 'unsupported'
+  | 'rate_limited'
+  | 'unavailable';
 
 const STATUS: Record<ErrorCode, number> = {
   invalid: 400,
@@ -12,6 +19,7 @@ const STATUS: Record<ErrorCode, number> = {
   method: 405,
   too_large: 413,
   unsupported: 415,
+  rate_limited: 429,
   unavailable: 502,
 };
 

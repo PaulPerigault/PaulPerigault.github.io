@@ -10,7 +10,7 @@ export const CONTACT_FIELDS = ['name', 'email', 'message'] as const;
 export type ContactField = (typeof CONTACT_FIELDS)[number];
 
 /** Issue d'un envoi, chacune associée à un message traduit. */
-type Outcome = 'sent' | 'invalid' | 'challenge' | 'unavailable';
+type Outcome = 'sent' | 'invalid' | 'challenge' | 'rate_limited' | 'unavailable';
 
 export interface Result {
   readonly outcome: Outcome;
@@ -34,6 +34,7 @@ export function resultOf(ok: boolean, body: unknown): Result {
   const data = typeof body === 'object' && body !== null ? (body as Record<string, unknown>) : {};
   if (ok && data['ok'] === true) return only('sent');
   if (data['error'] === 'challenge') return only('challenge');
+  if (data['error'] === 'rate_limited') return only('rate_limited');
   return data['error'] === 'invalid' ? invalidResult(data['fields']) : only('unavailable');
 }
 

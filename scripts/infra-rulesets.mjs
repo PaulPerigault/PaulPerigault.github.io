@@ -30,12 +30,20 @@ const listZone = async (deps, token, name) => {
   const rulesets = await cloudflareGet(deps.fetch, token, `/zones/${zone.id}/rulesets`);
   const own = rulesets.filter(isZoneRuleset);
   if (own.length === 0) deps.log('aucun ruleset de zone');
-  for (const { id } of own) {
-    logRuleset(
-      deps.log,
-      zone.id,
-      await cloudflareGet(deps.fetch, token, `/zones/${zone.id}/rulesets/${id}`),
-    );
+  for (const summary of own) {
+    logRuleset(deps.log, zone.id, await details(deps, token, zone.id, summary));
+  }
+};
+
+// Le détail (règles) demande la permission de lecture de la phase (_Single Redirect_, _Zone WAF_,
+// _Transform Rules_…) : sans elle, la liste suffit à donner phase et identifiant d'import.
+const details = async (deps, token, zoneId, summary) => {
+  try {
+    return await cloudflareGet(deps.fetch, token, `/zones/${zoneId}/rulesets/${summary.id}`);
+  } catch (error) {
+    deps.log(`
+(règles illisibles : ${error.message})`);
+    return { ...summary, rules: [] };
   }
 };
 

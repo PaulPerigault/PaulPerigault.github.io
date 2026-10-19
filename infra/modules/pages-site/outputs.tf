@@ -3,6 +3,11 @@ output "project_name" {
   value       = cloudflare_pages_project.site.name
 }
 
+output "subdomain" {
+  description = "Sous-domaine `<projet>.pages.dev`, cible des CNAME des domaines personnalisés."
+  value       = cloudflare_pages_project.site.subdomain
+}
+
 output "pages_dev_url" {
   description = "Adresse `*.pages.dev` du projet, avant tout domaine personnalisé."
   value       = "https://${cloudflare_pages_project.site.subdomain}"

@@ -41,6 +41,7 @@
     "infra:tf": "node scripts/infra-tf.mjs",
     "infra:dns": "node scripts/infra-dns.mjs",
     "infra:r2-check": "node scripts/infra-r2-check.mjs",
+    "infra:rulesets": "node scripts/infra-rulesets.mjs",
     "infra:worker-secrets": "node scripts/infra-worker-secrets.mjs"
   },
   "dependencies": {

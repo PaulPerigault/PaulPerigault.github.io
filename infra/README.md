@@ -1,11 +1,18 @@
 # Infrastructure (OpenTofu)
 
-Services du portfolio hébergés chez Cloudflare, sur la zone `paulperigault.dev`. Le domaine canonique `paulperigault.fr` reste chez OVH et n'est pas géré ici. Un **module par service**, composé par la racine (`main.tf`) :
+Services du portfolio hébergés chez Cloudflare : la zone `paulperigault.dev` (services, redirection vers le `.fr`) et la zone DNS du domaine canonique `paulperigault.fr`. OVH reste le **registrar** du `.fr` : couper DNSSEC, changer les serveurs de noms et publier le DS s'y font à la main (`docs/runbook-cloudflare.md` §4), tout le reste est ici. Un **module par service**, composé par la racine (`main.tf`) :
 
-| Module                  | Contenu                                                                                                                                       |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `modules/contact-form`  | widget Turnstile, Worker `contact-form` (sans code : déployé par Wrangler depuis `worker/`), domaine personnalisé `contact.paulperigault.dev` |
-| `modules/resend-domain` | DKIM et chemin de retour de Resend sur `paulperigault.dev`, **importés** (`imports.tf`) et non recréés                                        |
+| Module                       | Contenu                                                                                                                                       |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `modules/contact-form`       | widget Turnstile, Worker `contact-form` (sans code : déployé par Wrangler depuis `worker/`), domaine personnalisé `contact.paulperigault.dev` |
+| `modules/resend-domain`      | DKIM et chemin de retour de Resend sur `paulperigault.dev`, **importés** (`imports.tf`) et non recréés                                        |
+| `modules/pages-site`         | projet Cloudflare Pages (envoi direct) et ses domaines personnalisés                                                                          |
+| `modules/zone-fr`            | zone `paulperigault.fr` : messagerie iCloud, vérifications, enregistrements du site, réglages, DNSSEC (sorties : serveurs de noms et DS)      |
+| `modules/canonical-redirect` | redirection 301 vers `https://paulperigault.fr` : `.dev` et `www.dev` (ruleset **importé**), `www.fr`                                         |
+
+La limitation de débit du formulaire est dans `modules/contact-form` (seule règle `http_ratelimit` de l'offre gratuite).
+
+**Bascule pilotée par deux variables** (`variables.tf`), changées par une PR à l'étape voulue du runbook, jamais en ligne de commande : `fr_dnssec` (`false`, puis `true` au §4.5) et `fr_site_host` (`github-pages`, puis `cloudflare-pages` au §5 : domaines Pages, `CNAME` proxifiés, enregistrements GitHub supprimés dans le même `apply`).
 
 Ajouter un service = un nouveau dossier `modules/<service>` (variables, outputs, README) et un bloc `module` dans `main.tf`, sans toucher aux autres.
 
@@ -35,6 +42,7 @@ Toujours passer par ces commandes (`scripts/infra-*.mjs`, chargeur `scripts/lib/
 | `npm run infra:tf`             | token Cloudflare, clés S3 du state                                       |
 | `npm run infra:dns`            | token Cloudflare                                                         |
 | `npm run infra:r2-check`       | token Cloudflare                                                         |
+| `npm run infra:rulesets`       | token Cloudflare                                                         |
 | `npm run infra:worker-secrets` | les quatre (token pour Wrangler, clé Resend, clés S3 pour `tofu output`) |
 
 ```shell
@@ -44,6 +52,9 @@ npm run infra:tf -- apply              # propriétaire uniquement, jamais en CI
 npm run infra:tf -- output contact_form_turnstile_sitekey
 npm run infra:dns                      # lecture seule : identifiants DNS pour les imports
 npm run infra:r2-check                 # lecture seule : aucun accès public au bucket du state
+npm run infra:rulesets                 # lecture seule : rulesets des zones et leur identifiant d'import
+npm run infra:tf -- output fr_name_servers   # serveurs de noms à saisir chez OVH
+npm run infra:tf -- output fr_dnssec_ds      # DS à saisir chez OVH (après fr_dnssec = true)
 npm run infra:worker-secrets           # pose RESEND_API_KEY et TURNSTILE_SECRET sur le Worker (stdin)
 ```
 
@@ -102,6 +113,9 @@ Le state contient le secret Turnstile en clair : le bucket ne doit être joignab
 
 Permissions du token « terraform-portfolio » (nom conservé, utilisé par OpenTofu) :
 
-- Turnstile, Workers Scripts, Workers Routes et DNS sont nécessaires ici ; les autres (R2, KV, D1, Queues) servent aux services futurs.
-- Turnstile et Workers Scripts sont des permissions **de compte** : le token doit inclure le compte, pas seulement la zone.
+- Compte : _Turnstile : Edit_, _Workers Scripts : Edit_, _Cloudflare Pages : Edit_ ; les autres (R2, KV, D1, Queues) servent aux services futurs.
+- Ressources de zone : **_All zones from an account_** (le compte du portfolio), pas une zone précise : la zone `paulperigault.fr` est créée par OpenTofu, elle n'existe pas encore quand le token est réglé.
+- Zone : _Zone : Edit_ (création de la zone `.fr`), _DNS : Edit_ (enregistrements et DNSSEC), _Workers Routes : Edit_, _Single Redirect : Edit_ (rulesets de redirection), _Zone WAF : Edit_ (limitation de débit), _Zone Settings : Edit_, _Bot Management : Edit_, _Transform Rules : Read_ (pour que `npm run infra:rulesets` voie aussi les Transform Rules).
+- Turnstile, Workers Scripts et Pages sont des permissions **de compte** : le token doit inclure le compte, pas seulement la zone.
+- Token en lecture seule de la CI (`CLOUDFLARE_API_TOKEN_READONLY`, job `tofu-plan`) : les mêmes en _Read_, sur _All zones from an account_.
 - Le déploiement du code en CI utilise un token distinct, limité à _Workers Scripts : Edit_ (`CLOUDFLARE_API_TOKEN_DEPLOY`).

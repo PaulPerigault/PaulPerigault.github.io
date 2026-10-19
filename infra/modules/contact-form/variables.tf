@@ -28,3 +28,20 @@ variable "turnstile_domains" {
     error_message = "Au moins un domaine est requis pour le widget Turnstile."
   }
 }
+
+variable "rate_limit_path" {
+  description = "Chemin du Worker compté par la limitation de débit (offre gratuite : filtre sur le chemin seulement)."
+  type        = string
+  default     = "/"
+}
+
+variable "rate_limit_requests" {
+  description = "Requêtes admises par IP en 10 s avant un blocage de 10 s (un envoi = POST, plus OPTIONS hors cache)."
+  type        = number
+  default     = 5
+
+  validation {
+    condition     = var.rate_limit_requests >= 2 && floor(var.rate_limit_requests) == var.rate_limit_requests
+    error_message = "Entier d'au moins 2 : un envoi légitime peut faire deux requêtes."
+  }
+}

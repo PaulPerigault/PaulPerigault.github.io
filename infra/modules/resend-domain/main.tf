@@ -23,7 +23,7 @@ resource "cloudflare_dns_record" "return_path" {
 }
 
 # Politique DMARC du domaine d'envoi (Resend est le seul expéditeur de paulperigault.dev). Créée par
-# Terraform (aucun enregistrement n'existait), en mode observation d'abord : voir ROADMAP.md.
+# OpenTofu (aucun enregistrement n'existait) : observation, quarantaine puis rejet (ROADMAP.md).
 resource "cloudflare_dns_record" "dmarc" {
   zone_id = var.zone_id
   name    = "_dmarc.${var.domain}"

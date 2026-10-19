@@ -4,6 +4,8 @@ const PORT = 4201;
 
 export default defineConfig({
   testDir: './e2e',
+  // Références visuelles sans suffixe de plateforme : une seule image Playwright les produit (#201).
+  snapshotPathTemplate: '{testDir}/__snapshots__/{testFilePath}/{arg}{ext}',
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,

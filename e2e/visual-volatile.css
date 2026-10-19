@@ -1,0 +1,5 @@
+/* Masqué pendant les captures visuelles : données GitHub récupérées au build (étoiles, descriptions,
+   dates), qui changent sans commit. */
+#projects {
+  display: none !important;
+}

@@ -141,10 +141,26 @@ jobs:
       - run: terraform -chdir=infra init -backend=false -input=false
       - run: terraform -chdir=infra validate
 
+  # Audit statique des workflows et actions (injections, permissions, épinglage, Dependabot).
+  # Version de zizmor figée : un nouvel audit arrive par une PR, jamais par surprise.
+  zizmor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        with:
+          version: 1.31.1
+          min-severity: medium
+          advanced-security: false
+          annotations: true
+
   # Point de contrôle unique (check requis `ci`) : vert seulement si TOUT le reste est vert.
   ci:
     if: ${{ always() }}
-    needs: [verify, build, e2e, links, lighthouse, container, worker, infra]
+    needs: [verify, build, e2e, links, lighthouse, container, worker, infra, zizmor]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

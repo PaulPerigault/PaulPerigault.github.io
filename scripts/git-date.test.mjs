@@ -1,27 +1,12 @@
-import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { lastCommitDate } from './lib/git-date.mjs';
-
-const git = (cwd, date, ...args) =>
-  execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], {
-    cwd,
-    env: { ...process.env, GIT_COMMITTER_DATE: date, GIT_AUTHOR_DATE: date },
-    stdio: 'ignore',
-  });
-
-const commit = (cwd, file, date) => {
-  mkdirSync(join(cwd, file, '..'), { recursive: true });
-  writeFileSync(join(cwd, file), date);
-  git(cwd, date, 'add', '.');
-  git(cwd, date, 'commit', '-m', file);
-};
+import { commit, emptyRepo } from './lib/test-git-repo.mjs';
 
 const repo = () => {
-  const dir = mkdtempSync(join(tmpdir(), 'git-date-'));
-  git(dir, '2026-01-01T00:00:00Z', 'init', '-q');
+  const dir = emptyRepo('git-date-');
   commit(dir, 'src/page.ts', '2026-03-01T10:00:00Z');
   commit(dir, 'src/page.test.ts', '2026-05-01T10:00:00Z');
   commit(dir, 'docs/notes.md', '2026-07-01T10:00:00Z');

@@ -1,23 +1,7 @@
-import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { lastmodFor, routeSources } from './lib/sitemap-lastmod.mjs';
-
-const git = (cwd, date, ...args) =>
-  execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], {
-    cwd,
-    env: { ...process.env, GIT_COMMITTER_DATE: date, GIT_AUTHOR_DATE: date },
-    stdio: 'ignore',
-  });
-
-const commit = (cwd, file, date) => {
-  mkdirSync(join(cwd, file, '..'), { recursive: true });
-  writeFileSync(join(cwd, file), date);
-  git(cwd, date, 'add', '.');
-  git(cwd, date, 'commit', '-m', file);
-};
+import { commit, emptyRepo } from './lib/test-git-repo.mjs';
 
 // Un commit par mois, chacun sur une source différente : la date dit quel fichier a compté.
 const HISTORY = [
@@ -32,8 +16,7 @@ const HISTORY = [
 
 let repo = '';
 beforeAll(() => {
-  repo = mkdtempSync(join(tmpdir(), 'sitemap-lastmod-'));
-  git(repo, '2025-12-01T00:00:00Z', 'init', '-q');
+  repo = emptyRepo('sitemap-lastmod-');
   for (const [file, date] of HISTORY) commit(repo, file, date);
 });
 

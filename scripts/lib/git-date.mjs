@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { withoutGitEnv } from './git-env.mjs';
 
 /**
  * Date du dernier commit qui touche ces chemins (pathspecs Git), ou `undefined` si elle est
@@ -11,6 +12,7 @@ export const lastCommitDate = (paths, cwd = process.cwd()) => {
   try {
     const out = execFileSync('git', ['log', '-1', '--format=%cI', '--', ...paths], {
       cwd,
+      env: withoutGitEnv(),
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();

@@ -16,8 +16,9 @@ const SECURITY = {
   'cross-origin-opener-policy': 'same-origin',
   'cross-origin-resource-policy': 'same-origin',
   'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
-  // Sans `includeSubDomains` : les sous-domaines du .fr (OVH) ne sont pas tous en HTTPS.
-  'strict-transport-security': 'max-age=63072000',
+  // Toute la zone en HTTPS, liste de préchargement des navigateurs (#210, ADR-0009) : pré-requis
+  // vérifié par `npm run check:hsts` (chaque sous-domaine existant répond en HTTPS).
+  'strict-transport-security': 'max-age=63072000; includeSubDomains; preload',
 };
 
 describe('public/_headers (Cloudflare Pages)', () => {

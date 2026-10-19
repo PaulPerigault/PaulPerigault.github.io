@@ -3,13 +3,25 @@
 // une erreur. Chaque commande déclare les variables dont elle a besoin.
 import { join } from 'node:path';
 
+// Jetons d'amorçage (droits larges, durée courte, IP du propriétaire) : ils ne servent qu'à créer
+// les jetons limités, donc réservés aux commandes de infra/identity/ (`identityEnv`), jamais à
+// infra/ ni à infra/registrar/ (`childEnv` les refuse et les retire de l'environnement hérité).
+const BOOTSTRAP_SECRETS = [
+  'BOOTSTRAP_CLOUDFLARE',
+  'BOOTSTRAP_OVH_KEY',
+  'BOOTSTRAP_OVH_SECRET',
+  'BOOTSTRAP_OVH_CONSUMER',
+];
+
 // Variables que le fichier peut contenir ; toute autre ligne est refusée (fichier corrompu ou erreur).
 const KNOWN_SECRETS = new Set([
   'TF_VAR_cloudflare_api_token',
   'TF_VAR_resend_api_key',
   'AWS_ACCESS_KEY_ID',
   'AWS_SECRET_ACCESS_KEY',
+  ...BOOTSTRAP_SECRETS,
 ]);
+const isBootstrap = (name) => BOOTSTRAP_SECRETS.includes(name);
 const COMMENT_OR_BLANK = /^\s*(?:#|$)/;
 const ASSIGNMENT = /^\s*([A-Za-z_]\w*)\s*=(.*)$/;
 const QUOTED = /^"(.*)"$|^'(.*)'$/;
@@ -64,12 +76,25 @@ const readSecretsFile = (path, readFile) => {
   }
 };
 
+const loadEnv = (names, { env, readFile, root }) => {
+  const text = readSecretsFile(secretsFilePath(env, root), readFile);
+  const inherited = Object.fromEntries(Object.entries(env).filter(([name]) => !isBootstrap(name)));
+  return { ...inherited, ...parseSecrets(text, names) };
+};
+
 /**
- * Copie de `env` augmentée des secrets `names`, à passer à un processus enfant.
+ * Copie de `env` augmentée des secrets `names`, à passer à un processus enfant de infra/ ou de
+ * infra/registrar/. Les jetons d'amorçage n'y entrent jamais, même hérités.
  * @param {string[]} names
  * @param {{ env: Record<string, string | undefined>, readFile: (path: string) => string, root: string }} deps
  */
-export function childEnv(names, { env, readFile, root }) {
-  const text = readSecretsFile(secretsFilePath(env, root), readFile);
-  return { ...env, ...parseSecrets(text, names) };
+export function childEnv(names, deps) {
+  const refused = names.filter(isBootstrap);
+  if (refused.length > 0) {
+    throw new Error(`Jeton d'amorçage réservé à infra/identity/ : ${refused.join(', ')}.`);
+  }
+  return loadEnv(names, deps);
 }
+
+/** Variante de `childEnv` des seules commandes de infra/identity/ : jetons d'amorçage admis. */
+export const identityEnv = (names, deps) => loadEnv(names, deps);

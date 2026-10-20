@@ -1,17 +1,13 @@
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
-import { lastCommitDate } from './scripts/lib/git-date.mjs';
-
-// `lastmod` = dernier changement réel du site (pas la date du build : le redéploiement hebdomadaire
-// la ferait changer sans contenu nouveau, et les moteurs finissent par ignorer un lastmod peu fiable).
-const CONTENT_PATHS = ['src', 'public', ':(exclude,glob)src/**/*.test.ts'];
+import { lastmodFor } from './scripts/lib/sitemap-lastmod.mjs';
 
 export default defineConfig({
   site: 'https://paulperigault.fr',
   output: 'static',
   trailingSlash: 'always',
-  build: { format: 'directory' },
+  build: { format: 'directory', inlineStylesheets: 'always' },
   i18n: {
     defaultLocale: 'fr',
     locales: ['fr', 'en'],
@@ -22,13 +18,18 @@ export default defineConfig({
       i18n: { defaultLocale: 'fr', locales: { fr: 'fr', en: 'en' } },
       // Ni la racine (redirection) ni les pages techniques ne sont listées.
       filter: (page) => new URL(page).pathname !== '/' && !page.includes('/styleguide/'),
-      lastmod: lastCommitDate(CONTENT_PATHS),
+      // `lastmod` par URL = dernier commit qui touche SON contenu (scripts/lib/sitemap-lastmod.mjs),
+      // jamais la date du build : le redéploiement hebdomadaire la changerait sans contenu nouveau,
+      // et Google ignore un lastmod peu fiable. Ni changefreq ni priority : Google les ignore.
+      serialize: (item) => ({ ...item, lastmod: lastmodFor(new URL(item.url).pathname) }),
+      // Seul xhtml sert (hreflang) : pas d'espaces de noms news, image ni video inutilisés.
+      namespaces: { news: false, image: false, video: false },
     }),
   ],
   security: {
     // CSP par balise <meta> (GitHub Pages ne sait pas envoyer d'en-têtes) : Astro calcule les
     // hashes des scripts/styles ; tout le reste est interdit par défaut. `frame-ancestors`
-    // n'existe qu'en en-tête HTTP (voir nginx.conf). `connect-src 'self'` (même origine seulement) :
+    // n'existe qu'en en-tête HTTP (voir public/_headers). `connect-src 'self'` (même origine seulement) :
     // Lighthouse lit robots.txt par un fetch depuis la page ; aucun script du site n'appelle fetch.
     csp: {
       algorithm: 'SHA-256',

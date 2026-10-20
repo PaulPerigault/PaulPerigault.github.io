@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { join } from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { buildSite } from './lib/astro-build.mjs';
+import { afterEach, beforeEach, describe, expect, it, onTestFinished } from 'vitest';
+import { buildSite, disposeBuild } from './lib/astro-build.mjs';
 import { walk } from './lib/walk.mjs';
 
 const BUILD_TIMEOUT_MS = 120_000;
@@ -36,13 +36,20 @@ beforeEach(async () => {
 
 afterEach(() => new Promise((resolve) => server.close(resolve)));
 
+/** Build de test, supprimé à la fin du test. */
+const build = async (env) => {
+  const result = await buildSite({ env });
+  onTestFinished(() => disposeBuild(result.outDir));
+  return result;
+};
+
 const html = (outDir, lang) => readFileSync(join(outDir, lang, 'index.html'), 'utf8');
 
 describe('projets GitHub récupérés au build', () => {
   it(
     'rend les projets dans les deux langues, sans appel navigateur vers GitHub',
     async () => {
-      const { status: code, outDir } = await buildSite({ env: { GITHUB_API_URL: baseUrl } });
+      const { status: code, outDir } = await build({ GITHUB_API_URL: baseUrl });
       expect(code).toBe(0);
       for (const lang of ['fr', 'en']) {
         const page = html(outDir, lang);
@@ -66,7 +73,7 @@ describe('projets GitHub récupérés au build', () => {
     'échoue en mode strict quand un dépôt configuré est introuvable',
     async () => {
       status = 404;
-      const result = await buildSite({ env: { GITHUB_API_URL: baseUrl, STRICT_DATA: 'true' } });
+      const result = await build({ GITHUB_API_URL: baseUrl, STRICT_DATA: 'true' });
       expect(result.status).not.toBe(0);
       expect(result.output).toContain('GetUrlCloudRun');
       expect(result.output).toContain('GitHub indisponible');
@@ -78,7 +85,7 @@ describe('projets GitHub récupérés au build', () => {
     'se replie sur un état vide, avec avertissement, en mode tolérant',
     async () => {
       status = 404;
-      const result = await buildSite({ env: { GITHUB_API_URL: baseUrl } });
+      const result = await build({ GITHUB_API_URL: baseUrl });
       expect(result.status).toBe(0);
       expect(result.output).toContain('GitHub indisponible');
       expect(html(result.outDir, 'fr')).toContain('data-state="empty"');

@@ -32,3 +32,45 @@ module "resend_domain" {
     rsend = "rsend-euw1.forge.rmta.net"
   }
 }
+
+locals {
+  canonical_origin = "https://${var.canonical_domain}"
+  on_pages         = var.fr_site_host == "cloudflare-pages"
+}
+
+# Hébergement du site (ADR-0008) : projet Pages ; ses domaines ne sont servis qu'une fois la zone
+# `.fr` active chez Cloudflare (runbook §5, `fr_site_host`).
+module "pages_site" {
+  source = "./modules/pages-site"
+
+  account_id     = var.account_id
+  custom_domains = local.on_pages ? [var.canonical_domain, "www.${var.canonical_domain}"] : []
+}
+
+# Zone du domaine canonique chez Cloudflare (OVH reste le registrar, runbook §4).
+module "zone_fr" {
+  source = "./modules/zone-fr"
+
+  account_id     = var.account_id
+  domain         = var.canonical_domain
+  dnssec_enabled = var.fr_dnssec
+  pages_target   = local.on_pages ? module.pages_site.subdomain : null
+}
+
+# `.dev` et `www.dev` → `.fr` (docs/infra.md §2) ; ruleset créé à la main, importé (imports.tf).
+module "dev_redirect" {
+  source = "./modules/canonical-redirect"
+
+  zone_id       = data.cloudflare_zone.services.zone_id
+  hosts         = [var.zone_name, "www.${var.zone_name}"]
+  target_origin = local.canonical_origin
+}
+
+# `www.fr` → apex, que GitHub Pages faisait seul ; sans effet tant que `www` est en DNS seul.
+module "fr_www_redirect" {
+  source = "./modules/canonical-redirect"
+
+  zone_id       = module.zone_fr.zone_id
+  hosts         = ["www.${var.canonical_domain}"]
+  target_origin = local.canonical_origin
+}

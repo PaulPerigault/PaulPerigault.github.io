@@ -1,0 +1,45 @@
+import { expect, test } from '@playwright/test';
+
+// Régression visuelle (#201) : filet du futur design system (#182). Captures pleine page comparées
+// à des références versionnées, générées dans la même image Playwright que le job CI `visual`
+// (`npm run test:visual:update`, docs/visual-regression.md). Ailleurs (shards e2e, macOS, Windows),
+// le rendu des polices diffère : ces tests ne tournent qu'avec VISUAL=1.
+test.skip(process.env['VISUAL'] !== '1', 'régression visuelle : job CI `visual` uniquement');
+// La CSP du site bloquerait la feuille de masquage injectée pendant la capture (`stylePath`) ;
+// elle est testée par csp*.spec.ts, ici seul le rendu compte.
+test.use({ bypassCSP: true });
+
+const PAGES = [
+  { path: '/fr/', name: 'fr' },
+  { path: '/en/', name: 'en' },
+  { path: '/404.html', name: '404' },
+];
+const VIEWPORTS = {
+  desktop: { width: 1280, height: 800 },
+  mobile: { width: 390, height: 844 },
+};
+const SCHEMES = ['light', 'dark'] as const;
+// Feuille appliquée par Playwright pendant la capture.
+const STYLE_PATH = 'e2e/visual-volatile.css';
+
+for (const { path, name } of PAGES) {
+  for (const [device, viewport] of Object.entries(VIEWPORTS)) {
+    for (const scheme of SCHEMES) {
+      test(`${name} · ${device} · ${scheme}`, async ({ page }) => {
+        await page.setViewportSize(viewport);
+        await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
+        await page.goto(path);
+        await page.evaluate(() => document.fonts.ready);
+        await expect(page).toHaveScreenshot(`${name}-${device}-${scheme}.png`, {
+          fullPage: true,
+          animations: 'disabled',
+          caret: 'hide',
+          stylePath: STYLE_PATH,
+          // Année calculée au build : sans masque, toutes les références casseraient chaque janvier.
+          mask: [page.getByText(/^© \d{4} /)],
+          maxDiffPixelRatio: 0.001,
+        });
+      });
+    }
+  }
+}

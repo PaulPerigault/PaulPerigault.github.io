@@ -1,6 +1,7 @@
 ---
 import '@/styles/global.css';
 import ButtonLink from '@/components/ui/ButtonLink.astro';
+import SeoHead from '@/components/layout/SeoHead.astro';
 import Heading from '@/components/ui/Heading.astro';
 import { SITE } from '@/config/site';
 import { useTranslations } from '@/lib/i18n';
@@ -14,8 +15,7 @@ const en = useTranslations('en');
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>404 — {SITE.name}</title>
-    <meta name="robots" content="noindex" />
+    <SeoHead kind="noindex" title={`404 — ${SITE.name}`} />
   </head>
   <body class="bg-bg text-fg font-sans">
     <main class="mx-auto max-w-prose px-6 py-section">

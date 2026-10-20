@@ -1,5 +1,6 @@
 // Garde-fou : docs/test-matrix.md et les fichiers e2e/*.spec.ts sont cohérents.
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { reportAndExit } from './lib/report.mjs';
 
 const MATRIX = 'docs/test-matrix.md';
 const E2E_DIR = 'e2e';
@@ -48,8 +49,5 @@ export function run() {
 }
 
 if (import.meta.main) {
-  const problems = run();
-  for (const problem of problems) console.error(problem);
-  if (problems.length > 0) process.exit(1);
-  console.log('check-test-matrix: OK');
+  reportAndExit('check-test-matrix', run());
 }

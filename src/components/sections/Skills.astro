@@ -3,14 +3,12 @@ import Section from '@/components/ui/Section.astro';
 import type { Lang } from '@/domain/lang';
 import type { SkillCategory } from '@/domain/skill';
 import { useTranslations } from '@/lib/i18n';
+import { SEPARATOR } from '@/lib/typography';
 
 interface Props {
   lang: Lang;
   categories: readonly SkillCategory[];
 }
-
-// Espace insécable avant le séparateur : une ligne ne commence jamais par « · ».
-const SEPARATOR = ' · ';
 
 const { lang, categories } = Astro.props;
 const t = useTranslations(lang);

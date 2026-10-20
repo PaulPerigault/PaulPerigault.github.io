@@ -3,6 +3,7 @@ import type { Formation } from '@/domain/formation';
 import type { Lang } from '@/domain/lang';
 import { newestFirst } from './chronology';
 import { formatPeriod } from './format-date';
+import { SEPARATOR } from './typography';
 
 /** Données d'une entrée de chronologie, communes aux expériences et aux formations. */
 export interface TimelineEntryData {
@@ -15,8 +16,6 @@ export interface TimelineEntryData {
   readonly tags: readonly string[];
 }
 
-const JOINER = ' · ';
-
 export const experienceEntries = (
   items: readonly Experience[],
   lang: Lang,
@@ -25,7 +24,7 @@ export const experienceEntries = (
   newestFirst(items).map((item) => ({
     id: item.id,
     title: item.role,
-    subtitle: [item.company, item.location].join(JOINER),
+    subtitle: [item.company, item.location].join(SEPARATOR),
     period: formatPeriod(item.dateStart, item.dateEnd, lang, presentLabel),
     dateTime: item.dateStart,
     description: item.description,
@@ -40,7 +39,7 @@ export const formationEntries = (
   newestFirst(items).map((item) => ({
     id: item.id,
     title: item.degree,
-    subtitle: [item.school, item.speciality].join(JOINER),
+    subtitle: [item.school, item.speciality].join(SEPARATOR),
     period: formatPeriod(item.dateStart, item.dateEnd, lang, presentLabel),
     dateTime: item.dateStart,
     description: item.description,

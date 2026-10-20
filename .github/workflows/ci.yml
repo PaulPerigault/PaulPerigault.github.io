@@ -23,7 +23,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -57,15 +57,78 @@ jobs:
     needs: build
     uses: ./.github/workflows/e2e.yml
 
-  lighthouse:
+  # Liens internes, ancres et URL du domaine dans l'artefact, hors ligne (lychee, docs/tooling.md).
+  links:
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: site
+          path: dist
+      - uses: ./.github/actions/setup-lychee
+      # Aucun `npm ci` : le script n'utilise que Node et scripts/lib.
+      - run: npm run check:links
+
+  # Régression visuelle (#201, docs/visual-regression.md) : image Playwright épinglée par digest,
+  # la même que `npm run test:visual:update` (scripts/lib/visual-image.mjs). Une référence absente
+  # est écrite par Playwright et publiée en artefact `visual-snapshots`, à relire puis à commiter.
+  visual:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:7852dc5a7d72f5fe458a597d690f6c42fbc8e9e26ddfa95f8e6ef552558d9bbf
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: site
+          path: dist
+      - run: npx playwright test e2e/visual.spec.ts
+        env:
+          VISUAL: '1'
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: ${{ failure() }}
+        with:
+          name: visual-snapshots
+          path: |
+            e2e/__snapshots__/
+            test-results/
+          retention-days: 7
+
+  # Une page par job (en parallèle) : le chemin critique ne dépend plus du nombre de pages.
+  lighthouse:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { page: /fr/, name: fr }
+          - { page: /en/, name: en }
+          - { page: /fr/legal/, name: fr-legal }
+          - { page: /en/legal/, name: en-legal }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
         with:
           name: site
           path: dist
@@ -73,18 +136,12 @@ jobs:
         uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12
         with:
           uploadArtifacts: true
+          artifactName: lighthouse-${{ matrix.name }}
           temporaryPublicStorage: true
           configPath: .lighthouserc.json
-
-  container:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - name: Construire l'image et vérifier en-têtes, pages et utilisateur non-root
-        run: scripts/check-container.sh
+        # Remplace la liste `collect.url` du fichier (variables LHCI_* prioritaires sur la config).
+        env:
+          LHCI_COLLECT__URL: ${{ matrix.page }}
 
   # Worker du formulaire (brique autonome, ses propres dépendances) : lint, format, types, tests.
   worker:
@@ -97,7 +154,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -105,7 +162,7 @@ jobs:
       - run: npm ci
       - run: npm run verify
 
-  # Terraform sans secret ni backend : format et validité. Jamais de plan ni d'apply en CI.
+  # OpenTofu sans secret ni backend : format et validité. Jamais de plan ni d'apply en CI.
   infra:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -113,25 +170,90 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
         with:
-          terraform_version: 1.15.8
-          terraform_wrapper: false
-      - run: terraform fmt -check -recursive infra
-      - run: terraform -chdir=infra init -backend=false -input=false
-      - run: terraform -chdir=infra validate
-      - name: Tests des helpers PowerShell (faux secrets, doublures)
-        shell: pwsh
+          tofu_version: 1.13.1
+          tofu_wrapper: false
+      - run: tofu fmt -check -recursive infra
+      - run: tofu -chdir=infra init -backend=false -input=false
+      - run: tofu -chdir=infra validate
+      # Modules avec un provider simulé (infra/tests/*.tftest.hcl) : aucun appel à Cloudflare.
+      - run: tofu -chdir=infra test
+      # Brique identité (jetons limités) : mêmes contrôles, providers simulés.
+      - run: tofu -chdir=infra/identity init -backend=false -input=false
+      - run: tofu -chdir=infra/identity validate
+      - run: tofu -chdir=infra/identity test
+      # Brique registrar (délégation chez OVH) : module testé avec un provider simulé.
+      - run: tofu -chdir=infra/registrar init -backend=false -input=false
+      - run: tofu -chdir=infra/registrar validate
+      - run: tofu -chdir=infra/registrar test
+
+  # Plan OpenTofu (#203) contre l'infrastructure réelle, avec un token Cloudflare et des clés R2 en
+  # LECTURE SEULE (#181). Jamais d'apply ni de verrou. Sans ces secrets (avant leur création, PR de
+  # fork), le job reste vert et le dit. Un écart (code 2) est signalé, sans casser la CI : seul le
+  # propriétaire applique.
+  tofu-plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Secrets en lecture seule présents ?
+        id: gate
+        env:
+          HAS_SECRETS: ${{ secrets.CLOUDFLARE_API_TOKEN_READONLY != '' && secrets.TFSTATE_R2_READ_ACCESS_KEY_ID != '' && secrets.TFSTATE_R2_READ_SECRET_KEY != '' }}
         run: |
-          foreach ($test in Get-ChildItem infra/tests/*.test.ps1) {
-            pwsh -NoProfile -File $test.FullName
-            if ($LASTEXITCODE -ne 0) { exit 1 }
-          }
+          echo "ready=$HAS_SECRETS" >> "$GITHUB_OUTPUT"
+          if [ "$HAS_SECRETS" != true ]; then
+            echo "::notice::tofu plan sauté : secrets en lecture seule absents (création : issue #181)."
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          persist-credentials: false
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          tofu_version: 1.13.1
+          tofu_wrapper: false
+      - name: tofu init et plan (lecture seule)
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN_READONLY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.TFSTATE_R2_READ_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TFSTATE_R2_READ_SECRET_KEY }}
+        run: |
+          tofu -chdir=infra init -input=false -lockfile=readonly
+          set +e
+          tofu -chdir=infra plan -input=false -lock=false -no-color -detailed-exitcode > plan.txt 2>&1
+          code=$?
+          set -e
+          { echo '### tofu plan'; echo '```'; tail -n 200 plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$code" = 2 ]; then
+            echo "::notice::Écart entre infra/ et l'infrastructure réelle : relire le plan (résumé du job)."
+            exit 0
+          fi
+          exit "$code"
+
+  # Audit statique des workflows et actions (injections, permissions, épinglage, Dependabot).
+  # Version de zizmor figée (la plus récente connue de l'action v0.6.4) : un nouvel audit arrive
+  # par une PR, jamais par surprise.
+  zizmor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        with:
+          version: 1.30.1
+          min-severity: medium
+          advanced-security: false
+          annotations: true
 
   # Point de contrôle unique (check requis `ci`) : vert seulement si TOUT le reste est vert.
   ci:
     if: ${{ always() }}
-    needs: [verify, build, e2e, lighthouse, container, worker, infra]
+    needs: [verify, build, e2e, links, lighthouse, visual, worker, infra, tofu-plan, zizmor]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

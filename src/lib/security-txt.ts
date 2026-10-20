@@ -1,13 +1,24 @@
 import { SITE } from '@/config/site';
 
-const DAYS_VALID = 365;
+// RFC 9116 § 2.5.5 : moins d'un an. Le redéploiement hebdomadaire (deploy.yml) le renouvelle ;
+// 180 jours laissent de la marge si les déploiements s'arrêtent.
+const DAYS_VALID = 180;
 const MS_PER_DAY = 86_400_000;
 
-/** `/.well-known/security.txt` (RFC 9116) : `Expires` est recalculé à chaque build. */
+/** Arrondie au jour UTC : les deux routes, rendues à des instants différents, restent identiques. */
+const expiry = (now: Date): Date => {
+  const day = Math.floor(now.getTime() / MS_PER_DAY) * MS_PER_DAY;
+  return new Date(day + DAYS_VALID * MS_PER_DAY);
+};
+
+/**
+ * `security.txt` (RFC 9116), source unique des deux routes (`/.well-known/` qui fait foi, et la
+ * copie à la racine) : `Expires` est recalculé à chaque build, aucun fichier à tenir à la main.
+ */
 export const buildSecurityTxt = (now: Date): string =>
   [
     `Contact: mailto:${SITE.email}`,
-    `Expires: ${new Date(now.getTime() + DAYS_VALID * MS_PER_DAY).toISOString()}`,
+    `Expires: ${expiry(now).toISOString()}`,
     'Preferred-Languages: fr, en',
     `Canonical: ${SITE.domain}/.well-known/security.txt`,
   ].join('\n') + '\n';

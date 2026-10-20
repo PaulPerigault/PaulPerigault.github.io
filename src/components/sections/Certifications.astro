@@ -5,6 +5,7 @@ import type { Lang } from '@/domain/lang';
 import { certificationsNewestFirst } from '@/lib/chronology';
 import { formatYearMonth } from '@/lib/format-date';
 import { useTranslations } from '@/lib/i18n';
+import { SEPARATOR } from '@/lib/typography';
 
 interface Props {
   lang: Lang;
@@ -33,7 +34,7 @@ const t = useTranslations(lang);
               )}
               {cert.dateExpires && (
                 <span>
-                  {' · '}
+                  {SEPARATOR}
                   {t('certifications.expires')}{' '}
                   <time datetime={cert.dateExpires}>{formatYearMonth(cert.dateExpires, lang)}</time>
                 </span>

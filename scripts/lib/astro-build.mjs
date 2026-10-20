@@ -4,7 +4,7 @@
 import { spawn } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
 
 const LOCK = join(tmpdir(), 'portfolio-astro-build.lock');
@@ -46,6 +46,11 @@ const run = (outDir, env) =>
     child.on('error', reject);
     child.on('close', (status) => resolve({ status, output }));
   });
+
+/** Supprime le dossier d'un build de test (sinon `.astro/test-builds` grossit à chaque `npm test`). */
+export function disposeBuild(outDir) {
+  rmSync(dirname(outDir), { recursive: true, force: true });
+}
 
 /** @returns {Promise<{ status: number | null, output: string, outDir: string }>} */
 export async function buildSite({ env = {} } = {}) {

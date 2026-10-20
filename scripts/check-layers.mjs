@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { posix } from 'node:path';
 import { localImports } from './lib/imports.mjs';
 import { isAllowed, isInLayer } from './lib/layers.mjs';
+import { reportAndExit } from './lib/report.mjs';
 import { walk } from './lib/walk.mjs';
 
 export function findViolations(files) {
@@ -47,9 +48,6 @@ const runOrExit = () => {
 };
 
 if (import.meta.main) {
-  const violations = runOrExit();
-  for (const { file, target } of violations)
-    console.error(`${file} ne peut pas importer ${target}`);
-  if (violations.length > 0) process.exit(1);
-  console.log('check-layers: OK');
+  const problems = runOrExit().map(({ file, target }) => `${file} ne peut pas importer ${target}`);
+  reportAndExit('check-layers', problems);
 }

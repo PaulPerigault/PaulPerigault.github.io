@@ -4,12 +4,22 @@ on:
   pull_request:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
+  # Auteur de la PR et dépôt d'origine, pas l'acteur (celui qui a déclenché l'événement,
+  # usurpable : zizmor bot-conditions). fetch-metadata revérifie l'auteur et le 1er commit signé.
   auto-merge:
-    if: github.actor == 'dependabot[bot]'
+    if: >-
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: write
+      pull-requests: write
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -19,10 +29,11 @@ jobs:
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
 
-      # Jamais pour Terraform : une mise à jour du fournisseur peut changer le plan de l'infra réelle.
+      # Jamais pour l'infra (OpenTofu) : une mise à jour du fournisseur peut changer le plan réel.
       - name: Approve and enable auto-merge for patch/minor updates
         if: |
-          steps.metadata.outputs.package-ecosystem != 'terraform' && (
+          steps.metadata.outputs.package-ecosystem != 'terraform' &&
+          steps.metadata.outputs.package-ecosystem != 'opentofu' && (
             steps.metadata.outputs.update-type == 'version-update:semver-patch' ||
             steps.metadata.outputs.update-type == 'version-update:semver-minor'
           )

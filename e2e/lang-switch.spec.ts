@@ -1,8 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+// Nom accessible = code visible puis langue en toutes lettres (WCAG 2.5.3, « label in name »).
 const SWITCH = {
-  fr: { name: 'English', target: 'en' },
-  en: { name: 'Français', target: 'fr' },
+  fr: { name: 'en English', target: 'en' },
+  en: { name: 'fr Français', target: 'fr' },
 } as const;
 const NAV_NAME = { fr: 'Navigation principale', en: 'Main navigation' } as const;
 
@@ -14,6 +15,8 @@ for (const lang of ['fr', 'en'] as const) {
       await page.goto(`/${lang}/`);
       const link = page.getByRole('link', { name, exact: true });
       await expect(link).toHaveAttribute('hreflang', target);
+      const visible = (await link.locator('span').first().innerText()).trim().toLowerCase();
+      expect(name.startsWith(visible)).toBe(true);
       await link.click();
       await expect(page).toHaveURL(new RegExp(`/${target}/$`));
       await expect(page.locator('html')).toHaveAttribute('lang', target);
@@ -40,7 +43,7 @@ for (const lang of ['fr', 'en'] as const) {
 
 test('garde la page technique en changeant de langue', async ({ page }) => {
   await page.goto('/fr/styleguide/');
-  await page.getByRole('link', { name: 'English', exact: true }).click();
+  await page.getByRole('link', { name: SWITCH.fr.name, exact: true }).click();
   await expect(page).toHaveURL(/\/en\/styleguide\/$/);
 });
 

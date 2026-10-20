@@ -1,7 +1,5 @@
 import type { APIRoute } from 'astro';
+import { textResponse } from '@/lib/http';
 import { buildSecurityTxt } from '@/lib/security-txt';
 
-export const GET: APIRoute = () =>
-  new Response(buildSecurityTxt(new Date()), {
-    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-  });
+export const GET: APIRoute = () => textResponse(buildSecurityTxt(new Date()));

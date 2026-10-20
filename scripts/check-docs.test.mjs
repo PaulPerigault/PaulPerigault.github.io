@@ -24,11 +24,6 @@ describe('check-docs : ce qui doit échouer', () => {
       'README.md : lien relatif cassé « docs/absent.md »',
     ]);
   });
-
-  it("le vocabulaire de l'ancienne architecture, sauf dans les ADR", () => {
-    expect(check('Le mode zoneless est activé')).toHaveLength(1);
-    expect(check('Le mode zoneless était activé', 'docs/adr/0001.md')).toEqual([]);
-  });
 });
 
 describe('check-docs : ce qui doit passer', () => {

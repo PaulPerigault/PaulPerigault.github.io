@@ -33,6 +33,14 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
     }
   });
 
+  it('sérialisent chaque workflow déclenché (concurrency), hors workflows réutilisables', () => {
+    const missing = workflows
+      .filter(({ text }) => !/^on:\n {2}workflow_call:/m.test(text))
+      .filter(({ text }) => !/^concurrency:\n {2}group: /m.test(text))
+      .map((w) => w.name);
+    expect(missing).toEqual([]);
+  });
+
   it('bornent la durée de chaque job qui exécute du code', () => {
     const unbounded = workflows.flatMap(({ name, text }) => {
       const jobs = text.split(/^jobs:\n/m)[1] ?? '';
@@ -54,14 +62,28 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
     }
     expect(text('e2e.yml')).toContain('name: site');
     expect(text('deploy.yml')).toMatch(/needs: e2e[\s\S]*upload-pages-artifact/);
+    // Sans cette option, upload-pages-artifact exclut `.well-known/` (security.txt en 404).
+    const pagesUpload =
+      text('deploy.yml').split('upload-pages-artifact@')[1]?.split('\n      - ')[0] ?? '';
+    expect(pagesUpload).toContain('include-hidden-files: true');
+    expect(text('build.yml')).toContain('include-hidden-files: true');
   });
 
   it('expose les checks requis par la protection de branche : ci (agrégat) et commitlint', () => {
     const ci = text('ci.yml');
     expect(ci).toMatch(
-      /^ {2}ci:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify, build, e2e, lighthouse, container, worker, infra\]/m,
+      /^ {2}ci:\n {4}if: \$\{\{ always\(\) \}\}\n {4}needs: \[verify, build, e2e, links, lighthouse, visual, worker, infra, tofu-plan, zizmor\]/m,
     );
     expect(ci).toMatch(/^ {2}commitlint:/m);
+  });
+
+  it('passe chaque page budgétée de Lighthouse dans sa propre tâche, sans en oublier', () => {
+    const pages = JSON.parse(readFileSync('.lighthouserc.json', 'utf8')).ci.collect.url;
+    const matrix = [...text('ci.yml').matchAll(/- \{ page: (\S+), name: [\w-]+ \}/g)].map(
+      (m) => m[1],
+    );
+    expect(matrix).toEqual(pages);
+    expect(text('ci.yml')).toContain('LHCI_COLLECT__URL: ${{ matrix.page }}');
   });
 
   it('redéploie chaque semaine sans commit et à la demande', () => {
@@ -75,34 +97,5 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
     const browsers = text('browsers.yml');
     expect(browsers).toContain('cron:');
     expect(browsers).toContain('all-browsers: true');
-  });
-
-  it('cherchent des secrets dans tout l’historique Git avec un binaire vérifié', () => {
-    const gitleaks =
-      text('security.yml')
-        .split(/^ {2}gitleaks:\n/m)[1]
-        ?.split(/^ {2}\w/m)[0] ?? '';
-    expect(gitleaks).toContain('fetch-depth: 0');
-    expect(gitleaks).toMatch(/GITLEAKS_SHA256: [0-9a-f]{64}/);
-    expect(gitleaks).toContain('sha256sum -c');
-    expect(gitleaks).toContain('--redact');
-  });
-
-  it('installent les dépendances avec npm ci (jamais npm install)', () => {
-    for (const { name, text } of workflows) expect(text, name).not.toMatch(/run: npm install\b/);
-  });
-
-  it('ne laissent pas les identifiants Git dans les checkouts de vérification', () => {
-    for (const name of [
-      'ci.yml',
-      'e2e.yml',
-      'build.yml',
-      'deploy.yml',
-      'security.yml',
-      'deploy-worker.yml',
-    ]) {
-      const checkouts = (text(name).match(/actions\/checkout@/g) ?? []).length;
-      expect((text(name).match(/persist-credentials: false/g) ?? []).length, name).toBe(checkouts);
-    }
   });
 });

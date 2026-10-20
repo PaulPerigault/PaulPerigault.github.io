@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { extname } from 'node:path';
 import { RULES } from './lib/design-rules.mjs';
+import { reportAndExit } from './lib/report.mjs';
 import { walk } from './lib/walk.mjs';
 
 const EXTENSIONS = ['.astro', '.ts', '.css', '.json'];
@@ -31,9 +32,8 @@ export function run(root = 'src') {
 }
 
 if (import.meta.main) {
-  const violations = run();
-  for (const v of violations)
-    console.error(`${v.file}:${v.line} [${v.rule}] ${v.message}\n    ${v.excerpt}`);
-  if (violations.length > 0) process.exit(1);
-  console.log('check-design: OK');
+  const problems = run().map(
+    (v) => `${v.file}:${v.line} [${v.rule}] ${v.message}\n    ${v.excerpt}`,
+  );
+  reportAndExit('check-design', problems);
 }

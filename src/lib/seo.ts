@@ -18,7 +18,8 @@ export interface Alternate {
   href: string;
 }
 
-const absolute = (path: string): string => `${SITE.domain}${path}`;
+/** URL absolue sur le domaine canonique (`/fr/` → `https://…/fr/`). */
+export const absoluteUrl = (path: string): string => `${SITE.domain}${path}`;
 
 /** Chemin de la même page dans une autre langue (`/fr/a/` → `/en/a/`). */
 export const pathForLang = (path: string, from: Lang, to: Lang): string =>
@@ -26,8 +27,8 @@ export const pathForLang = (path: string, from: Lang, to: Lang): string =>
 
 /** Toutes les versions linguistiques + `x-default` (français). */
 export const alternates = (path: string, lang: Lang): Alternate[] => [
-  ...LANGS.map((code) => ({ hreflang: code, href: absolute(pathForLang(path, lang, code)) })),
-  { hreflang: 'x-default', href: absolute(pathForLang(path, lang, 'fr')) },
+  ...LANGS.map((code) => ({ hreflang: code, href: absoluteUrl(pathForLang(path, lang, code)) })),
+  { hreflang: 'x-default', href: absoluteUrl(pathForLang(path, lang, 'fr')) },
 ];
 
 /** Balises Open Graph et Twitter (nom → contenu), toutes dérivées de la même entrée. */
@@ -41,8 +42,8 @@ export const socialTags = ({ lang, path, title, description }: SeoInput) => {
       'og:locale:alternate': OG_LOCALE[other],
       'og:title': title,
       'og:description': description,
-      'og:url': absolute(path),
-      'og:image': absolute(SITE.ogImagePath),
+      'og:url': absoluteUrl(path),
+      'og:image': absoluteUrl(SITE.ogImagePath),
       'og:image:width': String(OG_IMAGE_WIDTH),
       'og:image:height': String(OG_IMAGE_HEIGHT),
       'og:image:alt': title,
@@ -51,12 +52,18 @@ export const socialTags = ({ lang, path, title, description }: SeoInput) => {
       'twitter:card': 'summary_large_image',
       'twitter:title': title,
       'twitter:description': description,
-      'twitter:image': absolute(SITE.ogImagePath),
+      'twitter:image': absoluteUrl(SITE.ogImagePath),
     },
   };
 };
 
-export const canonicalUrl = (path: string): string => absolute(path);
+export const canonicalUrl = (path: string): string => absoluteUrl(path);
+
+/**
+ * Directive des pages hors index (styleguide, 404). Sans `nofollow` : leurs liens mènent à des
+ * pages indexables que les moteurs peuvent suivre.
+ */
+export const NOINDEX = 'noindex';
 
 const VERIFICATION_VARIABLES = {
   PUBLIC_GOOGLE_SITE_VERIFICATION: 'google-site-verification',

@@ -4,9 +4,13 @@ on:
   push:
     branches: [main]
 
-permissions:
-  contents: write
-  pull-requests: write
+# release-please agit avec son propre jeton (`secrets.TOKEN`) : GITHUB_TOKEN n'a besoin d'aucun droit.
+permissions: {}
+
+# Jamais annulé en cours : release-please pourrait laisser un tag sans release.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   release:

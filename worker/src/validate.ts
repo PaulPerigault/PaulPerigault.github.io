@@ -24,6 +24,9 @@ const EMAIL = /^[^\s@<>()[\]",;:]+@[^\s@<>()[\]",;:]+\.[^\s@<>()[\]",;:]+$/;
 // Caractères de contrôle (catégorie Unicode Cc) interdits ; le message garde retours à la ligne
 // et tabulations.
 const CONTROL = /\p{Cc}/u;
+// Le nom va dans le sujet du message : ni caractère de mise en forme invisible (Cf : inversion de
+// sens, largeur nulle) ni séparateur de ligne ou de paragraphe Unicode.
+const FORMATTING = /[\p{Cf}\p{Zl}\p{Zp}]/u;
 const LINE_BREAKS_AND_TABS = /[\n\r\t]/g;
 const hasControl = (value: string): boolean => CONTROL.test(value);
 const hasControlInText = (value: string): boolean =>
@@ -51,8 +54,8 @@ export function validate(raw: unknown): Validation {
   const message = text(raw, 'message');
   const turnstileToken = text(raw, 'turnstileToken');
   const checks: ReadonlyArray<readonly [string, boolean]> = [
-    ['name', fits(name, FIELD_LIMITS.name) && !hasControl(name)],
-    ['email', fits(email, FIELD_LIMITS.email) && EMAIL.test(email)],
+    ['name', fits(name, FIELD_LIMITS.name) && !hasControl(name) && !FORMATTING.test(name)],
+    ['email', fits(email, FIELD_LIMITS.email) && EMAIL.test(email) && !hasControl(email)],
     ['message', fits(message, FIELD_LIMITS.message) && !hasControlInText(message)],
     ['turnstileToken', fits(turnstileToken, FIELD_LIMITS.turnstileToken)],
   ];

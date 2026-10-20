@@ -1,0 +1,106 @@
+// Garde-fous de l'assistant déclarés dans .claude/settings.json : aucune signature d'outil, hooks
+// de secrets et de fusion actifs, actions réservées au propriétaire refusées en Bash ET PowerShell.
+// Correspondance des motifs : scripts/lib/deny-match.mjs (règle documentée de Claude Code).
+import { readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import { denied as deniedBy } from './lib/deny-match.mjs';
+
+const settings = JSON.parse(readFileSync('.claude/settings.json', 'utf8'));
+const TOOLS = ['Bash', 'PowerShell'];
+
+const denied = (tool, command) => deniedBy(settings.permissions.deny, tool, command);
+
+const FORBIDDEN = [
+  'terraform apply',
+  'terraform -chdir=infra apply -auto-approve',
+  'tofu destroy',
+  'terraform import cloudflare_dns_record.x id',
+  'npm run infra:tf -- destroy',
+  'node scripts/infra-tf.mjs destroy',
+  'npm run infra:worker-secrets',
+  'node scripts/infra-worker-secrets.mjs',
+  'wrangler deploy',
+  'npx wrangler secret put RESEND_API_KEY',
+  'npx --prefix worker wrangler deploy',
+  'npx --prefix worker wrangler deploy --env production',
+  'git push origin main',
+  'git push -f origin HEAD:main',
+  'git push origin refs/heads/main',
+  'git push origin main --force',
+  'git push origin +main',
+  'terraform -chdir=infra show',
+  'terraform state pull',
+  'terraform output',
+  'npm run infra:tf -- output -raw contact_form_turnstile_secret',
+  'npm run infra:tf -- state list',
+  'npm run infra:tf -- con' + 'sole',
+  'terra' + 'form -chdir=infra con' + 'sole',
+  'tofu con' + 'sole',
+  'gh pr merge 165 --admin --squash',
+  'gh -R o/r pr merge 165',
+  'gh pr ready 206',
+  'gh pr ready',
+  'gh -R o/r pr ready 206',
+  'gh --repo o/r pr ready 206 --undo',
+  'gh --repo=o/r pr merge 165 --squash',
+  'gh api -X PATCH repos/o/r',
+  'gh api repos/o/r/pages -F https_enforced=true',
+  'gh repo edit --enable-auto-merge',
+  'gh secret set TOKEN',
+];
+
+const ALLOWED = [
+  'terraform plan',
+  'npm run infra:tf -- plan',
+  'npm run infra:tf -- output contact_form_turnstile_sitekey',
+  'git add scripts/infra-worker-secrets.mjs',
+  'terraform fmt -check',
+  'git push origin feat/173-claude-config',
+  'git push -u origin fix/180-domain',
+  'git push origin docs/181-domain --force-with-lease',
+  'gh pr merge 171 --squash',
+  'gh api repos/o/r/pages --jq .build_type',
+  'npx wrangler dev',
+  'gh pr view 165',
+  'gh -R o/r pr view 165',
+  'gh pr create --draft --base develop --title x',
+];
+
+describe('.claude/settings.json', () => {
+  it('ne signe ni les commits ni les PR', () => {
+    expect(settings.attribution).toEqual({ commit: '', pr: '' });
+  });
+
+  it('branche les hooks de secrets et de fusion sur Bash et PowerShell, bloquants', () => {
+    const [entry] = settings.hooks.PreToolUse;
+    expect(entry.matcher).toBe('Bash|PowerShell');
+    const scripts = entry.hooks.map((hook) => hook.args.at(-1));
+    expect(scripts).toEqual([
+      '${CLAUDE_PROJECT_DIR}/scripts/guard-secret-files.mjs',
+      '${CLAUDE_PROJECT_DIR}/scripts/guard-pr-merge.mjs',
+    ]);
+    for (const hook of entry.hooks) expect(hook.onFailure).toBe('block');
+  });
+
+  it.each(TOOLS)('refuse en %s chaque action réservée au propriétaire', (tool) => {
+    expect(FORBIDDEN.filter((command) => !denied(tool, command))).toEqual([]);
+  });
+
+  it.each(TOOLS)('laisse passer en %s les commandes de lecture et de travail', (tool) => {
+    expect(ALLOWED.filter((command) => denied(tool, command))).toEqual([]);
+  });
+
+  it('interdit d’éditer à la main les verrous et le changelog généré', () => {
+    for (const file of ['**/package-lock.json', '**/.terraform.lock.hcl', 'CHANGELOG.md']) {
+      expect(settings.permissions.deny).toEqual(
+        expect.arrayContaining([`Edit(${file})`, `Write(${file})`]),
+      );
+    }
+  });
+
+  it('déclare chaque plugin une seule fois, retenu ou écarté', () => {
+    const plugins = Object.keys(settings.enabledPlugins);
+    expect(plugins.every((id) => /^[\w-]+@[\w-]+$/.test(id))).toBe(true);
+    expect(settings.enabledPlugins['fp-check@trailofbits']).toBe(false);
+  });
+});

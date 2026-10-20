@@ -2,7 +2,7 @@ name: Deploy Worker
 
 # Déploie le CODE du Worker du formulaire (worker/) avec Wrangler. Le service, son domaine et le
 # widget Turnstile sont gérés par Terraform (infra/, appliqué par le propriétaire) ; les secrets du
-# Worker sont posés par infra/contact-form-secrets.ps1 et conservés par `wrangler deploy`.
+# Worker sont posés par `npm run infra:worker-secrets` et conservés par `wrangler deploy`.
 on:
   push:
     branches: [main]
@@ -28,7 +28,7 @@ jobs:
         with:
           ref: main
           persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version-file: .nvmrc
           cache: npm

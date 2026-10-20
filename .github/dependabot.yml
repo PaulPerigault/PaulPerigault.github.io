@@ -1,4 +1,6 @@
 version: 2
+# `cooldown` : une version doit avoir 7 jours avant d'être proposée (paquet compromis retiré
+# entre-temps). Les mises à jour de sécurité ne l'attendent pas.
 updates:
   - package-ecosystem: npm
     directory: /
@@ -6,6 +8,8 @@ updates:
       interval: weekly
       day: monday
       time: "08:00"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     labels:
       - dependencies
@@ -43,6 +47,8 @@ updates:
       interval: weekly
       day: monday
       time: "08:00"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 3
     labels:
       - dependencies
@@ -54,14 +60,16 @@ updates:
         update-types:
           - version-update:semver-major
 
-  # Fournisseur Terraform (Cloudflare) : jamais fusionné automatiquement (voir
+  # Fournisseur Cloudflare (OpenTofu, registry.opentofu.org) : jamais fusionné automatiquement (voir
   # dependabot-auto-merge.yml) ; relire le changelog, mettre à jour le lock, lancer un plan.
-  - package-ecosystem: terraform
+  - package-ecosystem: opentofu
     directory: /infra
     schedule:
       interval: weekly
       day: monday
       time: "08:00"
+    cooldown:
+      default-days: 7
     labels:
       - dependencies
       - infra
@@ -72,23 +80,11 @@ updates:
       interval: weekly
       day: monday
       time: "08:00"
+    cooldown:
+      default-days: 7
     labels:
       - dependencies
     groups:
       actions:
         patterns: ["*"]
 
-  # Images de base du Dockerfile (node, nginx-unprivileged).
-  - package-ecosystem: docker
-    directory: /
-    schedule:
-      interval: weekly
-      day: monday
-      time: "08:00"
-    labels:
-      - dependencies
-    # Le stage de build doit rester sur la version de `.nvmrc` (LTS) : pas de saut de majeure automatique.
-    ignore:
-      - dependency-name: "node"
-        update-types:
-          - version-update:semver-major

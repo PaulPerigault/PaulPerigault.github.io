@@ -2,8 +2,9 @@ import { SITE } from '@/config/site';
 import { LANGS, type Lang } from '@/domain/lang';
 import { useTranslations } from './i18n';
 import { profileMarkdown, type ProfileData } from './profile-markdown';
+import { absoluteUrl } from './seo';
 
-const link = (label: string, path: string): string => `- [${label}](${SITE.domain}${path})`;
+const link = (label: string, path: string): string => `- [${label}](${absoluteUrl(path)})`;
 
 const langSection = (lang: Lang): string => {
   const t = useTranslations(lang);

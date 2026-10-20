@@ -1,0 +1,19 @@
+# Configuration de lychee (vérification des liens de dist/), lue par scripts/check-links.mjs.
+# Les options qui dépendent du poste (chemin absolu de dist/, remap du domaine, mode hors ligne)
+# sont passées par le script, pas ici. Retrait de l'outil : docs/tooling.md.
+
+# Ancres : un lien /fr/#projects échoue si l'id n'existe pas dans la page cible.
+include_fragments = "anchor-only"
+# GitHub Pages sert /fr/ depuis fr/index.html : un lien vers un dossier vaut son index.
+index_files = ["index.html"]
+no_progress = true
+
+# Mode externe seulement (npm run check:links -- --external).
+max_concurrency = 8
+timeout = 20
+max_retries = 2
+
+exclude = [
+  # LinkedIn répond 999 à tout client non navigateur : aucun signal exploitable.
+  '^https://www\.linkedin\.com/',
+]

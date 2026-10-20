@@ -198,4 +198,4 @@ Vérification : `check:dns -- --expect=cloudflare` code 0 (les deux noms) ; `che
 1. Créer le secret `CLOUDFLARE_API_TOKEN_PAGES` (token _Cloudflare Pages : Edit_). Les jobs `pages` (`deploy.yml`) et `pages-preview` (`ci.yml`), préparés par #207, l'utilisent dès qu'il existe ; le nettoyage de GitHub Pages est préparé par #208.
 2. Après un déploiement réussi par la CI : _Settings → Pages_ du dépôt → désactiver GitHub Pages.
 
-Vérification : `npm run check:live` reste vert ; `npm run check:dns -- --expect=cloudflare` code 0.
+Vérification : `npm run check:live` reste vert, y compris `paulperigault.github.io` en 404 (le dépôt est renommé `PaulPerigault/portfolio` : GitHub interdit de désactiver Pages sur le nom réservé `<compte>.github.io`, erreur 422) ; `npm run check:dns -- --expect=cloudflare` code 0.

@@ -83,3 +83,22 @@ describe('parseMerge et prNumber', () => {
     expect(prNumber(null)).toBeNull();
   });
 });
+
+describe('dépôt renommé en PaulPerigault/portfolio', () => {
+  const PORTFOLIO = 'PaulPerigault/portfolio';
+  const toDevelop = { base: 'develop', head: 'feat/x', crossRepository: false };
+  const merge = (...args) => ['gh', ...args].join(' ');
+
+  it('lit le nouveau nom par -R, GH_REPO et l’URL de PR, puis applique la règle', () => {
+    const seen = [];
+    const read = (pr, repo) => (seen.push(repo), toDevelop);
+    for (const command of [
+      merge('-R', PORTFOLIO, 'pr', 'merge', '7', '--squash'),
+      `GH_REPO=${PORTFOLIO} ${merge('pr', 'merge', '7')}`,
+      merge('pr', 'merge', `https://github.com/${PORTFOLIO}/pull/7`),
+    ]) {
+      expect(mergeRefusal(command, read), command).toBeNull();
+    }
+    expect(seen).toEqual([PORTFOLIO, PORTFOLIO, PORTFOLIO]);
+  });
+});

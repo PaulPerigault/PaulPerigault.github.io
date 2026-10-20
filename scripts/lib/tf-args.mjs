@@ -1,8 +1,11 @@
-// Commandes Terraform/OpenTofu qui afficheraient le secret Turnstile gardé dans le state : `show`,
-// `console`, `state show|pull`, `output` sans nom, en JSON ou d'une sortie nommée « secret ».
-// Logique pure : `infra-tf.mjs` refuse avant de lire les secrets ou de lancer OpenTofu.
+// Commandes Terraform/OpenTofu refusées par les commandes `infra:*`, quel que soit l'appelant :
+// - celles qui afficheraient un secret du state (Turnstile, jetons de infra/identity/) : `show`,
+//   `console`, `state show|pull`, `output` sans nom, en JSON ou d'une sortie « secret », « token »
+//   ou « client » ;
+// - toute destruction (`destroy`, `-destroy`) et tout `apply` sans plan enregistré et relu.
+// Logique pure : les commandes refusent avant de lire les secrets ou de lancer OpenTofu.
 
-const SECRET_NAME = /secret/i;
+const SECRET_NAME = /secret|token|client/i;
 const ALWAYS = new Set(['show', 'console']);
 const STATE_DUMPS = new Set(['show', 'pull']);
 
@@ -26,3 +29,19 @@ export function secretOutputRefusal(args) {
     (command === 'output' && leaksOutput(rest));
   return leaks ? REFUSAL : null;
 }
+
+const DESTROY_REFUSAL =
+  'Commande refusée : aucune destruction par les commandes infra:* (destroy, -destroy).';
+const APPLY_REFUSAL =
+  'Commande refusée : `apply` seulement avec un plan enregistré et relu (`plan -out=<fichier>`, puis `apply <fichier>`).';
+
+/** @param {string[]} args arguments passés à tofu @returns {string | null} raison du refus */
+export function changeRefusal(args) {
+  const positional = args.filter((arg) => !arg.startsWith('-'));
+  if (positional[0] === 'destroy' || args.includes('-destroy')) return DESTROY_REFUSAL;
+  if (positional[0] === 'apply' && positional.length < 2) return APPLY_REFUSAL;
+  return null;
+}
+
+/** Premier refus applicable (secret affiché ou changement non relu), sinon null. */
+export const tofuRefusal = (args) => secretOutputRefusal(args) ?? changeRefusal(args);

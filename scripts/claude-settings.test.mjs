@@ -27,6 +27,10 @@ const FORBIDDEN = [
   'node scripts/infra-tf.mjs destroy',
   'npm run infra:worker-secrets',
   'node scripts/infra-worker-secrets.mjs',
+  'npm run infra:identity -- apply identity.tfplan',
+  'node scripts/infra-identity.mjs apply identity.tfplan',
+  'npm run infra:identity-push',
+  'node scripts/infra-identity-push.mjs',
   'wrangler deploy',
   'npx wrangler secret put RESEND_API_KEY',
   'npx --prefix worker wrangler deploy',
@@ -60,6 +64,7 @@ const FORBIDDEN = [
 const ALLOWED = [
   'terraform plan',
   'npm run infra:tf -- plan',
+  'npm run infra:identity -- plan -out=identity.tfplan',
   'npm run infra:tf -- output contact_form_turnstile_sitekey',
   'git add scripts/infra-worker-secrets.mjs',
   'terraform fmt -check',

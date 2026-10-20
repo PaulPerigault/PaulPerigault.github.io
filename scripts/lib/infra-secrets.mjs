@@ -19,6 +19,9 @@ const KNOWN_SECRETS = new Set([
   'TF_VAR_resend_api_key',
   'AWS_ACCESS_KEY_ID',
   'AWS_SECRET_ACCESS_KEY',
+  // Compte de service OVH d'écriture de infra/registrar/ (posé par npm run infra:identity-push).
+  'OVH_CLIENT_ID',
+  'OVH_CLIENT_SECRET',
   ...BOOTSTRAP_SECRETS,
 ]);
 const isBootstrap = (name) => BOOTSTRAP_SECRETS.includes(name);

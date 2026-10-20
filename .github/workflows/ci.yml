@@ -179,6 +179,10 @@ jobs:
       - run: tofu -chdir=infra validate
       # Modules avec un provider simulé (infra/tests/*.tftest.hcl) : aucun appel à Cloudflare.
       - run: tofu -chdir=infra test
+      # Brique identité (jetons limités) : mêmes contrôles, providers simulés.
+      - run: tofu -chdir=infra/identity init -backend=false -input=false
+      - run: tofu -chdir=infra/identity validate
+      - run: tofu -chdir=infra/identity test
 
   # Plan OpenTofu (#203) contre l'infrastructure réelle, avec un token Cloudflare et des clés R2 en
   # LECTURE SEULE (#181). Jamais d'apply ni de verrou. Sans ces secrets (avant leur création, PR de

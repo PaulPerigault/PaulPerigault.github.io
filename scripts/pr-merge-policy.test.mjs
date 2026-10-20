@@ -1,6 +1,6 @@
-// Fusions admises d'après la base ET la tête de la PR : vers develop, ou vers main depuis develop
-// ou release-please (jamais depuis un fork). Le hook est aussi lancé pour de vrai par Bash, avec un
-// faux `gh` en tête du PATH : code de sortie 2 et raison sur stderr.
+// Fusions admises d'après la base réelle de la PR : vers develop seulement. Vers main, jamais, même
+// depuis develop ou release-please : c'est le geste du propriétaire. Le hook est aussi lancé pour
+// de vrai par Bash, avec un faux `gh` en tête du PATH : code de sortie 2 et raison sur stderr.
 import { spawnSync } from 'node:child_process';
 import { chmodSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -15,14 +15,15 @@ const refs = (base, head, crossRepository = false) => ({ base, head, crossReposi
 describe('refsRefusal', () => {
   it.each([
     ['develop', 'feat/181-identity'],
-    ['main', 'develop'],
-    ['main', RELEASE],
-    ['main', 'release-please--branches--main'],
+    ['develop', 'release-please--branches--main'],
   ])('accepte %s ← %s', (base, head) => {
     expect(refsRefusal('1', refs(base, head))).toBeNull();
   });
 
   it.each([
+    ['main', 'develop'],
+    ['main', RELEASE],
+    ['main', 'release-please--branches--main'],
     ['main', 'feat/x'],
     ['main', 'fix/develop'],
     ['main', 'release-please--branches--develop'],
@@ -33,9 +34,8 @@ describe('refsRefusal', () => {
     expect(refsRefusal('7', refs(base, head))).toMatch(/#7 va de « .+ » vers « .+ »/);
   });
 
-  it('refuse vers main une tête venue d’un fork, même nommée develop ou release-please', () => {
+  it('refuse vers main une tête venue d’un fork', () => {
     expect(refsRefusal('2', refs('main', 'develop', true))).toMatch(/#2/);
-    expect(refsRefusal('2', refs('main', RELEASE, true))).toMatch(/#2/);
   });
 
   it('refuse une PR illisible ou incomplète', () => {
@@ -46,11 +46,15 @@ describe('refsRefusal', () => {
   });
 
   it('mergeRefusal applique la règle à chaque fusion d’une commande composée', () => {
-    const prs = { 165: refs('main', RELEASE), 236: refs('main', 'develop'), 9: refs('main', 'x') };
+    const prs = {
+      171: refs('develop', 'feat/a'),
+      128: refs('develop', 'fix/b'),
+      9: refs('main', RELEASE),
+    };
     const read = (pr) => prs[pr] ?? null;
-    expect(mergeRefusal('gh pr merge 165 --squash', read)).toBeNull();
-    expect(mergeRefusal('gh pr merge 236 --merge && gh pr merge 165', read)).toBeNull();
-    expect(mergeRefusal('gh pr merge 236; gh pr merge 9 --squash', read)).toMatch(/#9/);
+    expect(mergeRefusal('gh pr merge 171 --squash', read)).toBeNull();
+    expect(mergeRefusal('gh pr merge 171 --squash && gh pr merge 128', read)).toBeNull();
+    expect(mergeRefusal('gh pr merge 171; gh pr merge 9 --squash', read)).toMatch(/#9/);
   });
 });
 
@@ -74,9 +78,13 @@ const runHook = (command, view) => {
 describe.skipIf(process.platform === 'win32')('hook guard-pr-merge lancé par Bash', () => {
   const view = (base, head) => ({ baseRefName: base, headRefName: head, isCrossRepository: false });
 
-  it('laisse passer la PR release-please et la PR develop → main', () => {
-    expect(runHook('gh pr merge 165 --squash', view('main', RELEASE)).status).toBe(0);
-    expect(runHook('gh pr merge 236 --merge', view('main', 'develop')).status).toBe(0);
+  it('laisse passer une PR vers develop', () => {
+    expect(runHook('gh pr merge 171 --squash', view('develop', 'feat/x')).status).toBe(0);
+  });
+
+  it('bloque (code 2) la PR release-please et la PR develop → main', () => {
+    expect(runHook('gh pr merge 165 --squash', view('main', RELEASE)).status).toBe(2);
+    expect(runHook('gh pr merge 236 --merge', view('main', 'develop')).status).toBe(2);
   });
 
   it('bloque (code 2) une PR vers main depuis une autre branche, raison sur stderr', () => {

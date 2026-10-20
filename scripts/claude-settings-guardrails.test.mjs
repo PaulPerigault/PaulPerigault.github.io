@@ -1,9 +1,10 @@
-// Partage des garde-fous entre les règles `deny` et le code testé (#181). Restent refusés en Bash et
-// en PowerShell : OpenTofu et Wrangler appelés directement, toute destruction (`destroy`,
-// `-destroy`, suppression de zone ou de domaine), les chemins OVH de transfert, authInfo, owner et
-// contacts, l'affichage d'un secret, le push forcé et `gh repo delete`. Ne sont plus refusés que par
-// le code : `apply <plan>.tfplan` par les scripts npm (lib/tf-args.mjs), `infra:identity-push`, les
-// scripts npm de déploiement et `gh pr merge` vers main (hook guard-pr-merge : base ET tête).
+// Partage des garde-fous entre les règles `deny` et le code testé (#181). Refusés en Bash et en
+// PowerShell : OpenTofu et Wrangler appelés directement, tout `apply` (même d'un plan enregistré,
+// par les scripts npm), toute destruction (`destroy`, `-destroy`, suppression de zone ou de
+// domaine), les chemins OVH de transfert, authInfo, owner et contacts, l'affichage d'un secret,
+// `infra:identity-push`, les scripts npm de déploiement, toute publication npm, toute écriture de
+// la configuration npm ou Claude Code de l'utilisateur, tout push forcé et `gh repo delete`.
+// `gh pr merge` reste confié au hook guard-pr-merge, qui refuse toute fusion vers main.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { denied } from './lib/deny-match.mjs';
@@ -59,6 +60,20 @@ const KEPT = {
     'git push origin feat/x --force',
     'git push -f origin feat/x',
     'git push origin feat/x -f',
+    'git push --force-with-lease origin feat/181-identity',
+    'git push origin feat/x --force-with-lease',
+    'git push origin +feat/x',
+  ],
+  'scripts npm de déploiement': ['npm --prefix worker run deploy', 'npm run deploy:pages'],
+  'publication npm': [
+    'npm publish',
+    'npm publish --dry-run',
+    'npm -w @x/y publish',
+    'pnpm publish',
+  ],
+  'configuration npm et Claude Code de l’utilisateur': [
+    ...['npm config set registry r', 'npm set registry r', 'npm login', 'npm token create'],
+    ...['cat ~/.npmrc', 'echo x >> $HOME/.npmrc', 'cp a ~/.claude/settings.json'],
   ],
   'gh repo delete et fusions hors hook': [
     'gh repo delete o/r --yes',
@@ -70,17 +85,15 @@ const KEPT = {
 };
 
 const RELEASED = {
-  'apply d’un plan enregistré': [
-    'npm run infra:tf -- apply fr.tfplan',
-    'npm run infra:identity -- apply identity.tfplan',
-    'npm run infra:registrar -- apply registrar.tfplan',
+  'fusion (base vérifiée par le hook)': ['gh pr merge 165 --squash', 'gh pr merge 236 --merge'],
+  'plan, fmt, validate des briques': [
+    ...['npm run infra:tf -- plan -out=fr.tfplan', 'npm run infra:github -- init'],
+    ...['npm run infra:identity -- validate', 'npm run infra:registrar -- fmt -check'],
   ],
-  'distribution des jetons': ['npm run infra:identity-push'],
-  'scripts npm de déploiement': ['npm --prefix worker run deploy', 'npm run deploy:pages'],
-  'fusion vers main (hook)': ['gh pr merge 165 --squash', 'gh pr merge 236 --merge'],
+  'vérification des paquets': ['npm pack --dry-run', 'npm run prepublish:check'],
   'travail courant': [
-    'git push --force-with-lease origin feat/181-identity',
     'git push origin develop:feat/x',
+    'git push -u origin feat/x',
     'grep -rn "/domain/" infra/registrar',
     'curl -sI https://www.paulperigault.dev/',
     'git commit -m "fix: transfert de la zone sans destruction"',

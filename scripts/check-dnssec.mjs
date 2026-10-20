@@ -11,7 +11,7 @@ import { lookup } from 'node:dns/promises';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { decodeResponse, encodeQuery } from './lib/dns-wire.mjs';
 import { PHASES, dsAbsence, phaseChecks } from './lib/dnssec-checks.mjs';
-import { dnsvizErrors } from './lib/dnsviz.mjs';
+import { dnsvizChecks } from './lib/dnsviz.mjs';
 
 const DOMAIN = 'paulperigault.fr';
 const TIMEOUT_MS = 5000;
@@ -44,16 +44,17 @@ const readHistory = () => {
   }
 };
 
-const runDnsviz = () => {
+const DNSVIZ_MAX_BYTES = 64 * 1024 * 1024;
+
+const runDnsviz = (phase) => {
   const bin = process.env.DNSVIZ_BIN || 'dnsviz';
-  const probe = spawnSync(bin, ['probe', '-A', '-a', 'fr', DOMAIN], { encoding: 'utf8' });
-  const grok = spawnSync(bin, ['grok', '-l', 'error'], { input: probe.stdout, encoding: 'utf8' });
-  if (probe.status !== 0 || grok.status !== 0)
-    return [{ name: 'dnsviz', ok: false, detail: 'échec' }];
-  const errors = dnsvizErrors(JSON.parse(grok.stdout));
-  return [
-    { name: 'dnsviz sans erreur', ok: errors.length === 0, detail: errors.join(' ; ') || 'aucune' },
-  ];
+  const run = (args, input) =>
+    spawnSync(bin, args, { input, encoding: 'utf8', maxBuffer: DNSVIZ_MAX_BYTES });
+  const probe = run(['probe', '-A', '-a', 'fr', DOMAIN]);
+  const grok = run(['grok'], probe.stdout);
+  if (probe.status !== 0 || grok.status !== 0 || !grok.stdout)
+    return [{ name: 'dnsviz', ok: false, detail: 'échec de probe ou de grok' }];
+  return dnsvizChecks(JSON.parse(grok.stdout), DOMAIN, phase);
 };
 
 const option = (name) => process.argv.find((arg) => arg.startsWith(`--${name}=`))?.split('=')[1];
@@ -71,7 +72,7 @@ if (phase === 'avant-ns') {
   writeFileSync(HISTORY, JSON.stringify(history));
   if (!process.env.CI) checks.push(check);
 }
-if (process.argv.includes('--dnsviz')) checks.push(...runDnsviz());
+if (process.argv.includes('--dnsviz')) checks.push(...runDnsviz(phase));
 for (const { name, ok, detail } of checks)
   console.log(`${ok ? 'OK  ' : 'ÉCHEC'} ${name} : ${detail}`);
 process.exitCode = checks.every((check) => check.ok) ? 0 : 1;

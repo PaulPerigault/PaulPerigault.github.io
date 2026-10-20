@@ -36,4 +36,12 @@ Imports seuls. Une seule différence attendue sur `github_repository.portfolio` 
 
 ## CI
 
-Le job `tofu-plan` de `ci.yml` planifie la brique avec `GITHUB_IAC_READONLY_TOKEN`, un jeton fine-grained en **lecture seule**, et la clé R2 en lecture seule. Sans ce secret, l'étape est sautée et le signale. Un écart (code 2) est signalé sans casser la CI.
+GitHub refuse les noms de secrets Actions qui commencent par `GITHUB_` (HTTP 422), d'où le préfixe `IAC_` ; `scripts/workflows-secret-names.test.mjs` échoue si un workflow référence un autre secret `GITHUB_*` que `GITHUB_TOKEN`. `GITHUB_IAC_TOKEN` reste un jeton du seul fichier de secrets local, jamais un secret Actions.
+
+**`IAC_GITHUB_READONLY_TOKEN` est un jeton personnel créé à la main par le propriétaire**, hors IaC : il n'est ni dans `infra/identity/` ni dans aucun state. GitHub n'a pas d'API pour créer un jeton fine-grained. Le propriétaire le pose lui-même avec `gh secret set IAC_GITHUB_READONLY_TOKEN -R PaulPerigault/portfolio` (valeur saisie au clavier) et le renouvelle à son expiration (90 jours).
+
+- Accès : dépôt `PaulPerigault/portfolio` seul.
+- Droits, tous en lecture seule : _Administration_, _Variables_, _Environments_, _Dependabot alerts_, _Pages_ et _Metadata_.
+- Aucun droit sur _Contents_ ni sur _Secrets_.
+
+Le job `tofu-plan` de `ci.yml` planifie la brique avec `IAC_GITHUB_READONLY_TOKEN`, un jeton fine-grained en **lecture seule**, et la clé R2 en lecture seule. Sans ce secret, l'étape est sautée et le signale. Un écart (code 2) est signalé sans casser la CI.

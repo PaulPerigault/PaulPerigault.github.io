@@ -108,10 +108,12 @@ describe('chaîne d’approvisionnement de la CI', () => {
   });
 
   it('attestent la provenance de l’artefact déployé, signée par OIDC', () => {
-    const deploy = text('deploy.yml').split(/^ {2}deploy:\n/m)[1] ?? '';
+    const deploy = text('deploy.yml').split(/^ {2}pages:\n/m)[1] ?? '';
     expect(deploy).toMatch(/actions\/attest-build-provenance@[0-9a-f]{40} # v\d/);
     expect(deploy).toContain("subject-path: 'dist/**'");
     expect(deploy).toContain('attestations: write');
-    expect(deploy.indexOf('attest-build-provenance')).toBeLessThan(deploy.indexOf('deploy-pages@'));
+    expect(deploy.indexOf('attest-build-provenance')).toBeLessThan(
+      deploy.indexOf('wrangler pages deploy'),
+    );
   });
 });

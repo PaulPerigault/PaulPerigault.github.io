@@ -1,14 +1,12 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { expectedSecurityHeaders } from './lib/expected-headers.mjs';
 import { buildChecks, runChecks } from './lib/live-checks.mjs';
 
-const SITES = { domain: 'example.fr', alias: 'example.dev' };
-const SECURE = {
-  'strict-transport-security': 'max-age=63072000',
-  'x-content-type-options': 'nosniff',
-  'referrer-policy': 'no-referrer',
-  'permissions-policy': 'camera=()',
-  'content-security-policy': "frame-ancestors 'none'",
-};
+// Les 8 en-têtes de sécurité exigés en production, valeurs exactes de public/_headers (#208).
+const EXPECTED = expectedSecurityHeaders(readFileSync('public/_headers', 'utf8'));
+const SITES = { domain: 'example.fr', alias: 'example.dev', expectedHeaders: EXPECTED };
+const SECURE = Object.fromEntries(EXPECTED);
 
 const reply = (status, headers = {}, body = '') => ({
   status,
@@ -34,6 +32,34 @@ const run = (fetchFn) => runChecks(buildChecks(SITES, NOW), fetchFn);
 const failing = (results) => results.filter((r) => r.problems.length > 0).map((r) => r.name);
 
 describe('check-live', () => {
+  it('exige les 8 en-têtes de sécurité de public/_headers, sans le cache ni le type', () => {
+    expect([...EXPECTED.keys()].sort()).toEqual([
+      'content-security-policy',
+      'cross-origin-opener-policy',
+      'cross-origin-resource-policy',
+      'permissions-policy',
+      'referrer-policy',
+      'strict-transport-security',
+      'x-content-type-options',
+      'x-frame-options',
+    ]);
+  });
+
+  it('signale chaque en-tête absent ou à une autre valeur que celle de public/_headers', async () => {
+    const weak = async (url) => {
+      const res = await healthy(url);
+      if (new URL(url).pathname !== '/fr/') return res;
+      res.headers.delete('cross-origin-resource-policy');
+      res.headers.set('strict-transport-security', 'max-age=60');
+      return res;
+    };
+    const result = (await run(weak)).find((r) => r.name === 'en-têtes de sécurité');
+    expect(result?.problems).toEqual([
+      'en-tête manquant ou différent de public/_headers : cross-origin-resource-policy',
+      'en-tête manquant ou différent de public/_headers : strict-transport-security',
+    ]);
+  });
+
   it('valide un site correctement configuré', async () => {
     expect(failing(await run(healthy))).toEqual([]);
   });

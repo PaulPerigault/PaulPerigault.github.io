@@ -1,3 +1,8 @@
 # Destructions admises par l'apply de cette brique (scripts/lib/tf-args.mjs), une adresse par ligne.
 # Ajoutées par la PR de l'étape qui détruit ou remplace, retirées par la PR suivante.
 # Vide = aucune destruction admise.
+module.zone_fr.cloudflare_dns_record.github_pages["apex-185.199.108.153"]
+module.zone_fr.cloudflare_dns_record.github_pages["apex-185.199.109.153"]
+module.zone_fr.cloudflare_dns_record.github_pages["apex-185.199.110.153"]
+module.zone_fr.cloudflare_dns_record.github_pages["apex-185.199.111.153"]
+module.zone_fr.cloudflare_dns_record.github_pages["www"]

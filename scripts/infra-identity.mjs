@@ -6,7 +6,7 @@
 import { join } from 'node:path';
 import { runCli } from './lib/infra-cli.mjs';
 import { identityEnv } from './lib/infra-secrets.mjs';
-import { planDestructionRefusal, tofuRefusal } from './lib/tf-args.mjs';
+import { allowedDestroys, planDestructionRefusal, tofuRefusal } from './lib/tf-args.mjs';
 
 // Variable du fichier de secrets → variable OpenTofu de infra/identity/variables.tf.
 const VARIABLES = {
@@ -39,8 +39,11 @@ export async function identity(args, deps) {
   const refusal = tofuRefusal(args);
   if (refusal) throw new Error(refusal);
   const env = await tofuEnv(args, deps);
-  const chdir = `-chdir=${join(deps.root, 'infra', 'identity')}`;
-  const destruction = planDestructionRefusal(args, { spawn: deps.spawn, env, chdir });
+  const dir = join(deps.root, 'infra', 'identity');
+  const chdir = `-chdir=${dir}`;
+  const allowed = allowedDestroys(deps.readFile, dir);
+  const run = { spawn: deps.spawn, env, chdir, allowed };
+  const destruction = planDestructionRefusal(args, run);
   if (destruction) throw new Error(destruction);
   const result = deps.spawn('tofu', [chdir, ...args], { env, stdio: 'inherit' });
   if (result.error) throw new Error(`tofu introuvable : ${result.error.message}`);

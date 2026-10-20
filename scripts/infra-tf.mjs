@@ -8,7 +8,7 @@
 import { join } from 'node:path';
 import { runCli } from './lib/infra-cli.mjs';
 import { childEnv } from './lib/infra-secrets.mjs';
-import { planDestructionRefusal, tofuRefusal } from './lib/tf-args.mjs';
+import { allowedDestroys, planDestructionRefusal, tofuRefusal } from './lib/tf-args.mjs';
 
 const NAMES = ['TF_VAR_cloudflare_api_token', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'];
 
@@ -17,8 +17,11 @@ export function tf(args, deps) {
   const refusal = tofuRefusal(args);
   if (refusal) throw new Error(refusal);
   const env = childEnv(NAMES, deps);
-  const chdir = `-chdir=${join(deps.root, 'infra')}`;
-  const destruction = planDestructionRefusal(args, { spawn: deps.spawn, env, chdir });
+  const dir = join(deps.root, 'infra');
+  const chdir = `-chdir=${dir}`;
+  const allowed = allowedDestroys(deps.readFile, dir);
+  const run = { spawn: deps.spawn, env, chdir, allowed };
+  const destruction = planDestructionRefusal(args, run);
   if (destruction) throw new Error(destruction);
   const result = deps.spawn('tofu', [chdir, ...args], { env, stdio: 'inherit' });
   if (result.error)

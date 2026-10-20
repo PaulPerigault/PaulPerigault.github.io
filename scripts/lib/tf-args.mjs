@@ -79,12 +79,29 @@ const readPlan = (plan, { spawn, env, chdir }) => {
   }
 };
 
+const ALLOWED_FILE = 'allowed-destroys.txt';
+
+/** Adresses du fichier versionné `allowed-destroys.txt` de la brique ; fichier absent = aucune. */
+export function allowedDestroys(readFile, brickDir) {
+  let text;
+  try {
+    text = readFile(`${brickDir}/${ALLOWED_FILE}`) ?? '';
+  } catch {
+    return [];
+  }
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith('#'));
+}
+
 /**
- * Refus si le plan passé à `apply` détruit ou remplace une ressource. Le JSON du plan (valeurs
- * sensibles comprises) reste en mémoire, sortie d'erreur comprise : seules les adresses des
- * ressources détruites sont citées. Plan illisible = refus.
+ * Refus si le plan passé à `apply` détruit ou remplace une ressource absente de `allowed` (liste
+ * `allowed-destroys.txt` de la brique, ajoutée par la PR de l'étape puis vidée par la suivante).
+ * Le JSON du plan (valeurs sensibles comprises) reste en mémoire : seules les adresses sont citées.
+ * Plan illisible = refus.
  * @param {string[]} args arguments passés à tofu
- * @param {{ spawn: Function, env: Record<string, string>, chdir: string }} run
+ * @param {{ spawn: Function, env: Record<string, string>, chdir: string, allowed?: string[] }} run
  * @returns {string | null} raison du refus
  */
 export function planDestructionRefusal(args, run) {
@@ -92,9 +109,10 @@ export function planDestructionRefusal(args, run) {
   if (!plan) return null;
   const parsed = readPlan(plan, run);
   if (!parsed) return `Commande refusée : plan ${plan} illisible par \`tofu show -json\`.`;
-  const destroyed = destroyedAddresses(parsed);
-  if (destroyed.length === 0) return null;
-  return `Commande refusée : le plan ${plan} détruit ou remplace ${destroyed.join(', ')}.`;
+  const allowed = new Set(run.allowed ?? []);
+  const refused = destroyedAddresses(parsed).filter((address) => !allowed.has(address));
+  if (refused.length === 0) return null;
+  return `Commande refusée : le plan ${plan} détruit ou remplace ${refused.join(', ')} (absent de ${ALLOWED_FILE}).`;
 }
 
 /** Premier refus applicable (secret affiché ou changement non relu), sinon null. */

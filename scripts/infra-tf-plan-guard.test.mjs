@@ -2,6 +2,7 @@
 // lu par `tofu show -json` (sortie capturée, jamais affichée). Doublures de spawn, aucun appel réel.
 import { describe, expect, it } from 'vitest';
 import {
+  allowedDestroys,
   appliedPlan,
   changeRefusal,
   destroyedAddresses,
@@ -92,5 +93,20 @@ describe('planDestructionRefusal', () => {
     const refusal = planDestructionRefusal(['plan', '-out=x.tfplan'], { spawn: fake.spawn });
     expect(refusal).toBeNull();
     expect(fake.calls).toEqual([]);
+  });
+});
+
+describe('allowedDestroys', () => {
+  it('lit les adresses, sans lignes vides ni commentaires', () => {
+    const read = (path) => (path === '/b/allowed-destroys.txt' ? '# x\n\n a.b \r\nc["d"]\n' : '');
+    expect(allowedDestroys(read, '/b')).toEqual(['a.b', 'c["d"]']);
+  });
+
+  it('fichier absent ou vide = aucune destruction admise', () => {
+    const missing = () => {
+      throw new Error('ENOENT');
+    };
+    expect(allowedDestroys(missing, '/b')).toEqual([]);
+    expect(allowedDestroys(() => '# vide\n', '/b')).toEqual([]);
   });
 });

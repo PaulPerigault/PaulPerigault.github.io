@@ -25,10 +25,18 @@ const FILE =
   'TF_VAR_cloudflare_api_token=fake-cf\nAWS_ACCESS_KEY_ID=fake-a\nAWS_SECRET_ACCESS_KEY=fake-b\n' +
   'OVH_CLIENT_ID=fake-id\nOVH_CLIENT_SECRET=fake-secret\nBOOTSTRAP_CLOUDFLARE=fake-boot\n' +
   'BOOTSTRAP_OVH_KEY=fake-k\nBOOTSTRAP_OVH_SECRET=fake-s\nBOOTSTRAP_OVH_CONSUMER=fake-c\n';
-const depsFor = (plan) => {
+// `allowed` : contenu du fichier allowed-destroys.txt de la brique (absent si undefined).
+const depsFor = (plan, allowed) => {
   const fake = showing(JSON.stringify(plan));
   const env = { PATH: '/bin', TF_SECRETS_FILE: '/faux' };
-  return { fake, deps: { env, root: '/depot', readFile: () => FILE, spawn: fake.spawn } };
+  const readFile = (path) => {
+    if (path === '/faux') return FILE;
+    if (path.replaceAll('\\', '/').endsWith('/allowed-destroys.txt') && allowed !== undefined) {
+      return allowed;
+    }
+    throw new Error(`absent : ${path}`);
+  };
+  return { fake, deps: { env, root: '/depot', readFile, spawn: fake.spawn } };
 };
 const COMMANDS = [
   ['infra:tf', tf, 'infra'],
@@ -53,5 +61,22 @@ describe.each(COMMANDS)('%s apply <plan>', (_, command, dir) => {
       await expect(async () => command(['apply', 'a.tfplan'], deps)).rejects.toThrow(/détruit/);
       expect(fake.calls.map(({ args }) => args[1])).toEqual(['show']);
     }
+  });
+
+  it('applique une destruction listée dans allowed-destroys.txt de la brique', async () => {
+    const allowed = '# étape 5\n\nm.dns["www"]\n  m.zone  \n';
+    for (const plan of [PLANS.destroy, PLANS.replace]) {
+      const { fake, deps } = depsFor(plan, allowed);
+      expect(await command(['apply', 'a.tfplan'], deps)).toBe(0);
+      expect(fake.calls.map(({ args }) => args[1])).toEqual(['show', 'apply']);
+    }
+  });
+
+  it('refuse une destruction absente de la liste, en citant le fichier', async () => {
+    const { fake, deps } = depsFor(PLANS.destroy, 'm.zone\n# m.dns["www"]\n');
+    await expect(async () => command(['apply', 'a.tfplan'], deps)).rejects.toThrow(
+      /m\.dns\["www"\] \(absent de allowed-destroys\.txt\)/,
+    );
+    expect(fake.calls.map(({ args }) => args[1])).toEqual(['show']);
   });
 });

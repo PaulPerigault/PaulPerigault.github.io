@@ -44,4 +44,4 @@ GitHub refuse les noms de secrets Actions qui commencent par `GITHUB_` (HTTP 422
 - Droits, tous en lecture seule : _Administration_, _Variables_, _Environments_, _Dependabot alerts_, _Pages_ et _Metadata_.
 - Aucun droit sur _Contents_ ni sur _Secrets_.
 
-Le job `tofu-plan` de `ci.yml` planifie la brique avec `IAC_GITHUB_READONLY_TOKEN`, un jeton fine-grained en **lecture seule**, et la clé R2 en lecture seule. Sans ce secret, l'étape est sautée et le signale. Un écart (code 2) est signalé sans casser la CI.
+Le job `tofu-plan` de `ci.yml` planifie la brique avec `IAC_GITHUB_READONLY_TOKEN`, un jeton fine-grained en **lecture seule**, et la clé R2 en lecture seule. Sans ce secret, l'étape est sautée et le signale. Chaque étape de plan doit trouver une ligne `Plan:` ou `No changes` et l'écrire dans le journal (`Résultat du plan de …`), sinon le job échoue (#262). Connu : avec ce jeton, les 8 réglages de fusion du dépôt sont lus vides, d'où un faux écart signalé (#262). Un écart (code 2) est signalé sans casser la CI.

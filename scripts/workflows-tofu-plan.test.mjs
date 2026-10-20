@@ -48,4 +48,19 @@ describe('job tofu-plan', () => {
     expect(plan).toContain('tofu -chdir=infra/github plan -input=false -lock=false');
     expect(plan).not.toContain('GITHUB_IAC_TOKEN');
   });
+
+  it('échoue si le résumé du plan n’est pas trouvé, et le rapporte sinon (#262)', () => {
+    const steps = plan
+      .split('\n      - ')
+      .filter((step) => /tofu -chdir=infra\S* plan /.test(step));
+    expect(steps).toHaveLength(2);
+    for (const step of steps) {
+      const output = /> (\S+\.txt) 2>&1/.exec(step)?.[1];
+      expect(step).toContain(`grep -E '^(Plan: |No changes\\.)' ${output} | tail -n 1`);
+      expect(step).toMatch(/if \[ -z "\$verdict" \]; then\n\s+echo "::error::[^"]+"\n\s+exit 1/);
+      expect(step).toMatch(/echo "Résultat du plan de [^:]+ : \$verdict"/);
+      // Le contrôle passe avant la lecture du code de sortie : un écart (2) ne le court-circuite pas.
+      expect(step.indexOf('$verdict')).toBeLessThan(step.indexOf('"$code" = 2'));
+    }
+  });
 });

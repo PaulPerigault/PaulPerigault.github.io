@@ -1,5 +1,25 @@
 # Changelog
 
+## [2.2.0](https://github.com/PaulPerigault/PaulPerigault.github.io/compare/v2.1.1...v2.2.0) (2026-10-20)
+
+
+### Features
+
+* **contact:** formulaire de contact accessible avec turnstile au focus ([#146](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/146)) ([2c5e708](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/2c5e708cd6bd40b5e9a48c502a634a3e2bfe695d)), closes [#136](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/136)
+* formulaire de contact (worker, turnstile, resend, terraform) ([#160](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/160)) ([a30de24](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/a30de24b403eb63f5ffedc81df8b706b88a69d54)), closes [#133](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/133)
+* formulaire de contact en production ([#163](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/163)) ([4c78ac6](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/4c78ac6da8ac00182277871a8ace260d6e618e73))
+* **infra:** dmarc en observation, doc dns du .dev, accès au state ([#157](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/157)) ([45c4c36](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/45c4c36c9c39f5126598da89d82869a07130b761)), closes [#156](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/156)
+* **infra:** terraform du formulaire de contact et import resend ([#154](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/154)) ([96202e2](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/96202e271962fb436f3d25739aa07d72c595d3c0)), closes [#138](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/138)
+* **worker:** worker cloudflare du formulaire de contact ([#145](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/145)) ([d90d5cb](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/d90d5cb79bdd9bbcb455bf13848d263420a5ab80)), closes [#135](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/135)
+
+
+### Bug Fixes
+
+* **deps:** versions corrigées de http-cache-semantics et source-map-js ([#149](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/149)) ([1a6e720](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/1a6e720db896c0421108da13ecfc70a8f9d6dcf9)), closes [#144](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/144)
+* **scripts:** check-layers échoue sans couverture, build rejeté si non lancé ([#153](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/153)) ([a8ba32b](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/a8ba32b3098ebe7a40e8e51830cd36ae3030488f)), closes [#150](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/150)
+* **scripts:** garde-fous et builds de test fonctionnels sous windows ([#142](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/142)) ([d46fa51](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/d46fa5112fa16c339970d65ead8f7dba36d4534e)), closes [#141](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/141)
+* **scripts:** garde-fous et builds de test fonctionnels sous windows ([#148](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/148)) ([fd65884](https://github.com/PaulPerigault/PaulPerigault.github.io/commit/fd65884e152b8355a11a1638e7546dd94f4e360a)), closes [#141](https://github.com/PaulPerigault/PaulPerigault.github.io/issues/141)
+
 ## [2.1.1](https://github.com/PaulPerigault/PaulPerigault.github.io/compare/v2.1.0...v2.1.1) (2026-09-30)
 
 

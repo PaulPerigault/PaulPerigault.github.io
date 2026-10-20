@@ -64,6 +64,14 @@ for (const lang of ['fr', 'en'] as const) {
       await expect(name).toHaveAccessibleDescription(field('error_rejected'));
     });
 
+    test('trop d’envois rapprochés (429) : invitation à patienter', async ({ page }) => {
+      await mockWorker(page, { status: 429, body: { ok: false, error: 'rate_limited' } });
+      await page.goto(`/${lang}/`);
+      await fillValid(page, lang);
+      await page.getByRole('button', { name: field('submit') }).click();
+      await expect(page.getByRole('status')).toHaveText(field('rate_limited'));
+    });
+
     for (const [label, reply] of [
       ['erreur du service', { status: 502, body: { ok: false, error: 'unavailable' } }],
       ['panne réseau', { abort: true }],

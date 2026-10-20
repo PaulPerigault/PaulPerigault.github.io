@@ -1,7 +1,7 @@
 {
   "title": "Legal notice and privacy",
   "description": "Publisher, host, personal data and visitor rights for paulperigault.fr.",
-  "updated": "13 October 2026",
+  "updated": "19 October 2026",
   "sections": [
     {
       "id": "editeur",
@@ -36,6 +36,7 @@
         "The form in the Contact section sends your name, your email address and your message. They are only used to reply to you (legal basis: legitimate interest in answering requests). The form only exists with JavaScript; you can also write directly to {email}.",
         "The message goes through the form service, hosted on Cloudflare Workers, which checks it and hands it to the Resend email delivery service (operated by Plus Five Five, Inc., United States). The form service neither stores nor logs your message. The message then reaches my inbox ({email}).",
         "To block automated submissions, the form uses Cloudflare Turnstile. This service only loads when you start filling in the form, never when the page opens. According to the Turnstile privacy policy, Cloudflare then processes the IP address, the TLS fingerprint, the User-Agent header of your browser and the site origin, to tell a person from a bot. Measured on this site: no cookie is set; Cloudflare stores a technical value (\"cf.turnstile.u\") in the storage of its own embedded frame, separate from this site's storage. This check is only used to protect the form against automated submissions.",
+        "To limit bursts of submissions, the service that receives the form (a Cloudflare Worker) counts submissions per IP address: beyond 5 per minute, sending is refused and you are asked to wait. Cloudflare keeps this counter for the one-minute window only; the Worker neither stores nor logs the address.",
         "Cloudflare, Inc. and Resend (Plus Five Five, Inc.) are companies based in the United States. Resend sends emails from its Ireland region but, according to its documentation, keeps account data, email content and delivery logs in the United States. These transfers rely on the EU–US Data Privacy Framework: both companies appear on the official list of its participants. Their data processing agreements also include the European Commission's standard contractual clauses, which take over should that framework be invalidated.",
         "I keep messages received in my inbox for 12 months after our last exchange, then delete them. The form service keeps no copy. According to its documentation, Resend keeps email content, email metadata and delivery logs for 30 days.",
         "The {email} inbox is hosted by Apple (iCloud Mail), which receives and stores messages on my behalf under its own privacy policy."

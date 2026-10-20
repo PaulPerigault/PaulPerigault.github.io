@@ -18,6 +18,13 @@ describe('resultOf : réponse du Worker → issue affichée', () => {
     );
   });
 
+  it('429 rate_limited → patienter avant de renvoyer', () => {
+    expect(resultOf(false, { ok: false, error: 'rate_limited' })).toEqual({
+      outcome: 'rate_limited',
+      fields: [],
+    });
+  });
+
   it('403 challenge → nouvelle vérification', () => {
     expect(resultOf(false, { ok: false, error: 'challenge' }).outcome).toBe('challenge');
   });

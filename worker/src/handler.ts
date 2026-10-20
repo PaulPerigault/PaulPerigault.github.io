@@ -2,6 +2,7 @@ import { isJsonRequest, parseJson, readLimitedText } from './body';
 import { readConfig, type Config, type Env } from './config';
 import { allowedOrigin, corsHeaders } from './cors';
 import { MAX_BODY_BYTES } from './limits';
+import { isRateLimited } from './rate-limit';
 import { sendEmail } from './mail';
 import { fail, noContent, ok } from './responses';
 import { verifyTurnstile } from './turnstile';
@@ -17,7 +18,7 @@ type ResponseHeaders = Record<string, string>;
 const ALLOWED_METHODS = 'POST, OPTIONS';
 
 /**
- * Ordre des contrôles : méthode, origine, type, taille, JSON, piège, champs, Turnstile, envoi.
+ * Ordre des contrôles : méthode, origine, débit, type, taille, JSON, piège, champs, Turnstile, envoi.
  * Rien n'est journalisé ni stocké ; les erreurs du réseau deviennent « service indisponible ».
  */
 export const createHandler =
@@ -30,7 +31,9 @@ export const createHandler =
     const origin = allowedOrigin(request, config.allowedOrigins);
     if (origin === null) return fail('forbidden');
     const cors = corsHeaders(origin);
-    return request.method === 'OPTIONS' ? noContent(cors) : handlePost(request, config, deps, cors);
+    if (request.method === 'OPTIONS') return noContent(cors);
+    if (await isRateLimited(env.CONTACT_RATE_LIMITER, request)) return fail('rate_limited', cors);
+    return handlePost(request, config, deps, cors);
   };
 
 async function handlePost(request: Request, config: Config, deps: Deps, cors: ResponseHeaders) {

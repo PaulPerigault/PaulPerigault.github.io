@@ -14,6 +14,16 @@ preview_urls = false
 [observability]
 enabled = false
 
+# Limitation de débit par adresse IP, dans le Worker (worker/src/rate-limit.ts) : 5 envois par
+# minute (RATE_LIMIT, worker/src/limits.ts). Complète la règle de la zone (#181), sans la remplacer.
+[[ratelimits]]
+name = "CONTACT_RATE_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 5
+  period = 60
+
 [vars]
 # Origines autorisées (CORS), séparées par des virgules. `www` redirige vers l'apex : inutile.
 # En local, `.dev.vars` ajoute http://localhost:4321.

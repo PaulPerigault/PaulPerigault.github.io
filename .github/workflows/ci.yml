@@ -309,6 +309,16 @@ jobs:
           fi
           exit "$code"
       # Réglages du dépôt (#255) : jeton fine-grained en lecture seule, même clé R2 du state.
+      # SONDE TEMPORAIRE (#262, jamais fusionnée) : réglages de fusion lus par GraphQL avec le jeton
+      # en lecture seule. Seules les 8 valeurs (publiques) sont affichées.
+      - name: sonde GraphQL des réglages de fusion
+        if: steps.gate.outputs.ready == 'true' && steps.gate.outputs.github == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.IAC_GITHUB_READONLY_TOKEN }}
+        run: >-
+          gh api graphql -f query='query { repository(owner: "PaulPerigault", name: "portfolio")
+          { autoMergeAllowed mergeCommitAllowed rebaseMergeAllowed squashMergeAllowed
+          mergeCommitTitle mergeCommitMessage squashMergeCommitTitle squashMergeCommitMessage } }'
       - name: tofu init et plan de infra/github (lecture seule)
         if: steps.gate.outputs.ready == 'true' && steps.gate.outputs.github == 'true'
         env:

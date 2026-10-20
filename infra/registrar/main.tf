@@ -5,5 +5,9 @@ module "delegation" {
 
   domain       = "paulperigault.fr"
   name_servers = ["arushi.ns.cloudflare.com", "yew.ns.cloudflare.com"]
-  ds_records   = []
+  # Sortie fr_dnssec_ds de infra/ (2026-10-20) : KSK de Cloudflare, algorithme 13.
+  ds_records = [{
+    key_tag    = 2371
+    public_key = "mdsswUyr3DPW132mOi8V9xESWE8jTo0dxCjjnopKl+GqJxpVXckHAeF+KkxLbxILfDLUT0rAK9iUzy1L53eKGQ=="
+  }]
 }

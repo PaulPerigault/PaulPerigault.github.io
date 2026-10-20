@@ -318,6 +318,8 @@ jobs:
           { echo '### tofu plan (github)'; echo '```'; tail -n 200 github-plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           if [ "$code" = 2 ]; then
             echo "::notice::Écart entre infra/github et le dépôt réel : relire le plan (résumé du job)."
+            # Brique sans secret : les lignes de changement vont aussi dans le journal.
+            grep -E '^ *# |^ *[~+-] |^Plan:' github-plan.txt || true
             exit 0
           fi
           exit "$code"

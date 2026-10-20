@@ -1,5 +1,7 @@
 // Configuration Lighthouse pour une preview Cloudflare Pages (#207) : mêmes budgets que
 // `.lighthouserc.json` (source unique), mais pages servies par l'URL de preview au lieu de `dist/`.
+// Cloudflare sert toute preview avec `X-Robots-Tag: noindex` : l'audit `is-crawlable` y est sauté
+// (il resterait à 0 et ferait tomber le SEO), la production est mesurée avec lui (check:live).
 //   node scripts/lighthouse-preview-config.mjs <url-de-base> <fichier-de-sortie>
 import { readFileSync, writeFileSync } from 'node:fs';
 
@@ -7,6 +9,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 export function previewConfig(base, origin) {
   const collect = { ...base.ci.collect };
   delete collect.staticDistDir;
+  const settings = /** @type {{ skipAudits?: string[] }} */ (base.ci.collect.settings ?? {});
+  collect.settings = { ...settings, skipAudits: [...(settings.skipAudits ?? []), 'is-crawlable'] };
   const root = origin.replace(/\/+$/, '');
   const paths = /** @type {string[]} */ (base.ci.collect.url);
   return {

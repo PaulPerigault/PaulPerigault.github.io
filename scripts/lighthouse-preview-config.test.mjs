@@ -17,4 +17,10 @@ describe('previewConfig', () => {
   it('garde exactement les budgets de .lighthouserc.json', () => {
     expect(previewConfig(base, 'https://x.pages.dev').ci.assert).toEqual(base.ci.assert);
   });
+
+  it('saute is-crawlable (noindex des previews Cloudflare), et seulement lui', () => {
+    const { settings } = previewConfig(base, 'https://x.pages.dev').ci.collect;
+    expect(settings).toEqual({ ...base.ci.collect.settings, skipAudits: ['is-crawlable'] });
+    expect(base.ci.collect.settings.skipAudits).toBeUndefined();
+  });
 });

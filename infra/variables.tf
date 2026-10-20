@@ -26,7 +26,7 @@ variable "canonical_domain" {
 variable "fr_dnssec" {
   description = "DNSSEC de la zone `.fr` chez Cloudflare : true seulement après le changement de serveurs de noms (runbook §4.5)."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "fr_site_host" {

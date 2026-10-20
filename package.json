@@ -32,6 +32,7 @@
     "check:docs": "node scripts/check-docs.mjs",
     "check:live": "node scripts/check-live.mjs",
     "check:dns": "node scripts/check-dns.mjs",
+    "check:dnssec": "node scripts/check-dnssec.mjs",
     "test:visual:update": "node scripts/visual-update.mjs",
     "check:secrets": "secretlint \"**/*\"",
     "verify:worker": "npm --prefix worker run verify",
@@ -43,6 +44,7 @@
     "infra:identity": "node scripts/infra-identity.mjs",
     "infra:identity-push": "node scripts/infra-identity-push.mjs",
     "infra:r2-check": "node scripts/infra-r2-check.mjs",
+    "infra:registrar": "node scripts/infra-registrar.mjs",
     "infra:rulesets": "node scripts/infra-rulesets.mjs",
     "infra:worker-secrets": "node scripts/infra-worker-secrets.mjs"
   },

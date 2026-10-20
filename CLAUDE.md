@@ -21,6 +21,7 @@ npm run e2e            # Playwright against dist/ served by scripts/serve-dist.m
 npm run check:live     # checks the PRODUCTION site (redirects, headers, robots, AI bots) — see docs/infra.md
 npm run test:visual:update # regenerate visual references in the CI Playwright image (Docker, amd64; build first)
 npm run check:dns      # public DNS of paulperigault.fr/www, read-only (`-- --expect=cloudflare|github-pages`)
+npm run check:dnssec   # DNSSEC/delegation checks before/after NS or DS changes (`-- --phase=avant-ns|apres-ns|avant-ds|apres-ds`)
 npm run check:secrets  # secretlint on every non-ignored file (masked output)
 npm run guard          # check:secrets + check:size + check:layers + check:design + check:matrix + check:docs + knip
 npm run verify         # guard + lint + format:check + check + test + build + verify:worker (also the pre-push hook)
@@ -54,6 +55,8 @@ npm run bench          # hyperfine medians of lint/format/check/knip/build/test 
 - **Never `apply`/`destroy` from CI or the assistant**: the owner applies after reading the `plan`. Never run `tofu show`, `state show|pull`, `console` or a bare/JSON `output` (they print the Turnstile secret). First-deploy sequence: `infra/README.md`; OpenTofu then Cloudflare Pages switch: `docs/runbook-cloudflare.md` (owner, Windows).
 
 - **`infra/identity/`** (own state `identity/terraform.tfstate`): the only brick using the `BOOTSTRAP_*` tokens; creates limited Cloudflare tokens (`terraform`, `pages_deploy`, `ci_readonly`) and OVH OAuth2 service accounts with IAM policies on `paulperigault.fr` only (`nameServer`, `dsRecord`, `task`; write one IP-restricted). `npm run infra:identity` (plan/apply), `npm run infra:identity-push` (secrets file + `gh secret set` via stdin, values never printed). All `infra:*` commands refuse destroy, `-destroy`, `apply` without a saved plan, and outputs named secret/token/client (`scripts/lib/tf-args.mjs`); the assistant's `deny` rules cover the new commands too.
+
+- **`infra/registrar/`** (own state `registrar/terraform.tfstate`): OVH delegation of `paulperigault.fr` only, module `delegation` (`ovh_domain_name_servers` imported + `prevent_destroy`, `ovh_domain_ds_records` refused unless NS are Cloudflare's); values committed, changed by PR one step at a time. `npm run infra:registrar` (write OAuth2 account, never bootstrap tokens). `npm run check:dnssec -- --phase=avant-ns|apres-ns|avant-ds|apres-ds` before/after every NS or DS change (direct UDP queries to d.nic.fr, 1.1.1.1, 8.8.8.8; DS absent > 1 h from local history; iCloud MX; AD bit); `dnssec-check.yml` (manual) adds dnsviz (Linux only). `registrar-drift.yml`: daily read-only plan, opens one issue on drift.
 
 ### Contact Worker (`worker/`)
 
@@ -153,6 +156,8 @@ Everything is in `.github/workflows/`; the site is **built once** and the **same
 | `security.yml` | PR + push + weekly | `npm audit`, CodeQL, SBOM, `gitleaks` |
 | `scorecard.yml` | push develop, weekly, branch-protection change | OpenSSF Scorecard (pinned, `publish_results`, SARIF → Security tab, README badge); single job, no global `env`/`defaults` (Scorecard's own check) |
 | `gitleaks-watch.yml` | weekly cron, manual | opens one issue when a gitleaks release is newer than the pinned one, with version + SHA-256 to copy (`scripts/gitleaks-watch.mjs`, #204) |
+| `registrar-drift.yml` | daily cron, manual | read-only `tofu plan` of `infra/registrar/` (OVH read service account, R2 read keys); drift (code 2) opens one issue; skipped green without secrets |
+| `dnssec-check.yml` | manual (`phase`, `key_tag`) | `check:dnssec --dnsviz` on Linux, no secret |
 | `release.yml` | push `main` | release-please |
 | `dependabot-auto-merge.yml` | Dependabot PRs | auto-merge patch/minor, **except the infra provider** (`opentofu` ecosystem: read changelog, update lock, plan) |
 

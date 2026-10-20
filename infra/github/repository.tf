@@ -11,7 +11,7 @@ resource "github_repository" "portfolio" {
   # Champ « Website » ; pas de bloc `pages` : GitHub Pages est désactivé (check plus bas).
   homepage_url = "https://paulperigault.fr"
   visibility   = "public"
-  topics       = ["angular", "github-pages", "portfolio", "tailwind", "typescript"]
+  topics       = ["astro", "cloudflare-pages", "opentofu", "portfolio", "tailwind", "typescript"]
 
   has_issues      = true
   has_projects    = true

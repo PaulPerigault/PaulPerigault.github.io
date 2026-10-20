@@ -20,7 +20,10 @@ describe('classifyPlan et changedAttributes', () => {
   it('ne retient que les attributs réellement différents', () => {
     expect(changedAttributes(repo(READ_EMPTY, CODE).change)).toEqual(Object.keys(CODE).sort());
     expect(classifyPlan(planOf()).kind).toBe('none');
-    expect(classifyPlan(FALSE_DRIFT)).toEqual({ kind: 'merge-only', expected: CODE });
+    expect(classifyPlan(FALSE_DRIFT)).toEqual({
+      kind: 'merge-only',
+      repos: [{ name: 'portfolio', expected: CODE }],
+    });
   });
 });
 

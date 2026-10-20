@@ -47,13 +47,18 @@ run "jetons_cloudflare_au_plus_juste" {
   command = plan
 
   assert {
-    condition     = toset(keys(cloudflare_account_token.limited)) == toset(["terraform", "pages_deploy", "ci_readonly"])
-    error_message = "Trois jetons : terraform, pages-deploy, lecture seule de la CI."
+    condition     = toset(keys(cloudflare_account_token.limited)) == toset(["terraform", "pages_deploy", "ds_pages_deploy", "ci_readonly"])
+    error_message = "Quatre jetons : terraform, pages-deploy (site), ds-pages-deploy (docs), lecture seule de la CI."
   }
 
   assert {
     condition     = length(cloudflare_account_token.limited["pages_deploy"].policies) == 1 && [for group in cloudflare_account_token.limited["pages_deploy"].policies[0].permission_groups : group.id] == ["Pages Write"]
     error_message = "pages-deploy : Pages Write sur le compte, rien d'autre."
+  }
+
+  assert {
+    condition     = length(cloudflare_account_token.limited["ds_pages_deploy"].policies) == 1 && [for group in cloudflare_account_token.limited["ds_pages_deploy"].policies[0].permission_groups : group.id] == ["Pages Write"]
+    error_message = "ds-pages-deploy : Pages Write sur le compte, rien d'autre."
   }
 
   assert {
@@ -147,6 +152,11 @@ run "secrets_actions_du_depot" {
   assert {
     condition     = alltrue([for secret in github_actions_secret.ci : secret.repository == "portfolio"])
     error_message = "Le seul dépôt PaulPerigault/portfolio."
+  }
+
+  assert {
+    condition     = github_actions_environment_secret.ds_docs_pages.repository == "design-system" && github_actions_environment_secret.ds_docs_pages.environment == "docs-deploy" && github_actions_environment_secret.ds_docs_pages.secret_name == "CLOUDFLARE_API_TOKEN_PAGES"
+    error_message = "Jeton Pages des docs : secret de l'environnement docs-deploy du dépôt design-system seulement."
   }
 }
 

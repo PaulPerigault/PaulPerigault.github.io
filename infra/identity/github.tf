@@ -33,3 +33,13 @@ resource "github_actions_secret" "ci" {
   secret_name = each.key
   value       = local.actions_secrets[each.key]
 }
+
+# Dépôt design-system (#268) : jeton Pages dédié aux docs, posé en secret de l'environnement
+# `docs-deploy` (créé par infra/github, déployable depuis `main` seulement), jamais au niveau dépôt.
+# Ordre d'apply : infra/github d'abord (l'environnement doit exister).
+resource "github_actions_environment_secret" "ds_docs_pages" {
+  repository  = "design-system"
+  environment = "docs-deploy"
+  secret_name = "CLOUDFLARE_API_TOKEN_PAGES"
+  value       = cloudflare_account_token.limited["ds_pages_deploy"].value
+}

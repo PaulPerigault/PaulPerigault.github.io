@@ -74,3 +74,22 @@ module "fr_www_redirect" {
   hosts         = ["www.${var.canonical_domain}"]
   target_origin = local.canonical_origin
 }
+
+# Documentation du design system (#268) : projet Pages dédié (envoi direct par la CI du dépôt
+# PaulPerigault/design-system), servi sur `ds.paulperigault.dev` par un CNAME proxifié. Hôte
+# exact : la redirection `.dev` → `.fr` ne le capture pas (`dev_redirect`, hôtes listés).
+module "ds_docs_site" {
+  source = "./modules/pages-site"
+
+  account_id     = var.account_id
+  project_name   = "paulperigault-ds"
+  custom_domains = ["ds.${var.zone_name}"]
+}
+
+module "ds_docs_dns" {
+  source = "./modules/dns-cname"
+
+  zone_id = data.cloudflare_zone.services.zone_id
+  name    = "ds.${var.zone_name}"
+  target  = module.ds_docs_site.subdomain
+}

@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { TYPES } from './lib/dns-wire.mjs';
 import { checkDelegation, checkDs, checkMx, dsAbsence, phaseChecks } from './lib/dnssec-checks.mjs';
-import { dnsvizErrors } from './lib/dnsviz.mjs';
+import { dnsvizChecks, dnsvizErrors } from './lib/dnsviz.mjs';
 
 const fakeQuery = (answers) => async (server, _name, type) =>
   answers[`${server} ${type}`] ?? answers[type];
@@ -77,5 +77,14 @@ describe('contrôles DNSSEC', () => {
     };
     expect(dnsvizErrors(grok)).toEqual(['paulperigault.fr./delegation : No DS']);
     expect(dnsvizErrors({ a: { errors: [] } })).toEqual([]);
+  });
+
+  it('dnsviz : délégation lue, SECURE exigé seulement après le DS', () => {
+    const grok = (status) => ({ 'paulperigault.fr.': { delegation: { status } } });
+    const ok = (report, phase) => dnsvizChecks(report, 'paulperigault.fr', phase).map((c) => c.ok);
+    expect(ok(grok('INSECURE'), 'avant-ns')).toEqual([true, true]);
+    expect(ok(grok('INSECURE'), 'apres-ds')).toEqual([true, false]);
+    expect(ok(grok('SECURE'), 'apres-ds')).toEqual([true, true]);
+    expect(ok({}, 'apres-ns')).toEqual([true, false]);
   });
 });

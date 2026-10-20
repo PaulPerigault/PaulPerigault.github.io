@@ -3,7 +3,10 @@ provider "cloudflare" {
   api_token = var.bootstrap_cloudflare_token
 }
 
-data "cloudflare_api_token_permission_groups_list" "all" {}
+# Jetons de compte (BOOTSTRAP_CLOUDFLARE est un jeton de compte : l'API /user/tokens le refuse).
+data "cloudflare_account_api_token_permission_groups_list" "all" {
+  account_id = var.account_id
+}
 
 locals {
   account_resources = jsonencode({ "com.cloudflare.api.account.${var.account_id}" = "*" })
@@ -37,13 +40,15 @@ locals {
     }
   }
 
-  group_ids = { for group in data.cloudflare_api_token_permission_groups_list.all.result : group.name => group.id }
+  group_ids = { for group in data.cloudflare_account_api_token_permission_groups_list.all.result : group.name => group.id }
   wanted    = distinct(flatten([for token in local.tokens : concat(token.account, token.zone)]))
   missing   = [for name in local.wanted : name if !contains(keys(local.group_ids), name)]
 }
 
-resource "cloudflare_api_token" "limited" {
+resource "cloudflare_account_token" "limited" {
   for_each = local.tokens
+
+  account_id = var.account_id
 
   name = "portfolio-${replace(each.key, "_", "-")}"
   policies = concat(

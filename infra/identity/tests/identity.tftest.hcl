@@ -3,7 +3,7 @@ mock_provider "ovh" {}
 
 mock_provider "cloudflare" {
   override_data {
-    target = data.cloudflare_api_token_permission_groups_list.all
+    target = data.cloudflare_account_api_token_permission_groups_list.all
     values = {
       result = [
         for name in [
@@ -30,27 +30,27 @@ run "jetons_cloudflare_au_plus_juste" {
   command = plan
 
   assert {
-    condition     = toset(keys(cloudflare_api_token.limited)) == toset(["terraform", "pages_deploy", "ci_readonly"])
+    condition     = toset(keys(cloudflare_account_token.limited)) == toset(["terraform", "pages_deploy", "ci_readonly"])
     error_message = "Trois jetons : terraform, pages-deploy, lecture seule de la CI."
   }
 
   assert {
-    condition     = length(cloudflare_api_token.limited["pages_deploy"].policies) == 1 && [for group in cloudflare_api_token.limited["pages_deploy"].policies[0].permission_groups : group.id] == ["Pages Write"]
+    condition     = length(cloudflare_account_token.limited["pages_deploy"].policies) == 1 && [for group in cloudflare_account_token.limited["pages_deploy"].policies[0].permission_groups : group.id] == ["Pages Write"]
     error_message = "pages-deploy : Pages Write sur le compte, rien d'autre."
   }
 
   assert {
-    condition     = alltrue([for policy in cloudflare_api_token.limited["ci_readonly"].policies : alltrue([for group in policy.permission_groups : !endswith(group.id, " Write")])])
+    condition     = alltrue([for policy in cloudflare_account_token.limited["ci_readonly"].policies : alltrue([for group in policy.permission_groups : !endswith(group.id, " Write")])])
     error_message = "Le jeton de la CI n'a aucune permission d'écriture."
   }
 
   assert {
-    condition     = jsondecode(cloudflare_api_token.limited["terraform"].policies[1].resources) == { "com.cloudflare.api.account.5d7f707043c8dbe25d945c965f24880e" = { "com.cloudflare.api.account.zone.*" = "*" } }
+    condition     = jsondecode(cloudflare_account_token.limited["terraform"].policies[1].resources) == { "com.cloudflare.api.account.5d7f707043c8dbe25d945c965f24880e" = { "com.cloudflare.api.account.zone.*" = "*" } }
     error_message = "Jeton terraform : toutes les zones du compte (la zone .fr n'existe pas encore)."
   }
 
   assert {
-    condition     = alltrue([for token in cloudflare_api_token.limited : token.expires_on == "2027-10-19T00:00:00Z"])
+    condition     = alltrue([for token in cloudflare_account_token.limited : token.expires_on == "2027-10-19T00:00:00Z"])
     error_message = "Chaque jeton expire."
   }
 }
@@ -88,13 +88,13 @@ run "groupe_inconnu_refuse" {
   command = plan
 
   override_data {
-    target = data.cloudflare_api_token_permission_groups_list.all
+    target = data.cloudflare_account_api_token_permission_groups_list.all
     values = {
       result = [{ name = "Pages Write", id = "Pages Write", category = "test", is_selectable = true, scopes = [] }]
     }
   }
 
-  expect_failures = [cloudflare_api_token.limited]
+  expect_failures = [cloudflare_account_token.limited]
 }
 
 run "ip_invalide_refusee" {

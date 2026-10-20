@@ -143,6 +143,67 @@ jobs:
         env:
           LHCI_COLLECT__URL: ${{ matrix.page }}
 
+  # Preview Cloudflare Pages de chaque PR (#207) : le MÊME artefact, envoyé sur la branche `pr-<n>`
+  # du projet Pages, puis Lighthouse sur la preview (budgets de .lighthouserc.json). Sauté (vert)
+  # sans le secret du token Pages, donc aussi pour les PR de fork et de Dependabot.
+  pages-preview:
+    if: github.event_name == 'pull_request'
+    needs: e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Token Pages présent ?
+        id: gate
+        env:
+          HAS_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PAGES != '' }}
+        run: |
+          echo "ready=$HAS_TOKEN" >> "$GITHUB_OUTPUT"
+          if [ "$HAS_TOKEN" != true ]; then
+            echo "::notice::Preview Pages sautée : secret CLOUDFLARE_API_TOKEN_PAGES absent (issue #181)."
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: worker/package-lock.json
+      # Wrangler à la version exacte du lockfile du Worker (épinglé, vérifié par npm ci).
+      - run: npm ci --prefix worker
+        if: steps.gate.outputs.ready == 'true'
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          name: site
+          path: dist
+      - name: Envoi de la preview
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PAGES }}
+          CLOUDFLARE_ACCOUNT_ID: 5d7f707043c8dbe25d945c965f24880e
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          npx --prefix worker wrangler pages deploy dist --project-name paulperigault --branch "pr-$PR_NUMBER"
+          echo "url=https://pr-$PR_NUMBER.paulperigault.pages.dev" >> "$GITHUB_OUTPUT"
+          echo "Preview : https://pr-$PR_NUMBER.paulperigault.pages.dev/fr/" >> "$GITHUB_STEP_SUMMARY"
+        id: preview
+      - name: Configuration Lighthouse de la preview
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.url }}
+        run: node scripts/lighthouse-preview-config.mjs "$PREVIEW_URL" lighthouserc.preview.json
+      - name: Lighthouse sur la preview (budgets stricts)
+        if: steps.gate.outputs.ready == 'true'
+        uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12
+        with:
+          uploadArtifacts: true
+          artifactName: lighthouse-preview
+          temporaryPublicStorage: true
+          configPath: lighthouserc.preview.json
+
   # Worker du formulaire (brique autonome, ses propres dépendances) : lint, format, types, tests.
   worker:
     runs-on: ubuntu-latest
@@ -253,7 +314,7 @@ jobs:
   # Point de contrôle unique (check requis `ci`) : vert seulement si TOUT le reste est vert.
   ci:
     if: ${{ always() }}
-    needs: [verify, build, e2e, links, lighthouse, visual, worker, infra, tofu-plan, zizmor]
+    needs: [verify, build, e2e, links, lighthouse, visual, pages-preview, worker, infra, tofu-plan, zizmor]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

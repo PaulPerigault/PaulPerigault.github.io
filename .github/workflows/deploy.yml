@@ -28,6 +28,46 @@ jobs:
     with:
       ref: main
 
+  # Production sur Cloudflare Pages (#207, ADR-0008) : le MÊME artefact, branche de production
+  # `main` du projet. Sauté (vert) tant que le secret du token Pages n'existe pas ; GitHub Pages
+  # (job `deploy`) reste en service jusqu'au nettoyage après la bascule (#208).
+  pages:
+    needs: e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Token Pages présent ?
+        id: gate
+        env:
+          HAS_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PAGES != '' }}
+        run: |
+          echo "ready=$HAS_TOKEN" >> "$GITHUB_OUTPUT"
+          if [ "$HAS_TOKEN" != true ]; then
+            echo "::notice::Envoi Pages sauté : secret CLOUDFLARE_API_TOKEN_PAGES absent (issue #181)."
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          node-version-file: .nvmrc
+      - run: npm ci --prefix worker
+        if: steps.gate.outputs.ready == 'true'
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        if: steps.gate.outputs.ready == 'true'
+        with:
+          name: site
+          path: dist
+      - name: Envoi en production
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PAGES }}
+          CLOUDFLARE_ACCOUNT_ID: 5d7f707043c8dbe25d945c965f24880e
+        run: npx --prefix worker wrangler pages deploy dist --project-name paulperigault --branch main
+
   deploy:
     needs: e2e
     runs-on: ubuntu-latest

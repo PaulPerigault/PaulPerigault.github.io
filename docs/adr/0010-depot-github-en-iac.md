@@ -21,4 +21,5 @@ Après #181, Cloudflare et OVH sont décrits en OpenTofu. Le dépôt GitHub (ré
 - `archive_on_destroy` et `ignore_vulnerability_alerts_during_read` sont des champs du provider, absents de l'API GitHub. Après l'import, leur première écriture apparaît comme une modification qui ne change rien côté GitHub.
 - Modifier les secrets Actions demande un `apply` de `infra/identity/`, donc des jetons de départ temporaires (`infra/identity/README.md`) et `GITHUB_IAC_TOKEN`.
 - `infra/github/` a des blocs `import` : comme la racine de `infra/`, elle n'a pas de `tofu test`. Ses invariants sont vérifiés par `scripts/infra-github-config.test.mjs`.
-- CI : `tofu-plan` planifie la brique avec un jeton en lecture seule (`GITHUB_IAC_READONLY_TOKEN`), à créer par le propriétaire.
+- CI : `tofu-plan` planifie la brique avec un jeton en lecture seule (`GITHUB_IAC_READONLY_TOKEN`). C'est un **jeton personnel créé à la main** et posé par le propriétaire (`gh secret set`), volontairement hors de `infra/identity/` : GitHub n'expose pas la création de jetons fine-grained par API.
+- Premier `apply` (2026-10-20) : 11 imports et une modification limitée à `archive_on_destroy` et `ignore_vulnerability_alerts_during_read`. Le plan suivant donne « No changes ».

@@ -1,5 +1,6 @@
 # Brique « identité » : crée les jetons limités dont se servent infra/ et infra/registrar/.
-# Seule brique authentifiée avec les jetons d'amorçage (BOOTSTRAP_*, larges et de courte durée).
+# Seule brique authentifiée avec les jetons d'amorçage (BOOTSTRAP_*, larges et de courte durée) ;
+# elle pose aussi les secrets Actions du dépôt (github.tf).
 terraform {
   required_version = "~> 1.13.0"
 
@@ -11,6 +12,10 @@ terraform {
     ovh = {
       source  = "ovh/ovh"
       version = "~> 2.22.0"
+    }
+    github = {
+      source  = "integrations/github"
+      version = "~> 6.13.0"
     }
   }
 }

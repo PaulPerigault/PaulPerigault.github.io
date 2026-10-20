@@ -21,10 +21,10 @@ Le provider OVH appelle `/auth/details` au démarrage. Si IAM le refuse à un co
 npm run infra:identity -- init
 npm run infra:identity -- plan -out=identity.tfplan   # relève l'IP publique (cloudflare.com/cdn-cgi/trace)
 npm run infra:identity -- apply identity.tfplan        # seulement un plan enregistré et relu
-npm run infra:identity-push                            # fichier de secrets + secrets GitHub, valeurs jamais affichées
+npm run infra:identity-push                            # fichier de secrets local seul, valeurs jamais affichées
 ```
 
-`infra:identity` est la seule commande qui charge les `BOOTSTRAP_*` (`identityEnv`, `scripts/lib/infra-secrets.mjs`). Elle refuse, comme `infra:tf`, toute destruction, tout `apply` sans plan enregistré et toute sortie de jeton (`scripts/lib/tf-args.mjs`). `infra:identity-push` écrit `TF_VAR_cloudflare_api_token`, `OVH_CLIENT_ID` et `OVH_CLIENT_SECRET` dans le fichier de secrets local, puis pose six secrets GitHub par l'entrée standard de `gh secret set` (dont les clés S3 du state en lecture seule). Seuls les noms sont affichés.
+`infra:identity` est la seule commande qui charge les `BOOTSTRAP_*` (`identityEnv`, `scripts/lib/infra-secrets.mjs`). Elle refuse, comme `infra:tf`, toute destruction, tout `apply` sans plan enregistré et toute sortie de jeton (`scripts/lib/tf-args.mjs`). `infra:identity-push` écrit `TF_VAR_cloudflare_api_token`, `OVH_CLIENT_ID` et `OVH_CLIENT_SECRET` dans le fichier de secrets local, et rien d'autre. Les six secrets GitHub Actions (jetons de la CI, compte OVH de lecture, clés S3 du state en lecture seule) sont posés par la brique elle-même (`github.tf`, `github_actions_secret`, ADR-0010), avec `GITHUB_IAC_TOKEN` (droit _Secrets : write_), passé au provider sous `GITHUB_TOKEN`. Seuls les noms sont affichés.
 
 ## Rotation et fin des jetons d'amorçage
 
@@ -39,6 +39,7 @@ Une fois les `BOOTSTRAP_*` supprimés, **tout** `plan` ou `apply` de cette briqu
 | `BOOTSTRAP_CLOUDFLARE`                                                | Cloudflare, _Manage Account → Account API Tokens → Create Token → Custom_ (jeton **de compte**, pas utilisateur) | compte du portfolio : _Account → Account API Tokens → Edit_ (lister les groupes de permissions, créer, modifier et supprimer les jetons de compte)                                                                                     | 1 jour (_TTL_)      | _Client IP Address Filtering_ : l'IP publique du propriétaire |
 | `BOOTSTRAP_OVH_KEY`, `BOOTSTRAP_OVH_SECRET`, `BOOTSTRAP_OVH_CONSUMER` | https://eu.api.ovh.com/createToken/                                                                              | `GET`, `POST`, `PUT` sur `/me/api/oauth2/client` et `/me/api/oauth2/client/*`, `/iam/policy` et `/iam/policy/*` ; `GET /auth/details` ; `DELETE` sur les mêmes chemins **seulement** si `allowed-destroys.txt` liste une ressource OVH | 1 jour (_Validity_) | _Authorized IPs_ : l'IP publique du propriétaire              |
 
+- `GITHUB_IAC_TOKEN` (fine-grained, `PaulPerigault/portfolio`, _Secrets : write_) doit aussi être présent : la brique pose les secrets Actions.
 - Le chargeur (`identityEnv`) exige les **quatre** noms `BOOTSTRAP_*`, même pour un changement qui ne touche que Cloudflare : le provider OVH doit pouvoir lire l'état de ses ressources.
 - L'IP publique est celle que `npm run infra:identity -- plan` relève (`cloudflare.com/cdn-cgi/trace`) ; elle sert aussi à la politique d'écriture d'OVH.
 - Ensuite : `npm run infra:identity-push` si une sortie a changé, puis suppression des jetons temporaires (Cloudflare : page _Account API Tokens_ ; OVH : `DELETE /me/api/application/{applicationId}`, identifiant donné par `GET /auth/currentCredential`), et retrait des quatre lignes du fichier de secrets.

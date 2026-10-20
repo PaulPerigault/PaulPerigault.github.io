@@ -1,6 +1,8 @@
 # Brique identité avec des providers simulés : aucun appel à Cloudflare ni à OVH (`tofu test`).
 mock_provider "ovh" {}
 
+mock_provider "github" {}
+
 mock_provider "cloudflare" {
   override_data {
     target = data.cloudflare_account_api_token_permission_groups_list.all
@@ -128,6 +130,23 @@ run "cles_r2_du_state_en_lecture_seule" {
   assert {
     condition     = cloudflare_account_token.state_read.expires_on == "2027-10-19T00:00:00Z"
     error_message = "Le jeton expire."
+  }
+}
+
+run "secrets_actions_du_depot" {
+  command = plan
+
+  assert {
+    condition = toset(keys(github_actions_secret.ci)) == toset([
+      "CLOUDFLARE_API_TOKEN_READONLY", "CLOUDFLARE_API_TOKEN_PAGES", "OVH_READ_CLIENT_ID",
+      "OVH_READ_CLIENT_SECRET", "TFSTATE_R2_READ_ACCESS_KEY_ID", "TFSTATE_R2_READ_SECRET_KEY",
+    ])
+    error_message = "Les six secrets Actions de la CI, rien d'autre."
+  }
+
+  assert {
+    condition     = alltrue([for secret in github_actions_secret.ci : secret.repository == "portfolio"])
+    error_message = "Le seul dépôt PaulPerigault/portfolio."
   }
 }
 

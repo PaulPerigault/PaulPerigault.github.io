@@ -8,12 +8,14 @@ import { runCli } from './lib/infra-cli.mjs';
 import { identityEnv } from './lib/infra-secrets.mjs';
 import { allowedDestroys, planDestructionRefusal, tofuRefusal } from './lib/tf-args.mjs';
 
-// Variable du fichier de secrets → variable OpenTofu de infra/identity/variables.tf.
+// Variable du fichier de secrets → variable d'environnement d'OpenTofu (variables.tf, ou jeton du
+// provider GitHub pour les secrets Actions de github.tf).
 const VARIABLES = {
   BOOTSTRAP_CLOUDFLARE: 'TF_VAR_bootstrap_cloudflare_token',
   BOOTSTRAP_OVH_KEY: 'TF_VAR_bootstrap_ovh_application_key',
   BOOTSTRAP_OVH_SECRET: 'TF_VAR_bootstrap_ovh_application_secret',
   BOOTSTRAP_OVH_CONSUMER: 'TF_VAR_bootstrap_ovh_consumer_key',
+  GITHUB_IAC_TOKEN: 'GITHUB_TOKEN',
 };
 const BACKEND = ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'];
 const TRACE = 'https://www.cloudflare.com/cdn-cgi/trace';

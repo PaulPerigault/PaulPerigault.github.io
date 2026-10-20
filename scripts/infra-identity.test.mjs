@@ -8,7 +8,7 @@ import { upsertSecrets } from './lib/secrets-file-update.mjs';
 const FILE =
   '# local\nTF_VAR_cloudflare_api_token=fake-old\nAWS_ACCESS_KEY_ID=fake-id\n' +
   'AWS_SECRET_ACCESS_KEY=fake-key\nBOOTSTRAP_CLOUDFLARE=fake-boot-cf\nBOOTSTRAP_OVH_KEY=fake-k\n' +
-  'BOOTSTRAP_OVH_SECRET=fake-s\nBOOTSTRAP_OVH_CONSUMER=fake-c\n';
+  'BOOTSTRAP_OVH_SECRET=fake-s\nBOOTSTRAP_OVH_CONSUMER=fake-c\nGITHUB_IAC_TOKEN=fake-gh\n';
 
 const setup = (outputs = {}) => {
   const calls = [];
@@ -42,7 +42,9 @@ describe('identity', () => {
       TF_VAR_bootstrap_ovh_consumer_key: 'fake-c',
       TF_VAR_owner_ip: '192.0.2.10',
       AWS_ACCESS_KEY_ID: 'fake-id',
+      GITHUB_TOKEN: 'fake-gh',
     });
+    expect(options.env).not.toHaveProperty('GITHUB_IAC_TOKEN');
     expect(Object.keys(options.env).filter((name) => name.startsWith('BOOTSTRAP_'))).toEqual([]);
     expect(options.env).not.toHaveProperty('TF_VAR_cloudflare_api_token');
   });
@@ -75,31 +77,17 @@ describe('upsertSecrets', () => {
 describe('pushIdentity', () => {
   const outputs = {
     cloudflare_token_terraform: 'fake-tf',
-    cloudflare_token_ci_readonly: 'fake-ro',
-    cloudflare_token_pages_deploy: 'fake-pages',
     ovh_client_write: { id: 'fake-wid', secret: 'fake-wsecret' },
-    ovh_client_read: { id: 'fake-rid', secret: 'fake-rsecret' },
-    r2_tfstate_read_secret: { access_key_id: 'fake-r2id', secret_access_key: 'fake-r2key' },
   };
 
-  it('écrit le fichier local et pose les secrets GitHub par stdin, sans afficher de valeur', () => {
+  it('écrit le seul fichier local, sans gh ni valeur affichée', () => {
     const { calls, lines, files, deps } = setup(outputs);
     expect(pushIdentity(deps)).toBe(0);
     expect(files['/faux']).toMatch(/^TF_VAR_cloudflare_api_token=fake-tf$/m);
     expect(files['/faux']).toMatch(/^OVH_CLIENT_SECRET=fake-wsecret$/m);
     expect(files['/faux']).toMatch(/^BOOTSTRAP_CLOUDFLARE=fake-boot-cf$/m);
-    const gh = calls.filter((call) => call.command === 'gh');
-    expect(gh.map((call) => call.args.at(-1))).toEqual([
-      'CLOUDFLARE_API_TOKEN_READONLY',
-      'CLOUDFLARE_API_TOKEN_PAGES',
-      'OVH_READ_CLIENT_ID',
-      'OVH_READ_CLIENT_SECRET',
-      'TFSTATE_R2_READ_ACCESS_KEY_ID',
-      'TFSTATE_R2_READ_SECRET_KEY',
-    ]);
-    expect(gh[3].options.input).toBe('fake-rsecret');
-    expect(gh[5].options.input).toBe('fake-r2key');
-    expect(gh.flatMap((call) => call.args).join(' ')).not.toMatch(/fake-/);
+    // Les secrets Actions sont posés par infra/identity/ (github_actions_secret), plus par gh.
+    expect(calls.filter((call) => call.command === 'gh')).toEqual([]);
     expect(lines.join('\n')).not.toMatch(/fake-/);
   });
 });

@@ -13,6 +13,10 @@ const BOOTSTRAP_SECRETS = [
   'BOOTSTRAP_OVH_CONSUMER',
 ];
 
+// Jeton GitHub de l'IaC (fine-grained, dépôt PaulPerigault/portfolio seul) : réservé aux briques
+// infra/github/ (`githubEnv`) et infra/identity/ (secrets Actions, `identityEnv`).
+const GITHUB_SECRETS = ['GITHUB_IAC_TOKEN'];
+
 // Variables que le fichier peut contenir ; toute autre ligne est refusée (fichier corrompu ou erreur).
 const KNOWN_SECRETS = new Set([
   'TF_VAR_cloudflare_api_token',
@@ -23,8 +27,10 @@ const KNOWN_SECRETS = new Set([
   'OVH_CLIENT_ID',
   'OVH_CLIENT_SECRET',
   ...BOOTSTRAP_SECRETS,
+  ...GITHUB_SECRETS,
 ]);
 const isBootstrap = (name) => BOOTSTRAP_SECRETS.includes(name);
+const isGithub = (name) => GITHUB_SECRETS.includes(name);
 const COMMENT_OR_BLANK = /^\s*(?:#|$)/;
 const ASSIGNMENT = /^\s*([A-Za-z_]\w*)\s*=(.*)$/;
 const QUOTED = /^"(.*)"$|^'(.*)'$/;
@@ -79,9 +85,16 @@ const readSecretsFile = (path, readFile) => {
   }
 };
 
-const loadEnv = (names, { env, readFile, root }) => {
+// `reserved` : variables refusées à la commande, et retirées de l'environnement hérité.
+const loadEnv = (names, { env, readFile, root }, reserved = () => false) => {
+  const refused = names.filter(reserved);
+  if (refused.length > 0) {
+    throw new Error(`Secret réservé à une autre brique : ${refused.join(', ')}.`);
+  }
   const text = readSecretsFile(secretsFilePath(env, root), readFile);
-  const inherited = Object.fromEntries(Object.entries(env).filter(([name]) => !isBootstrap(name)));
+  const inherited = Object.fromEntries(
+    Object.entries(env).filter(([name]) => !isBootstrap(name) && !reserved(name)),
+  );
   return { ...inherited, ...parseSecrets(text, names) };
 };
 
@@ -96,8 +109,11 @@ export function childEnv(names, deps) {
   if (refused.length > 0) {
     throw new Error(`Jeton d'amorçage réservé à infra/identity/ : ${refused.join(', ')}.`);
   }
-  return loadEnv(names, deps);
+  return loadEnv(names, deps, isGithub);
 }
 
-/** Variante de `childEnv` des seules commandes de infra/identity/ : jetons d'amorçage admis. */
+/** Variante de infra/github/ : jeton GitHub admis, jamais les jetons d'amorçage. */
+export const githubEnv = (names, deps) => loadEnv(names, deps, isBootstrap);
+
+/** Variante des seules commandes de infra/identity/ : jetons d'amorçage et jeton GitHub admis. */
 export const identityEnv = (names, deps) => loadEnv(names, deps);

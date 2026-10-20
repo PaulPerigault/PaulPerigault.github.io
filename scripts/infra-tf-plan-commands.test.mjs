@@ -1,6 +1,8 @@
-// infra:tf, infra:identity et infra:registrar lisent le plan avant `apply <fichier>.tfplan` et le
-// refusent s'il détruit ou remplace une ressource. Doublures de spawn et de fichier de secrets.
+// infra:tf, infra:identity, infra:registrar et infra:github lisent le plan avant
+// `apply <fichier>.tfplan` et le refusent s'il détruit ou remplace une ressource. Doublures de
+// spawn et de fichier de secrets.
 import { describe, expect, it } from 'vitest';
+import { github } from './infra-github.mjs';
 import { identity } from './infra-identity.mjs';
 import { registrar } from './infra-registrar.mjs';
 import { tf } from './infra-tf.mjs';
@@ -24,7 +26,8 @@ const showing = (stdout) => {
 const FILE =
   'TF_VAR_cloudflare_api_token=fake-cf\nAWS_ACCESS_KEY_ID=fake-a\nAWS_SECRET_ACCESS_KEY=fake-b\n' +
   'OVH_CLIENT_ID=fake-id\nOVH_CLIENT_SECRET=fake-secret\nBOOTSTRAP_CLOUDFLARE=fake-boot\n' +
-  'BOOTSTRAP_OVH_KEY=fake-k\nBOOTSTRAP_OVH_SECRET=fake-s\nBOOTSTRAP_OVH_CONSUMER=fake-c\n';
+  'BOOTSTRAP_OVH_KEY=fake-k\nBOOTSTRAP_OVH_SECRET=fake-s\nBOOTSTRAP_OVH_CONSUMER=fake-c\n' +
+  'GITHUB_IAC_TOKEN=fake-gh\n';
 // `allowed` : contenu du fichier allowed-destroys.txt de la brique (absent si undefined).
 const depsFor = (plan, allowed) => {
   const fake = showing(JSON.stringify(plan));
@@ -42,6 +45,7 @@ const COMMANDS = [
   ['infra:tf', tf, 'infra'],
   ['infra:identity', identity, 'infra/identity'],
   ['infra:registrar', registrar, 'infra/registrar'],
+  ['infra:github', github, 'infra/github'],
 ];
 
 describe.each(COMMANDS)('%s apply <plan>', (_, command, dir) => {

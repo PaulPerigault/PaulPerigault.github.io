@@ -2,8 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { decide } from './guard-pr-merge.mjs';
 import { mergeRefusal } from './lib/pr-merge-guard.mjs';
 
-const BASES = { 165: 'main', 171: 'develop', 128: 'develop' };
-const readBase = (pr) => BASES[pr] ?? null;
+const refs = (base, head) => ({ base, head, crossRepository: false });
+// 165 : PR vers main depuis une branche de travail (refusée) ; 171 et 128 : PR vers develop.
+const PRS = {
+  165: refs('main', 'feat/hotfix'),
+  171: refs('develop', 'feat/x'),
+  128: refs('develop', 'b'),
+};
+const readBase = (pr) => PRS[pr] ?? null;
 const event = (command) => JSON.stringify({ tool_input: { command } });
 
 describe('mergeRefusal', () => {

@@ -1,8 +1,10 @@
 // Garde-fou des fusions de PR : toute commande `gh pr merge` doit viser une PR numérotée dont la
-// base réelle (lue sur GitHub) est `develop`. Base illisible, numéro absent ou autre base = refus.
+// base et la tête réelles (lues sur GitHub) sont admises par lib/pr-merge-policy.mjs. PR illisible,
+// numéro absent ou couple base/tête non admis = refus.
 // Seule une sous-commande qui commence par `gh pr … merge` est une fusion : le même texte entre
 // guillemets (message de commit, grep) n'en est pas une, sauf passé à un shell (`bash -c "…"`).
-// La lecture de la base est injectée (`readBase`) : la logique reste pure et testable.
+// La lecture de la PR est injectée (`readRefs`) : la logique reste pure et testable.
+import { refsRefusal } from './pr-merge-policy.mjs';
 import { segmentsOf, wordsOf } from './shell-segments.mjs';
 
 // `gh` par son nom ou son chemin (`/opt/homebrew/bin/gh`, `C:\\…\\gh.exe`).
@@ -20,7 +22,6 @@ const VALUE_FLAGS = new Set([
   ...['-t', '--subject', '-b', '--body', '-F', '--body-file', '-A', '--author-email'],
   '--match-head-commit',
 ]);
-const ALLOWED_BASE = 'develop';
 
 /** `--repo=o/r` devient `--repo o/r` : une seule forme à analyser ensuite. */
 const expandGlued = (tokens) =>
@@ -96,10 +97,11 @@ export function prNumber(selector) {
 
 /**
  * @param {string} command commande Bash ou PowerShell
- * @param {(pr: string, repo: string | null) => string | null} readBase base de la PR, null si illisible
+ * @param {(pr: string, repo: string | null) => import('./pr-merge-policy.mjs').PrRefs | null} readRefs
+ *   base et tête de la PR, null si illisibles
  * @returns {string | null} raison du refus, ou null si la commande est acceptée
  */
-export function mergeRefusal(command, readBase) {
+export function mergeRefusal(command, readRefs) {
   for (const args of mergeInvocations(command)) {
     const parsed = parseMerge(args);
     const selector = parsed.selector;
@@ -107,11 +109,8 @@ export function mergeRefusal(command, readBase) {
     const repo = PR_URL.exec(selector ?? '')?.[1] ?? parsed.repo;
     const pr = prNumber(selector);
     if (!pr) return 'Fusion refusée : `gh pr merge` doit citer un numéro de PR explicite.';
-    const base = readBase(pr, repo);
-    if (!base) return `Fusion refusée : base de la PR #${pr} illisible.`;
-    if (base !== ALLOWED_BASE) {
-      return `Fusion refusée : la PR #${pr} vise « ${base} » ; seules les PR vers develop sont fusionnées par l'assistant.`;
-    }
+    const refusal = refsRefusal(pr, readRefs(pr, repo));
+    if (refusal) return refusal;
   }
   return null;
 }

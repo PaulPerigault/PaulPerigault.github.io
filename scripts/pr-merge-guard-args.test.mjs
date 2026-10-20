@@ -3,10 +3,12 @@
 import { describe, expect, it } from 'vitest';
 import { mergeRefusal, parseMerge, prNumber } from './lib/pr-merge-guard.mjs';
 
+const TO_MAIN = { base: 'main', head: 'feat/x', crossRepository: false };
+
 describe('mergeRefusal et le dépôt', () => {
   it('lit --repo placé avant merge ou avant pr, sous toutes ses formes', () => {
     const seen = [];
-    const spy = (pr, repo) => (seen.push(repo), 'main');
+    const spy = (pr, repo) => (seen.push(repo), TO_MAIN);
     const commands = [
       'gh pr --repo o/r merge 165',
       'gh pr -R o/r merge 165',
@@ -33,7 +35,7 @@ describe('mergeRefusal et le dépôt', () => {
 
 describe('fusions masquées (revue finale, #180)', () => {
   const calls = [];
-  const spy = (pr, repo) => (calls.push([pr, repo]), 'main');
+  const spy = (pr, repo) => (calls.push([pr, repo]), TO_MAIN);
 
   it('lit le dépôt d’une URL de PR d’un autre dépôt, pas celui du répertoire courant', () => {
     calls.length = 0;
@@ -60,7 +62,7 @@ describe('fusions masquées (revue finale, #180)', () => {
     'sudo gh pr merge 165',
     'echo $(gh pr merge 165)',
   ])('reconnaît gh appelé par son chemin ou via un lanceur : %s', (command) => {
-    expect(mergeRefusal(command, () => 'main')).toMatch(/#165/);
+    expect(mergeRefusal(command, () => TO_MAIN)).toMatch(/#165/);
   });
 });
 

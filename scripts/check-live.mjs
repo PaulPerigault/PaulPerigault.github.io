@@ -3,13 +3,19 @@
 import { readFileSync } from 'node:fs';
 import { expectedSecurityHeaders } from './lib/expected-headers.mjs';
 import { buildChecks, runChecks } from './lib/live-checks.mjs';
+import { retiredHostChecks } from './lib/retired-host.mjs';
 
 const domain = process.env.LIVE_DOMAIN ?? 'paulperigault.fr';
 const alias = process.env.LIVE_ALIAS ?? 'paulperigault.dev';
+// Ancien hébergement : dépôt renommé en `portfolio`, GitHub Pages désactivé (plus de site utilisateur).
+const retired = process.env.LIVE_RETIRED ?? 'paulperigault.github.io';
 
 // Les 8 en-têtes de sécurité de public/_headers, valeurs exactes (servis par Cloudflare Pages).
 const expectedHeaders = expectedSecurityHeaders(readFileSync('public/_headers', 'utf8'));
-const results = await runChecks(buildChecks({ domain, alias, expectedHeaders }), fetch);
+const results = await runChecks(
+  [...buildChecks({ domain, alias, expectedHeaders }), ...retiredHostChecks(retired)],
+  fetch,
+);
 for (const { name, problems } of results) {
   console.log(`${problems.length === 0 ? 'OK  ' : 'FAIL'} ${name}`);
   for (const problem of problems) console.log(`       - ${problem}`);

@@ -79,6 +79,7 @@
       "invalid": "Le message n’est pas parti : corrigez les champs signalés.",
       "sent": "Message envoyé. Je vous réponds à l’adresse indiquée.",
       "challenge": "La vérification anti-robot n’a pas abouti. Patientez quelques secondes puis renvoyez le message.",
+      "rate_limited": "Trop d’envois en peu de temps. Patientez une minute avant de renvoyer le message.",
       "unavailable": "L’envoi n’a pas fonctionné. Vous pouvez m’écrire directement à {email}."
     }
   },

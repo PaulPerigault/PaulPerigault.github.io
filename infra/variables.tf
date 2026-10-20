@@ -32,7 +32,7 @@ variable "fr_dnssec" {
 variable "fr_site_host" {
   description = "Hébergeur servi par `paulperigault.fr` : github-pages (DNS seul) ou cloudflare-pages (CNAME proxifiés, runbook §5)."
   type        = string
-  default     = "github-pages"
+  default     = "cloudflare-pages"
 
   validation {
     condition     = contains(["github-pages", "cloudflare-pages"], var.fr_site_host)

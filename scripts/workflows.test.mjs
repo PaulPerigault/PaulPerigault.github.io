@@ -61,11 +61,10 @@ describe('workflows GitHub Actions (DevSecOps)', () => {
       expect(text(name), name).toContain('uses: ./.github/workflows/build.yml');
     }
     expect(text('e2e.yml')).toContain('name: site');
-    expect(text('deploy.yml')).toMatch(/needs: e2e[\s\S]*upload-pages-artifact/);
-    // Sans cette option, upload-pages-artifact exclut `.well-known/` (security.txt en 404).
-    const pagesUpload =
-      text('deploy.yml').split('upload-pages-artifact@')[1]?.split('\n      - ')[0] ?? '';
-    expect(pagesUpload).toContain('include-hidden-files: true');
+    // Seule cible de production : Cloudflare Pages, après les e2e (GitHub Pages retiré, #208).
+    expect(text('deploy.yml')).toMatch(/needs: e2e[\s\S]*wrangler pages deploy dist/);
+    expect(text('deploy.yml')).not.toMatch(/upload-pages-artifact|deploy-pages@|pages: write/);
+    // Sans cette option, l'artefact `site` exclut `.well-known/` (security.txt en 404).
     expect(text('build.yml')).toContain('include-hidden-files: true');
   });
 

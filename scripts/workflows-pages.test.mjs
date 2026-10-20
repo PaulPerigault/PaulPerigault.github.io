@@ -13,6 +13,11 @@ describe.each([
   ['preview de PR (ci.yml)', preview],
   ['production (deploy.yml)', production],
 ])('Cloudflare Pages : %s', (_label, job) => {
+  it('ne met le secret que dans l’environnement', () => {
+    expect(job).toContain('CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PAGES }}');
+    expect(job).not.toMatch(/run: .*\$\{\{\s*(?:secrets|github\.event)\./);
+  });
+
   it('envoie l’artefact testé avec le Wrangler épinglé du Worker', () => {
     expect(job).toMatch(/needs: e2e\n/);
     expect(job).toContain('name: site');
@@ -21,16 +26,15 @@ describe.each([
       /npx --prefix worker wrangler pages deploy dist --project-name paulperigault/,
     );
   });
-
-  it('se saute proprement sans secret, et ne met le secret que dans l’environnement', () => {
-    expect(job).toContain("secrets.CLOUDFLARE_API_TOKEN_PAGES != ''");
-    const steps = job.split('\n      - ').filter((step) => !step.includes('id: gate'));
-    for (const step of steps.slice(1)) expect(step).toContain("steps.gate.outputs.ready == 'true'");
-    expect(job).not.toMatch(/run: .*\$\{\{\s*(?:secrets|github\.event)\./);
-  });
 });
 
 describe('preview de PR', () => {
+  it('se saute proprement sans secret (PR de fork ou de Dependabot)', () => {
+    expect(preview).toContain("secrets.CLOUDFLARE_API_TOKEN_PAGES != ''");
+    const steps = preview.split('\n      - ').filter((step) => !step.includes('id: gate'));
+    for (const step of steps.slice(1)) expect(step).toContain("steps.gate.outputs.ready == 'true'");
+  });
+
   it('publie la branche pr-<n> et passe Lighthouse sur la preview avec les budgets du dépôt', () => {
     expect(preview).toContain("if: github.event_name == 'pull_request'");
     expect(preview).toContain('--branch "pr-$PR_NUMBER"');
@@ -44,6 +48,11 @@ describe('preview de PR', () => {
 });
 
 describe('production', () => {
+  it('exige le secret depuis la bascule : jamais sauté en silence (#208)', () => {
+    expect(production).not.toContain('steps.gate');
+    expect(production).toContain('node scripts/indexnow.mjs');
+  });
+
   it('déploie la branche de production `main` du projet', () => {
     expect(production).toContain('--branch main');
     expect(production).toContain('ref: main');

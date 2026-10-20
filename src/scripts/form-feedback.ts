@@ -9,6 +9,7 @@ export interface Messages {
   readonly invalid: string;
   readonly sent: string;
   readonly challenge: string;
+  readonly rate_limited: string;
   readonly unavailable: string;
   readonly sending: string;
 }

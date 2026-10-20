@@ -1,3 +1,5 @@
+import type { RateLimiter } from './rate-limit';
+
 /** Variables et secrets du Worker (`wrangler.toml` [vars], secrets, `.dev.vars` en local). */
 export interface Env {
   /** Origines autorisées, séparées par des virgules (jamais `*`). */
@@ -6,6 +8,8 @@ export interface Env {
   readonly MAIL_TO: string;
   readonly RESEND_API_KEY: string;
   readonly TURNSTILE_SECRET: string;
+  /** Binding de limitation de débit ; absent en local ou en test, il ne bloque rien. */
+  readonly CONTACT_RATE_LIMITER?: RateLimiter;
 }
 
 export interface Config {

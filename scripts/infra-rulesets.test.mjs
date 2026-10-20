@@ -44,6 +44,35 @@ describe('listRulesets', () => {
     expect(text).not.toMatch(/fake-cf/);
   });
 
+  it('donne phase et identifiant même si le détail est refusé (403)', async () => {
+    const responses = [
+      { result: [{ id: 'z-dev' }] },
+      {
+        result: [
+          { id: 'rs-1', kind: 'zone', phase: 'http_request_dynamic_redirect', name: 'default' },
+        ],
+      },
+      null,
+      { result: [] },
+    ];
+    const lines = [];
+    const deps = {
+      env: { TF_SECRETS_FILE: '/faux' },
+      readFile: () => 'TF_VAR_cloudflare_api_token=fake-cf\n',
+      root: '/depot',
+      fetch: async () => {
+        const body = responses.shift();
+        return body ? { ok: true, json: async () => body } : { ok: false, status: 403 };
+      },
+      log: (line) => lines.push(line),
+    };
+    expect(await listRulesets(deps)).toBe(0);
+    const text = lines.join('\n');
+    expect(text).toMatch(/phase {4}: http_request_dynamic_redirect/);
+    expect(text).toMatch(/import {3}: zones\/z-dev\/rs-1/);
+    expect(text).toMatch(/403/);
+  });
+
   it('signale une zone absente sans échouer', async () => {
     const { lines, deps } = setup([() => ({ result: [] }), () => ({ result: [] })]);
     expect(await listRulesets(deps)).toBe(0);

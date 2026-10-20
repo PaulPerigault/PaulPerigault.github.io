@@ -35,6 +35,35 @@ describe('infra/github', () => {
   });
 });
 
+describe('infra/github, dépôt design-system (#268)', () => {
+  const ds = read('design-system.tf');
+  const dsProtections = read('design-system-protections.tf');
+  const imports = read('imports.tf');
+
+  it('protège le dépôt et l’adopte par import, jamais par création', () => {
+    const block = /resource "github_repository" "design_system" \{[\s\S]*?\n\}/.exec(ds)?.[0] ?? '';
+    expect(block).toMatch(/archive_on_destroy\s*=\s*true/);
+    expect(block).toMatch(/lifecycle \{\s*prevent_destroy\s*=\s*true/);
+    expect(imports).toMatch(/to\s*=\s*github_repository\.design_system\[each\.key\]/);
+  });
+
+  it('squash seul, message = corps de la PR (aucune signature d’outil)', () => {
+    expect(ds).toMatch(/allow_squash_merge\s*=\s*true/);
+    expect(ds).toMatch(/allow_merge_commit\s*=\s*false/);
+    expect(ds).toMatch(/allow_rebase_merge\s*=\s*false/);
+    expect(ds).toMatch(/squash_merge_commit_message = "PR_BODY"/);
+    expect(dsProtections).toMatch(/allowed_merge_methods\s*=\s*\["squash"\]/);
+  });
+
+  it('protège develop et main sans relecture humaine, environnements limités à main', () => {
+    expect(dsProtections).toMatch(/\["develop", "main"\]/);
+    expect(dsProtections).toMatch(/required_approving_review_count\s*=\s*0/);
+    expect(dsProtections).toMatch(/\["npm-publish", "docs-deploy"\]/);
+    expect(dsProtections).toMatch(/branch_pattern = "main"/);
+    expect(dsProtections).toMatch(/can_admins_bypass\s*=\s*false/);
+  });
+});
+
 describe('allowed-destroys.txt', () => {
   const lists = execFileSync('git', ['ls-files', '-co', '--exclude-standard', 'infra'], {
     encoding: 'utf8',

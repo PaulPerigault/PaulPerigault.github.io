@@ -12,16 +12,16 @@ import {
 } from './lib/github-merge-settings.mjs';
 
 const ENDPOINT = 'https://api.github.com/graphql';
-const REPOSITORY = { owner: 'PaulPerigault', name: 'portfolio' };
+const OWNER = 'PaulPerigault';
 
-/** Réglages réels lus par GraphQL ; null si injoignable, refusé ou incomplet. */
-export async function readSettings(fetchFn, token) {
+/** Réglages réels d'un dépôt lus par GraphQL ; null si injoignable, refusé ou incomplet. */
+export async function readSettings(fetchFn, token, name) {
   if (!token) return null;
   try {
     const response = await fetchFn(ENDPOINT, {
       method: 'POST',
       headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ query: GRAPHQL_QUERY, variables: REPOSITORY }),
+      body: JSON.stringify({ query: GRAPHQL_QUERY, variables: { owner: OWNER, name } }),
     });
     return response.ok ? settingsFromGraphql(await response.json()) : null;
   } catch {
@@ -40,9 +40,11 @@ const MESSAGES = {
  * @returns {Promise<'none' | 'false-drift' | 'drift'>}
  */
 export async function checkGithubPlan({ plan, token, fetch, log }) {
-  const needsGraphql = classifyPlan(plan).kind === 'merge-only';
-  const real = needsGraphql ? await readSettings(fetch, token) : null;
-  const { verdict, reason } = judge(plan, real);
+  const classified = classifyPlan(plan);
+  const repos = classified.kind === 'merge-only' ? classified.repos : [];
+  const entries = [];
+  for (const { name } of repos) entries.push([name, await readSettings(fetch, token, name)]);
+  const { verdict, reason } = judge(plan, Object.fromEntries(entries));
   log(MESSAGES[verdict](reason));
   return verdict;
 }

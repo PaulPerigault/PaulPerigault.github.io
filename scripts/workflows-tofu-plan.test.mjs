@@ -64,6 +64,14 @@ describe('job tofu-plan', () => {
     }
   });
 
+  it('saute explicitement le dépôt design-system tant que le jeton n’y a pas accès (#268)', () => {
+    const step = plan.split('\n      - ').find((text) => text.includes('infra/github plan')) ?? '';
+    expect(step).toContain('repos/PaulPerigault/design-system/actions/permissions');
+    expect(step).toMatch(/::notice::plan du dépôt design-system sauté/);
+    expect(step).toContain('-var="design_system=$ds"');
+    expect(step.indexOf('design_system=$ds')).toBeGreaterThan(step.indexOf('ds=false'));
+  });
+
   it('qualifie un écart de infra/github par GraphQL, sans jamais le masquer (#262)', () => {
     const step = plan.split('\n      - ').find((text) => text.includes('infra/github plan')) ?? '';
     expect(step).toContain('-out=github.tfplan');

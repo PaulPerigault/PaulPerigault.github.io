@@ -11,7 +11,8 @@ Portfolio personnel — Paul Perigault, Alternant DevOps Cloud.
 - Effect (logique de données au build)
 - Vitest · Playwright (e2e)
 - GitHub Actions · Lighthouse CI · CodeQL · Dependabot
-- GitHub Pages (aujourd'hui) · Cloudflare Pages préparé (ADR-0008) · OpenTofu
+- Cloudflare Pages (ADR-0008) · OpenTofu (Cloudflare, GitHub, OVH en IaC)
+- Design system : [`PaulPerigault/design-system`](https://github.com/PaulPerigault/design-system) (paquets `@paulperigault/*`)
 
 ## Lancer en local
 
@@ -51,11 +52,11 @@ Le site est construit **une seule fois** (`build.yml`) ; cet artefact est testé
 | Workflow | Déclencheur | Action |
 |---|---|---|
 | ci.yml | PR | commitlint, guard/lint/types/tests, build, e2e, Lighthouse strict, zizmor, OpenTofu ; check requis `ci` |
-| deploy.yml | push main + chaque lundi | build → e2e → GitHub Pages → IndexNow |
+| deploy.yml | push main + chaque lundi | build → e2e → provenance SLSA → Cloudflare Pages → IndexNow |
 | browsers.yml | chaque dimanche | e2e Chromium + Firefox + WebKit |
 | security.yml | PR + hebdo | npm audit + CodeQL + SBOM |
 | release.yml | push main | CHANGELOG + tag semver |
 
-## Hébergement Cloudflare (préparé)
+## Hébergement Cloudflare
 
 Module OpenTofu `infra/modules/pages-site` et en-têtes `public/_headers` ; procédure de bascule : `docs/runbook-cloudflare.md`.

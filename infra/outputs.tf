@@ -33,3 +33,8 @@ output "fr_dnssec_ds" {
   description = "Key Tag, Flags, Algorithm, Public Key (et DS complet) à publier chez OVH (runbook §4.6) ; null tant que fr_dnssec vaut false."
   value       = module.zone_fr.dnssec_ds
 }
+
+output "ds_docs_url" {
+  description = "Adresse *.pages.dev de la documentation du design system (avant ds.paulperigault.dev)."
+  value       = module.ds_docs_site.pages_dev_url
+}

@@ -322,8 +322,17 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.TFSTATE_R2_READ_SECRET_KEY }}
         run: |
           tofu -chdir=infra/github init -input=false -lockfile=readonly
+          # Dépôt design-system (#268) : planifié seulement si le jeton y a accès (lecture des
+          # réglages Actions, réservée aux jetons autorisés sur le dépôt) ; sinon sauté, en vert.
+          access=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $GITHUB_TOKEN" \
+            https://api.github.com/repos/PaulPerigault/design-system/actions/permissions)
+          ds=true
+          if [ "$access" != 200 ]; then
+            ds=false
+            echo "::notice::plan du dépôt design-system sauté : IAC_GITHUB_READONLY_TOKEN sans accès (HTTP $access, docs/infra.md)."
+          fi
           set +e
-          tofu -chdir=infra/github plan -input=false -lock=false -no-color -detailed-exitcode -out=github.tfplan > github-plan.txt 2>&1
+          tofu -chdir=infra/github plan -input=false -lock=false -no-color -detailed-exitcode -var="design_system=$ds" -out=github.tfplan > github-plan.txt 2>&1
           code=$?
           set -e
           { echo '### tofu plan (github)'; echo '```'; tail -n 200 github-plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

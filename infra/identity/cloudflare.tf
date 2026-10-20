@@ -30,6 +30,13 @@ locals {
       account = ["Pages Write"]
       zone    = []
     }
+    # CI du dépôt design-system : envoi de la documentation vers Pages (#268). Jeton distinct de
+    # celui du site : révocable seul, et confiné à l'environnement `docs-deploy` (main seulement).
+    # Cloudflare ne restreint pas « Pages Write » à un projet : risque consigné dans l'ADR-0011.
+    ds_pages_deploy = {
+      account = ["Pages Write"]
+      zone    = []
+    }
     # CI : `tofu plan` de infra/ en lecture seule.
     ci_readonly = {
       account = ["Turnstile Sites Read", "Workers Scripts Read", "Pages Read"]

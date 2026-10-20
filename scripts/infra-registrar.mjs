@@ -7,7 +7,7 @@
 import { join } from 'node:path';
 import { runCli } from './lib/infra-cli.mjs';
 import { childEnv } from './lib/infra-secrets.mjs';
-import { tofuRefusal } from './lib/tf-args.mjs';
+import { planDestructionRefusal, tofuRefusal } from './lib/tf-args.mjs';
 
 const NAMES = ['OVH_CLIENT_ID', 'OVH_CLIENT_SECRET', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'];
 
@@ -17,6 +17,8 @@ export function registrar(args, deps) {
   if (refusal) throw new Error(refusal);
   const env = { ...childEnv(NAMES, deps), OVH_ENDPOINT: 'ovh-eu' };
   const chdir = `-chdir=${join(deps.root, 'infra', 'registrar')}`;
+  const destruction = planDestructionRefusal(args, { spawn: deps.spawn, env, chdir });
+  if (destruction) throw new Error(destruction);
   const result = deps.spawn('tofu', [chdir, ...args], { env, stdio: 'inherit' });
   if (result.error) throw new Error(`tofu introuvable : ${result.error.message}`);
   return result.status ?? 1;

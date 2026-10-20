@@ -1,36 +1,28 @@
 // Garde-fous de l'assistant déclarés dans .claude/settings.json : aucune signature d'outil, hooks
 // de secrets et de fusion actifs, actions réservées au propriétaire refusées en Bash ET PowerShell.
-// La correspondance reproduit la règle documentée de Claude Code : `*` = n'importe quel texte,
-// motif comparé à la commande entière, ` *` final qui accepte aussi la commande nue.
+// Correspondance des motifs : scripts/lib/deny-match.mjs (règle documentée de Claude Code).
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { denied as deniedBy } from './lib/deny-match.mjs';
 
 const settings = JSON.parse(readFileSync('.claude/settings.json', 'utf8'));
 const TOOLS = ['Bash', 'PowerShell'];
 
-const toRegex = (pattern) => {
-  const body = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
-  return new RegExp(`^${body.endsWith(' .*') ? `${body.slice(0, -3)}(?: .*)?` : body}$`);
-};
-const denyFor = (tool) =>
-  settings.permissions.deny
-    .filter((rule) => rule.startsWith(`${tool}(`))
-    .map((rule) => toRegex(rule.slice(tool.length + 1, -1)));
-const denied = (tool, command) => denyFor(tool).some((regex) => regex.test(command));
+const denied = (tool, command) => deniedBy(settings.permissions.deny, tool, command);
 
 const FORBIDDEN = [
   'terraform apply',
   'terraform -chdir=infra apply -auto-approve',
   'tofu destroy',
   'terraform import cloudflare_dns_record.x id',
-  'npm run infra:tf -- apply',
+  'npm run infra:tf -- destroy',
   'node scripts/infra-tf.mjs destroy',
   'npm run infra:worker-secrets',
   'node scripts/infra-worker-secrets.mjs',
   'wrangler deploy',
   'npx wrangler secret put RESEND_API_KEY',
   'npx --prefix worker wrangler deploy',
-  'npm --prefix worker run deploy',
+  'npx --prefix worker wrangler deploy --env production',
   'git push origin main',
   'git push -f origin HEAD:main',
   'git push origin refs/heads/main',
@@ -44,7 +36,7 @@ const FORBIDDEN = [
   'npm run infra:tf -- con' + 'sole',
   'terra' + 'form -chdir=infra con' + 'sole',
   'tofu con' + 'sole',
-  'gh pr merge 165 --squash',
+  'gh pr merge 165 --admin --squash',
   'gh -R o/r pr merge 165',
   'gh pr ready 206',
   'gh pr ready',

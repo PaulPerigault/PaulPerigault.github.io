@@ -4,6 +4,6 @@ module "delegation" {
   source = "./modules/delegation"
 
   domain       = "paulperigault.fr"
-  name_servers = ["dns14.ovh.net", "ns14.ovh.net"]
+  name_servers = ["arushi.ns.cloudflare.com", "yew.ns.cloudflare.com"]
   ds_records   = []
 }

@@ -42,8 +42,8 @@ describe('job tofu-plan', () => {
   });
 
   it('planifie aussi infra/github avec un jeton GitHub en lecture seule, sauté sans lui', () => {
-    expect(plan).toContain('secrets.GITHUB_IAC_READONLY_TOKEN');
-    expect(plan).toContain('GITHUB_TOKEN: ${{ secrets.GITHUB_IAC_READONLY_TOKEN }}');
+    expect(plan).toContain('secrets.IAC_GITHUB_READONLY_TOKEN');
+    expect(plan).toContain('GITHUB_TOKEN: ${{ secrets.IAC_GITHUB_READONLY_TOKEN }}');
     expect(plan).toContain("steps.gate.outputs.github == 'true'");
     expect(plan).toContain('tofu -chdir=infra/github plan -input=false -lock=false');
     expect(plan).not.toContain('GITHUB_IAC_TOKEN');

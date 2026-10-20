@@ -265,7 +265,7 @@ jobs:
         id: gate
         env:
           HAS_SECRETS: ${{ secrets.CLOUDFLARE_API_TOKEN_READONLY != '' && secrets.TFSTATE_R2_READ_ACCESS_KEY_ID != '' && secrets.TFSTATE_R2_READ_SECRET_KEY != '' }}
-          HAS_GITHUB: ${{ secrets.GITHUB_IAC_READONLY_TOKEN != '' }}
+          HAS_GITHUB: ${{ secrets.IAC_GITHUB_READONLY_TOKEN != '' }}
         run: |
           echo "ready=$HAS_SECRETS" >> "$GITHUB_OUTPUT"
           echo "github=$HAS_GITHUB" >> "$GITHUB_OUTPUT"
@@ -273,7 +273,7 @@ jobs:
             echo "::notice::tofu plan sauté : secrets en lecture seule absents (création : issue #181)."
           fi
           if [ "$HAS_GITHUB" != true ]; then
-            echo "::notice::plan de infra/github sauté : secret GITHUB_IAC_READONLY_TOKEN absent (issue #255)."
+            echo "::notice::plan de infra/github sauté : secret IAC_GITHUB_READONLY_TOKEN absent (issue #255)."
           fi
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         if: steps.gate.outputs.ready == 'true'
@@ -306,7 +306,7 @@ jobs:
       - name: tofu init et plan de infra/github (lecture seule)
         if: steps.gate.outputs.ready == 'true' && steps.gate.outputs.github == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_IAC_READONLY_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.IAC_GITHUB_READONLY_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.TFSTATE_R2_READ_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.TFSTATE_R2_READ_SECRET_KEY }}
         run: |

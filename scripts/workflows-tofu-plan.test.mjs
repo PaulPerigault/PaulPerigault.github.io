@@ -63,4 +63,15 @@ describe('job tofu-plan', () => {
       expect(step.indexOf('$verdict')).toBeLessThan(step.indexOf('"$code" = 2'));
     }
   });
+
+  it('qualifie un écart de infra/github par GraphQL, sans jamais le masquer (#262)', () => {
+    const step = plan.split('\n      - ').find((text) => text.includes('infra/github plan')) ?? '';
+    expect(step).toContain('-out=github.tfplan');
+    expect(step).toContain('tofu -chdir=infra/github show -json github.tfplan > github-plan.json');
+    expect(step).toContain('node scripts/check-github-plan.mjs github-plan.json');
+    expect(step.indexOf('check-github-plan')).toBeGreaterThan(step.indexOf('"$code" = 2'));
+    expect(plan).toMatch(
+      /setup-node@[0-9a-f]{40} # v\d+\n\s+if: steps\.gate\.outputs\.ready == 'true'/,
+    );
+  });
 });

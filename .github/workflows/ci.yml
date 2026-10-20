@@ -309,6 +309,11 @@ jobs:
           fi
           exit "$code"
       # Réglages du dépôt (#255) : jeton fine-grained en lecture seule, même clé R2 du state.
+      # Node 24 du dépôt (.nvmrc) pour scripts/check-github-plan.mjs.
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        if: steps.gate.outputs.ready == 'true' && steps.gate.outputs.github == 'true'
+        with:
+          node-version-file: .nvmrc
       - name: tofu init et plan de infra/github (lecture seule)
         if: steps.gate.outputs.ready == 'true' && steps.gate.outputs.github == 'true'
         env:
@@ -318,7 +323,7 @@ jobs:
         run: |
           tofu -chdir=infra/github init -input=false -lockfile=readonly
           set +e
-          tofu -chdir=infra/github plan -input=false -lock=false -no-color -detailed-exitcode > github-plan.txt 2>&1
+          tofu -chdir=infra/github plan -input=false -lock=false -no-color -detailed-exitcode -out=github.tfplan > github-plan.txt 2>&1
           code=$?
           set -e
           { echo '### tofu plan (github)'; echo '```'; tail -n 200 github-plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
@@ -329,9 +334,12 @@ jobs:
           fi
           echo "Résultat du plan de infra/github : $verdict"
           if [ "$code" = 2 ]; then
-            echo "::notice::Écart entre infra/github et le dépôt réel : relire le plan (résumé du job)."
             # Brique sans secret : les lignes de changement vont aussi dans le journal.
             grep -E '^ *# |^ *[~+-] |^Plan:' github-plan.txt || true
+            # Faux écart du jeton en lecture seule (réglages de fusion lus vides par REST) seulement
+            # si GraphQL confirme les valeurs du code ; sinon, dérive signalée (#262).
+            tofu -chdir=infra/github show -json github.tfplan > github-plan.json
+            node scripts/check-github-plan.mjs github-plan.json
             exit 0
           fi
           exit "$code"

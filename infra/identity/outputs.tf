@@ -2,19 +2,19 @@
 # de secrets, secrets GitHub), jamais affichées. `npm run infra:identity -- output <nom>` les refuse.
 output "cloudflare_token_terraform" {
   description = "Jeton de infra/ en local (TF_VAR_cloudflare_api_token du fichier de secrets)."
-  value       = cloudflare_api_token.limited["terraform"].value
+  value       = cloudflare_account_token.limited["terraform"].value
   sensitive   = true
 }
 
 output "cloudflare_token_pages_deploy" {
   description = "Jeton d'envoi vers Pages (secret GitHub CLOUDFLARE_API_TOKEN_PAGES)."
-  value       = cloudflare_api_token.limited["pages_deploy"].value
+  value       = cloudflare_account_token.limited["pages_deploy"].value
   sensitive   = true
 }
 
 output "cloudflare_token_ci_readonly" {
   description = "Jeton de `tofu plan` en CI (secret GitHub CLOUDFLARE_API_TOKEN_READONLY)."
-  value       = cloudflare_api_token.limited["ci_readonly"].value
+  value       = cloudflare_account_token.limited["ci_readonly"].value
   sensitive   = true
 }
 

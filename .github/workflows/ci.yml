@@ -297,6 +297,12 @@ jobs:
           code=$?
           set -e
           { echo '### tofu plan'; echo '```'; tail -n 200 plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          verdict=$(grep -E '^(Plan: |No changes\.)' plan.txt | tail -n 1 || true)
+          if [ -z "$verdict" ]; then
+            echo "::error::Résumé du plan de infra/ introuvable (ni « Plan: » ni « No changes ») : sortie lue en entier ?"
+            exit 1
+          fi
+          echo "Résultat du plan de infra/ : $verdict"
           if [ "$code" = 2 ]; then
             echo "::notice::Écart entre infra/ et l'infrastructure réelle : relire le plan (résumé du job)."
             exit 0
@@ -316,6 +322,12 @@ jobs:
           code=$?
           set -e
           { echo '### tofu plan (github)'; echo '```'; tail -n 200 github-plan.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          verdict=$(grep -E '^(Plan: |No changes\.)' github-plan.txt | tail -n 1 || true)
+          if [ -z "$verdict" ]; then
+            echo "::error::Résumé du plan de infra/github introuvable (ni « Plan: » ni « No changes ») : sortie lue en entier ?"
+            exit 1
+          fi
+          echo "Résultat du plan de infra/github : $verdict"
           if [ "$code" = 2 ]; then
             echo "::notice::Écart entre infra/github et le dépôt réel : relire le plan (résumé du job)."
             # Brique sans secret : les lignes de changement vont aussi dans le journal.

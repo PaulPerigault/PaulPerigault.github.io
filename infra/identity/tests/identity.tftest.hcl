@@ -6,13 +6,28 @@ mock_provider "cloudflare" {
     target = data.cloudflare_account_api_token_permission_groups_list.all
     values = {
       result = [
-        for name in [
-          "Turnstile Sites Write", "Workers Scripts Write", "Pages Write", "Zone Write", "DNS Write",
-          "Workers Routes Write", "Dynamic URL Redirects Write", "Zone WAF Write", "Zone Settings Write",
-          "Bot Management Write", "Zone Transform Rules Read", "Turnstile Sites Read",
-          "Workers Scripts Read", "Pages Read", "Zone Read", "DNS Read", "Workers Routes Read",
-          "Dynamic URL Redirects Read", "Zone WAF Read", "Zone Settings Read", "Bot Management Read",
-        ] : { name = name, id = name, category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] }
+        { name = "Turnstile Sites Write", id = "Turnstile Sites Write", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Workers Scripts Write", id = "Workers Scripts Write", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Pages Write", id = "Pages Write", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Zone Write", id = "Zone Write", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "DNS Write", id = "DNS Write", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Workers Routes Write", id = "Workers Routes Write", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Dynamic URL Redirects Write", id = "Dynamic URL Redirects Write", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Zone WAF Write", id = "Zone WAF Write", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Zone Settings Write", id = "Zone Settings Write", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Bot Management Write", id = "Bot Management Write", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Zone Transform Rules Read", id = "Zone Transform Rules Read", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Turnstile Sites Read", id = "Turnstile Sites Read", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Workers Scripts Read", id = "Workers Scripts Read", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Pages Read", id = "Pages Read", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Zone Read", id = "Zone Read", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "DNS Read", id = "DNS Read", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Workers Routes Read", id = "Workers Routes Read", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Dynamic URL Redirects Read", id = "Dynamic URL Redirects Read", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Zone WAF Read", id = "Zone WAF Read", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Zone Settings Read", id = "Zone Settings Read", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Bot Management Read", id = "Bot Management Read", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account", "com.cloudflare.api.account.zone"] },
+        { name = "Workers R2 Storage Bucket Item Read", id = "r2-item-read", category = "test", is_selectable = true, scopes = ["com.cloudflare.edge.r2.bucket"] },
       ]
     }
   }
@@ -86,6 +101,7 @@ run "groupes_choisis_par_portee" {
         { name = "Pages Write", id = "pages-zone", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account.zone"] },
         { name = "Pages Write", id = "pages-compte", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account"] },
         { name = "Pages Write", id = "pages-compte", category = "test", is_selectable = true, scopes = ["com.cloudflare.api.account"] },
+        { name = "Workers R2 Storage Bucket Item Read", id = "r2-item-read", category = "test", is_selectable = true, scopes = ["com.cloudflare.edge.r2.bucket"] },
       ]
     }
   }
@@ -93,6 +109,25 @@ run "groupes_choisis_par_portee" {
   assert {
     condition     = [for group in cloudflare_account_token.limited["pages_deploy"].policies[0].permission_groups : group.id] == ["pages-compte"]
     error_message = "Pages Write est pris dans la portée compte, une seule fois."
+  }
+}
+
+run "cles_r2_du_state_en_lecture_seule" {
+  command = plan
+
+  assert {
+    condition     = [for group in cloudflare_account_token.state_read.policies[0].permission_groups : group.id] == ["r2-item-read"]
+    error_message = "Un seul groupe : lecture des objets R2."
+  }
+
+  assert {
+    condition     = jsondecode(cloudflare_account_token.state_read.policies[0].resources) == { "com.cloudflare.edge.r2.bucket.5d7f707043c8dbe25d945c965f24880e_default_tfstate-portfolio" = "*" }
+    error_message = "Le seul bucket tfstate-portfolio du compte."
+  }
+
+  assert {
+    condition     = cloudflare_account_token.state_read.expires_on == "2027-10-19T00:00:00Z"
+    error_message = "Le jeton expire."
   }
 }
 
@@ -135,7 +170,7 @@ run "groupe_inconnu_refuse" {
     }
   }
 
-  expect_failures = [cloudflare_account_token.limited]
+  expect_failures = [cloudflare_account_token.limited, cloudflare_account_token.state_read]
 }
 
 run "ip_invalide_refusee" {

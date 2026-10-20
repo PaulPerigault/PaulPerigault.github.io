@@ -1,7 +1,7 @@
 // Distribue les jetons limités créés par infra/identity/, sans jamais afficher une valeur :
 // - fichier de secrets local : jeton Cloudflare de infra/ et compte de service OVH d'écriture ;
-// - secrets GitHub (`gh secret set`, valeur sur l'entrée standard) : jetons de la CI et compte de
-//   service OVH de lecture.
+// - secrets GitHub (`gh secret set`, valeur sur l'entrée standard) : jetons de la CI, compte de
+//   service OVH de lecture et clés S3 du state en lecture seule.
 // Les valeurs viennent de `tofu output` (capturées en mémoire). Seuls les noms sont affichés.
 //   npm run infra:identity-push   (après `npm run infra:identity -- apply <plan>`)
 import { join } from 'node:path';
@@ -39,6 +39,7 @@ export function pushIdentity(deps) {
   const env = identityEnv(BACKEND, deps);
   const write = output(deps, env, 'ovh_client_write');
   const read = output(deps, env, 'ovh_client_read');
+  const state = output(deps, env, 'r2_tfstate_read_secret');
   const local = {
     TF_VAR_cloudflare_api_token: output(deps, env, 'cloudflare_token_terraform'),
     OVH_CLIENT_ID: write.id,
@@ -52,6 +53,8 @@ export function pushIdentity(deps) {
     CLOUDFLARE_API_TOKEN_PAGES: output(deps, env, 'cloudflare_token_pages_deploy'),
     OVH_READ_CLIENT_ID: read.id,
     OVH_READ_CLIENT_SECRET: read.secret,
+    TFSTATE_R2_READ_ACCESS_KEY_ID: state.access_key_id,
+    TFSTATE_R2_READ_SECRET_KEY: state.secret_access_key,
   };
   for (const [name, value] of Object.entries(github)) ghSecret(deps, name, value);
   return 0;

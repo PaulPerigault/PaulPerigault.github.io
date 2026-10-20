@@ -35,3 +35,13 @@ output "ovh_client_read" {
   }
   sensitive = true
 }
+
+# Le nom contient « secret » : `npm run infra:identity -- output` le refuse (scripts/lib/tf-args.mjs).
+output "r2_tfstate_read_secret" {
+  description = "Clés S3 en lecture seule du state (secrets GitHub TFSTATE_R2_READ_ACCESS_KEY_ID / TFSTATE_R2_READ_SECRET_KEY)."
+  value = {
+    access_key_id     = cloudflare_account_token.state_read.id
+    secret_access_key = sha256(cloudflare_account_token.state_read.value)
+  }
+  sensitive = true
+}

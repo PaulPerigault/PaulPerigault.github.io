@@ -79,6 +79,7 @@ describe('pushIdentity', () => {
     cloudflare_token_pages_deploy: 'fake-pages',
     ovh_client_write: { id: 'fake-wid', secret: 'fake-wsecret' },
     ovh_client_read: { id: 'fake-rid', secret: 'fake-rsecret' },
+    r2_tfstate_read_secret: { access_key_id: 'fake-r2id', secret_access_key: 'fake-r2key' },
   };
 
   it('écrit le fichier local et pose les secrets GitHub par stdin, sans afficher de valeur', () => {
@@ -93,8 +94,11 @@ describe('pushIdentity', () => {
       'CLOUDFLARE_API_TOKEN_PAGES',
       'OVH_READ_CLIENT_ID',
       'OVH_READ_CLIENT_SECRET',
+      'TFSTATE_R2_READ_ACCESS_KEY_ID',
+      'TFSTATE_R2_READ_SECRET_KEY',
     ]);
     expect(gh[3].options.input).toBe('fake-rsecret');
+    expect(gh[5].options.input).toBe('fake-r2key');
     expect(gh.flatMap((call) => call.args).join(' ')).not.toMatch(/fake-/);
     expect(lines.join('\n')).not.toMatch(/fake-/);
   });

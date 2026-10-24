@@ -31,6 +31,7 @@
     "check:matrix": "node scripts/check-test-matrix.mjs",
     "check:docs": "node scripts/check-docs.mjs",
     "check:live": "node scripts/check-live.mjs",
+    "check:web": "node scripts/web-presence/run.mjs",
     "check:dns": "node scripts/check-dns.mjs",
     "check:dnssec": "node scripts/check-dnssec.mjs",
     "test:visual:update": "node scripts/visual-update.mjs",

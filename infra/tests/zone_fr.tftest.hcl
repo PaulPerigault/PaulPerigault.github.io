@@ -48,6 +48,21 @@ run "zone_avant_bascule" {
   }
 
   assert {
+    condition     = cloudflare_dns_record.txt["dmarc"].name == "_dmarc.paulperigault.fr" && cloudflare_dns_record.txt["dmarc"].content == "\"v=DMARC1; p=none; rua=mailto:contact@paulperigault.fr\""
+    error_message = "DMARC du .fr en observation (p=none) avec rapports agrégés vers contact@paulperigault.fr."
+  }
+
+  assert {
+    condition     = strcontains(cloudflare_dns_record.txt["spf"].content, "include:icloud.com") && startswith(cloudflare_dns_record.dkim.content, "sig1.dkim.paulperigault.fr.at.icloudmailadmin.com") && cloudflare_dns_record.dkim.type == "CNAME"
+    error_message = "DMARC s'appuie sur le SPF et le DKIM iCloud, qui doivent rester en place (le DKIM est aligné : d=paulperigault.fr)."
+  }
+
+  assert {
+    condition     = length(module.caa.records) == 8 && contains(module.caa.records, "issue-letsencrypt.org") && contains(module.caa.records, "issue-pki.goog; cansignhttpexchanges=yes")
+    error_message = "CAA du .fr : au moins Let's Encrypt et Google Trust Services, pour issue et issuewild."
+  }
+
+  assert {
     condition     = cloudflare_dns_record.dkim.name == "sig1._domainkey.paulperigault.fr" && cloudflare_dns_record.dkim.content == "sig1.dkim.paulperigault.fr.at.icloudmailadmin.com"
     error_message = "DKIM iCloud en CNAME."
   }
@@ -107,7 +122,7 @@ run "site_sur_cloudflare_pages" {
   }
 
   assert {
-    condition     = length(cloudflare_dns_record.mx) == 2 && length(cloudflare_dns_record.txt) == 4
+    condition     = length(cloudflare_dns_record.mx) == 2 && length(cloudflare_dns_record.txt) == 5
     error_message = "La messagerie et les vérifications ne bougent pas."
   }
 }
@@ -138,4 +153,18 @@ run "jeton_google_double_refuse" {
   }
 
   expect_failures = [var.google_site_verification]
+}
+
+run "politique_dmarc_invalide_refusee" {
+  command = plan
+
+  module {
+    source = "./modules/zone-fr"
+  }
+
+  variables {
+    dmarc_policy = "p=none"
+  }
+
+  expect_failures = [var.dmarc_policy]
 }

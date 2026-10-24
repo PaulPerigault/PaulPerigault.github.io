@@ -58,6 +58,14 @@ module "zone_fr" {
   pages_target   = local.on_pages ? module.pages_site.subdomain : null
 }
 
+# Autorités de certification admises pour le `.dev` (celles de Cloudflare, modules/dns-caa).
+module "dev_caa" {
+  source = "./modules/dns-caa"
+
+  zone_id = data.cloudflare_zone.services.zone_id
+  domain  = var.zone_name
+}
+
 # `.dev` et `www.dev` → `.fr` (docs/infra.md §2) ; ruleset créé à la main, importé (imports.tf).
 module "dev_redirect" {
   source = "./modules/canonical-redirect"

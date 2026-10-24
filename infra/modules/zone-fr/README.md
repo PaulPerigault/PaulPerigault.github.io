@@ -7,6 +7,8 @@ Zone DNS du domaine canonique `paulperigault.fr` chez Cloudflare (ADR-0008). **O
 | `cloudflare_zone.fr`                 | zone complète (`full`), offre gratuite                                                                                                                         |
 | `cloudflare_dns_record.mx`           | `MX` iCloud `mx01` et `mx02`, priorité 10                                                                                                                      |
 | `cloudflare_dns_record.txt`          | SPF iCloud, `apple-domain`, Google Search Console (jeton **une seule fois** : la valeur OVH le contenait deux fois), autorisation des rapports DMARC du `.dev` |
+| `cloudflare_dns_record.txt["dmarc"]` | politique DMARC du `.fr` (`dmarc_policy`) : `p=none` avec rapports agrégés (`rua`) vers `contact@paulperigault.fr`, cohérente avec le SPF et le DKIM iCloud ; durcissement : `ROADMAP.md` |
+| `module.caa`                         | CAA de l'apex (`modules/dns-caa`) : Let's Encrypt, Google Trust Services, SSL.com, Sectigo                                                                    |
 | `cloudflare_dns_record.dkim`         | `CNAME` `sig1._domainkey` (DKIM iCloud)                                                                                                                        |
 | `cloudflare_dns_record.github_pages` | tant que `pages_target` est nul : quatre `A` apex vers GitHub Pages et `CNAME` `www` vers `paulperigault.github.io`                                            |
 | `cloudflare_dns_record.pages`        | quand `pages_target` est donné : `CNAME` `@` et `www` vers le projet Pages, **proxifiés**                                                                      |
@@ -22,7 +24,7 @@ Tout est en **DNS seul** sauf les deux `CNAME` du site sur Pages : la messagerie
 
 ## Entrées
 
-`account_id`, `domain` (par défaut `paulperigault.fr`), `dnssec_enabled` (par défaut `false`), `pages_target` (par défaut `null` : GitHub Pages), `mx_hosts`, `apple_domain_token`, `google_site_verification` (jeton seul, validé), `github_pages_ipv4`, `github_pages_host`. Toutes les valeurs sont publiques (publiées en DNS).
+`account_id`, `domain` (par défaut `paulperigault.fr`), `dnssec_enabled` (par défaut `false`), `dmarc_policy` (par défaut `p=none` avec `rua`, validé), `pages_target` (par défaut `null` : GitHub Pages), `mx_hosts`, `apple_domain_token`, `google_site_verification` (jeton seul, validé), `github_pages_ipv4`, `github_pages_host`. Toutes les valeurs sont publiques (publiées en DNS).
 
 ## Sorties
 

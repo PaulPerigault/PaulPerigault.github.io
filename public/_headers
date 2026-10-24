@@ -21,3 +21,14 @@
 # Versions Markdown des pages (lien alternate, llms.txt).
 /*/index.md
   Content-Type: text/markdown; charset=utf-8
+
+# Fichiers texte pour les robots et les assistants (générés au build) : UTF-8 déclaré, jamais deviné.
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+/llms-full.txt
+  Content-Type: text/plain; charset=utf-8
+
+# Adresses *.pages.dev (production et aperçus) : doublons du site, jamais indexés. Le domaine
+# canonique n'est pas concerné (règle limitée à l'hôte pages.dev). Voir docs/seo-audit-2026-10-24.md.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex

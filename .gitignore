@@ -86,3 +86,6 @@ crash.log
 # Claude Code : réglages locaux (plugins désactivés, règles personnelles) et worktrees
 .claude/settings.local.json
 .claude/worktrees/
+
+# Rapport du contrôle de présence en ligne (npm run check:web)
+/web-presence-report.md

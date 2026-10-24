@@ -4,7 +4,7 @@
 const isRedirect = (res, to) =>
   res.status === 301 && res.headers.get('location') === to ? null : `attendu 301 → ${to}`;
 
-const robotsProblem = (body) => {
+export const robotsProblem = (body) => {
   if (!body.includes('sitemap-index.xml')) return 'sitemap absent';
   return /^\s*(Disallow:\s*\S|Content-Signal)/im.test(body)
     ? 'robots.txt modifié (Disallow / Content-Signal)'
@@ -17,7 +17,7 @@ const status = (res, expected) => (res.status === expected ? null : `statut ${re
 const MIN_VALIDITY_MS = 30 * 86_400_000;
 
 /** RFC 9116 : `Contact` présent, `Expires` lisible et à plus de 30 jours de `now`. */
-const securityTxtProblem = (body, now) => {
+export const securityTxtProblem = (body, now) => {
   if (!/^Contact: \S+/m.test(body)) return 'champ Contact absent';
   const expires = Date.parse(/^Expires: (.+)$/m.exec(body)?.[1] ?? '');
   if (Number.isNaN(expires)) return 'champ Expires absent ou illisible';
@@ -30,7 +30,7 @@ const headerProblems = (expected) => (res) =>
     .filter(([name, value]) => res.headers.get(name) !== value)
     .map(([name]) => `en-tête manquant ou différent de public/_headers : ${name}`);
 
-const redirects = ({ domain, alias }) => {
+export const redirects = ({ domain, alias }) => {
   const site = `https://${domain}`;
   const to = (path) => (r) => isRedirect(r, `${site}${path}`);
   return [

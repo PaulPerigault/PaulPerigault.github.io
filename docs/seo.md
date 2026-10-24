@@ -62,3 +62,7 @@ Un seul `h1` par page, landmarks (`header`, `main#content`, `footer`), lien d'é
 ## 8. i18n
 
 Deux langues, préfixées (`/fr/`, `/en/`). Chaque page indexable déclare ses hreflang `fr`, `en` et `x-default` (= `fr`), réciproques ; le sitemap les reprend (`xhtml:link`).
+
+## 9. noindex : liste blanche
+
+Seuls la 404 et les styleguides (`/fr/styleguide/`, `/en/styleguide/`) sont en `noindex`, et aucun n'est au sitemap. `robots.txt` ne bloque rien (un noindex doit pouvoir être lu). Les adresses `*.pages.dev` reçoivent `X-Robots-Tag: noindex` par `public/_headers`. La liste, avec les raisons, est dans `scripts/lib/noindex-allowlist.mjs` ; `e2e/indexability.spec.ts` et `scripts/noindex-allowlist.test.mjs` échouent sur tout noindex hors liste. Audit complet : `docs/seo-audit-2026-10-24.md`.

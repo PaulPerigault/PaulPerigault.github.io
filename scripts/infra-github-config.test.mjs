@@ -76,6 +76,7 @@ describe('allowed-destroys.txt', () => {
     expect(lists.sort()).toEqual([
       'infra/allowed-destroys.txt',
       'infra/github/allowed-destroys.txt',
+      'infra/google-observability/allowed-destroys.txt',
       'infra/identity/allowed-destroys.txt',
       'infra/registrar/allowed-destroys.txt',
     ]);

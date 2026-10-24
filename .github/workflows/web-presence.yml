@@ -1,0 +1,106 @@
+name: Web presence
+
+# Contrôle permanent de la présence en ligne de la PRODUCTION : indexation Google et Bing, Core Web
+# Vitals, Lighthouse, données structurées, fichiers d'indexation, canonical/hreflang, redirections,
+# liens, en-têtes, TLS, DNS (scripts/web-presence/, un module testé par vérification).
+# Chaque lundi après le redéploiement et `live.yml`, et à la demande. Lecture seule.
+#
+# Google : fédération d'identité (Workload Identity Federation), AUCUNE clé de compte de service.
+# Les secrets sont posés par infra/identity (GOOGLE_*) et à la main (BING_WEBMASTER_API_KEY). Tant
+# qu'ils n'existent pas, les vérifications concernées sont « non configuré » : pas d'échec.
+# Rapport Markdown en artefact ; une issue (une seule) s'ouvre sur échec et se referme au retour au vert.
+on:
+  schedule:
+    - cron: '23 7 * * 1'
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Vérifications à lancer, séparées par des virgules (vide = toutes)'
+        required: false
+        default: ''
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  web-presence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .nvmrc
+      - name: Identité Google configurée ?
+        id: gate
+        env:
+          HAS_IDENTITY: ${{ secrets.GOOGLE_WORKLOAD_IDENTITY_PROVIDER != '' && secrets.GOOGLE_SERVICE_ACCOUNT != '' }}
+        run: |
+          echo "google=$HAS_IDENTITY" >> "$GITHUB_OUTPUT"
+          if [ "$HAS_IDENTITY" != true ]; then
+            echo "::notice::Search Console sautée : fédération d'identité Google non configurée (docs/manual-steps.md)."
+          fi
+      # Jeton d'accès de courte durée en LECTURE SEULE (webmasters.readonly), échangé contre le jeton
+      # OIDC du run. La condition de l'IaC restreint cet échange à ce dépôt et à ce workflow.
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        id: google
+        if: steps.gate.outputs.google == 'true'
+        with:
+          workload_identity_provider: ${{ secrets.GOOGLE_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/webmasters.readonly
+          create_credentials_file: false
+      # Aucun `npm ci` : Node seul, scripts/web-presence/ n'a aucune dépendance.
+      - name: Contrôler la production
+        id: check
+        continue-on-error: true
+        env:
+          GOOGLE_ACCESS_TOKEN: ${{ steps.google.outputs.access_token }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          BING_WEBMASTER_API_KEY: ${{ secrets.BING_WEBMASTER_API_KEY }}
+          ONLY: ${{ inputs.only }}
+        run: node scripts/web-presence/run.mjs --out=web-presence-report.md --only="$ONLY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: always()
+        with:
+          name: web-presence-report
+          path: web-presence-report.md
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Issue (ouverte sur échec, refermée au retour au vert)
+        if: always() && steps.check.outcome != 'skipped'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OUTCOME: ${{ steps.check.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title='Présence en ligne : le contrôle hebdomadaire a échoué'
+          number=$(gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[0].number // empty')
+          if [ "$OUTCOME" = failure ]; then
+            { echo "Le contrôle de présence en ligne a échoué : $RUN_URL"; echo
+              echo "Le rapport complet est l'artefact \`web-presence-report\` de ce run. Dernier état :"; echo
+              head -c 60000 web-presence-report.md 2>/dev/null || echo "(rapport absent)"; } > body.md
+            if [ -z "$number" ]; then
+              gh issue create --title "$title" --body-file body.md
+            else
+              gh issue edit "$number" --body-file body.md
+            fi
+          elif [ -n "$number" ]; then
+            gh issue close "$number" --comment "Retour au vert : $RUN_URL"
+          fi
+      - name: Échec du job si un contrôle a échoué
+        if: steps.check.outcome == 'failure'
+        run: |
+          echo "::error::Au moins une vérification de présence en ligne a échoué (rapport en artefact)."
+          exit 1

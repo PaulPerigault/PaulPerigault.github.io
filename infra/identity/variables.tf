@@ -49,3 +49,9 @@ variable "token_expires_on" {
   type        = string
   default     = "2027-10-19T00:00:00Z"
 }
+
+variable "google_observability" {
+  description = "Pose les secrets GitHub du workflow web-presence depuis le state de infra/google-observability : true seulement après l'apply de cette brique (docs/manual-steps.md)."
+  type        = bool
+  default     = false
+}

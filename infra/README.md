@@ -17,6 +17,8 @@ La limitation de débit du formulaire est dans `modules/contact-form` (seule rè
 
 **Délégation chez OVH** : `infra/registrar/` (brique séparée, son propre state) gère les serveurs de noms et le DS de `paulperigault.fr` (`infra/registrar/README.md`), avec les contrôles `npm run check:dnssec`.
 
+**Accès Google en lecture seule** : `infra/google-observability/` (brique séparée, son propre state) crée le projet GCP, active les API Search Console, PageSpeed Insights et CrUX, un compte de service sans clé et la fédération d'identité du workflow `web-presence` (`infra/google-observability/README.md`, étapes manuelles : `docs/manual-steps.md`).
+
 **Dépôt GitHub** : `infra/github/` (brique séparée, son propre state) gère les réglages, protections, variable et environnements de `PaulPerigault/portfolio` (`infra/github/README.md`, ADR-0010).
 
 **Jetons** : `infra/identity/` (brique séparée, son propre state) crée les jetons Cloudflare limités et les comptes de service OVH, avec les seuls jetons d'amorçage ; `infra/` n'utilise ensuite que le jeton limité « terraform » (`infra/identity/README.md`).

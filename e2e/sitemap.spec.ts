@@ -1,39 +1,5 @@
-import { readdirSync, readFileSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
-import { expect, test, type APIRequestContext } from '@playwright/test';
-
-const ORIGIN = 'https://paulperigault.fr';
-const DIST = 'dist';
-
-const all = (text: string, pattern: RegExp) => [...text.matchAll(pattern)].map((m) => m[1] ?? '');
-const canonicalOf = (html: string) => /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1];
-const isNoindex = (html: string) => /<meta name="robots" content="[^"]*noindex/.test(html);
-
-/** Toutes les URL listées par le sitemap, en partant de l'index (ce que lit un moteur). */
-const sitemapUrls = async (request: APIRequestContext) => {
-  const index = await (await request.get('/sitemap-index.xml')).text();
-  const files = all(index, /<loc>([^<]+)<\/loc>/g);
-  const urls = await Promise.all(
-    files.map(async (file) => {
-      const xml = await (await request.get(new URL(file).pathname)).text();
-      return all(xml, /<loc>([^<]+)<\/loc>/g);
-    }),
-  );
-  return urls.flat();
-};
-
-/** Pages HTML de dist/ avec leur URL publique (`fr/legal/index.html` → `/fr/legal/`). */
-const builtPages = (dir = DIST): { url: string; html: string }[] =>
-  readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
-    const path = join(dir, entry.name);
-    if (entry.isDirectory()) return builtPages(path);
-    if (!entry.name.endsWith('.html')) return [];
-    const route = relative(DIST, path)
-      .split(sep)
-      .join('/')
-      .replace(/index\.html$/, '');
-    return [{ url: `${ORIGIN}/${route}`, html: readFileSync(path, 'utf8') }];
-  });
+import { expect, test } from '@playwright/test';
+import { ORIGIN, all, builtPages, canonicalOf, isNoindex, sitemapUrls } from './helpers/sitemap';
 
 test.describe('cohérence du sitemap', () => {
   test('chaque URL est sur le domaine canonique, avec une barre finale, et répond 200', async ({

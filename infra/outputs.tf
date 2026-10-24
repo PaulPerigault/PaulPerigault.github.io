@@ -35,6 +35,6 @@ output "fr_dnssec_ds" {
 }
 
 output "ds_docs_url" {
-  description = "Adresse *.pages.dev de la documentation du design system (avant ds.paulperigault.dev)."
+  description = "Adresse *.pages.dev de la documentation du design system (avant design.paulperigault.dev)."
   value       = module.ds_docs_site.pages_dev_url
 }

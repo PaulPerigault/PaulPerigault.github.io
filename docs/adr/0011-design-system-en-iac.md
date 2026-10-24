@@ -4,14 +4,14 @@
 
 ## Contexte
 
-Le design system de paulperigault.fr devient un dépôt dédié, `PaulPerigault/design-system`, qui publie les paquets npm `@paulperigault/*` (son ADR-0001). Il a été créé par `gh repo create` (public, branche `develop` seule) pour ne pas bloquer le travail. Comme le portfolio (ADR-0010), rien de ce dépôt ne doit être réglé à la main : ni ses protections, ni ses environnements, ni l'hébergement de sa documentation (`ds.paulperigault.dev`).
+Le design system de paulperigault.fr devient un dépôt dédié, `PaulPerigault/design-system`, qui publie les paquets npm `@paulperigault/*` (son ADR-0001). Il a été créé par `gh repo create` (public, branche `develop` seule) pour ne pas bloquer le travail. Comme le portfolio (ADR-0010), rien de ce dépôt ne doit être réglé à la main : ni ses protections, ni ses environnements, ni l'hébergement de sa documentation (`design.paulperigault.dev`).
 
 ## Décision
 
 - **Même brique `infra/github/`**, même state : `design-system.tf` (dépôt **importé**, `prevent_destroy`, `archive_on_destroy`, branche par défaut importée, branche `main` créée depuis `develop`, alertes Dependabot) et `design-system-protections.tf` (rulesets `develop` et `main` : PR obligatoire, **squash seul**, check `ci`, 0 approbation ; actions autorisées restreintes à celles de GitHub plus release-please et zizmor ; environnements `npm-publish` et `docs-deploy` déployables depuis `main` seulement, sans contournement admin).
 - **Message de squash = corps de la PR** (`PR_BODY`) : avec la règle commitlint du dépôt (aucune ligne `Co-authored-by`, aucun « Generated with »), aucun message d'un outil n'arrive sur `develop`.
 - **Variable `design_system`** (défaut `true`) : la CI la pose à `false` tant que `IAC_GITHUB_READONLY_TOKEN` n'a pas accès au dépôt, et l'annonce par un avis ; le plan reste vert. Jamais `false` pour un apply.
-- **Documentation sur Cloudflare Pages** : module `pages-site` réutilisé (`paulperigault-ds`, envoi direct, sans source Git) et nouveau module `dns-cname` (CNAME proxifié `ds.paulperigault.dev`, `tofu test`). L'hôte est exact : la redirection `.dev` → `.fr` ne le capture pas.
+- **Documentation sur Cloudflare Pages** : module `pages-site` réutilisé (`paulperigault-ds`, envoi direct, sans source Git) et nouveau module `dns-cname` (CNAME proxifié `design.paulperigault.dev`, `tofu test`). L'hôte est exact : la redirection `.dev` → `.fr` ne le capture pas. Le domaine, d'abord `ds.paulperigault.dev`, devient `design.paulperigault.dev` (plus lisible) ; le projet Pages garde son nom `paulperigault-ds` et reste sur l'offre gratuite de Cloudflare. Si l'ancien nom était déjà appliqué, le plan remplace le domaine personnalisé et le CNAME (un `apply` relu, puis un redéploiement des docs).
 - **Jeton Pages dédié** `portfolio-ds-pages-deploy` (infra/identity), posé en **secret de l'environnement `docs-deploy`** du dépôt, jamais en secret de dépôt.
 
 ## Jeton Pages : comparaison

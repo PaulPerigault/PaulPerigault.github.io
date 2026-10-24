@@ -2,7 +2,7 @@
 
 Un enregistrement `CNAME` **proxifié** (TTL automatique) d'une zone Cloudflare vers le sous-domaine
 `<projet>.pages.dev` d'un projet Pages : il active le domaine personnalisé déclaré par le module
-`pages-site`. Utilisé pour `ds.paulperigault.dev`, la documentation du design system (#268).
+`pages-site`. Utilisé pour `design.paulperigault.dev`, la documentation du design system (#268).
 
 | Ressource                     | Rôle                                                   |
 | ----------------------------- | ------------------------------------------------------ |

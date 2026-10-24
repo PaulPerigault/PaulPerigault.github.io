@@ -9,7 +9,7 @@ Services du portfolio hébergés chez Cloudflare : la zone `paulperigault.dev` (
 | `modules/pages-site`         | projet Cloudflare Pages (envoi direct) et ses domaines personnalisés                                                                          |
 | `modules/zone-fr`            | zone `paulperigault.fr` : messagerie iCloud, vérifications, enregistrements du site, réglages, DNSSEC (sorties : serveurs de noms et DS)      |
 | `modules/canonical-redirect` | redirection 301 vers `https://paulperigault.fr` : `.dev` et `www.dev` (ruleset **importé**), `www.fr`                                         |
-| `modules/dns-cname`          | CNAME proxifié vers un projet Pages : `ds.paulperigault.dev`, documentation du design system (`module.ds_docs_site`, ADR-0011)                |
+| `modules/dns-cname`          | CNAME proxifié vers un projet Pages : `design.paulperigault.dev`, documentation du design system (`module.ds_docs_site`, ADR-0011)                |
 
 La limitation de débit du formulaire est dans `modules/contact-form` (seule règle `http_ratelimit` de l'offre gratuite).
 

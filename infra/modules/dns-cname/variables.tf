@@ -4,7 +4,7 @@ variable "zone_id" {
 }
 
 variable "name" {
-  description = "Nom complet de l'enregistrement (ex. `ds.paulperigault.dev`)."
+  description = "Nom complet de l'enregistrement (ex. `design.paulperigault.dev`)."
   type        = string
 }
 

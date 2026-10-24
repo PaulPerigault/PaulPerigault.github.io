@@ -49,6 +49,12 @@ describe('public/_headers (Cloudflare Pages)', () => {
     }
     expect(at('/fr/').has('content-type')).toBe(false);
   });
+
+  it('déclare llms.txt et llms-full.txt en text/plain UTF-8', () => {
+    for (const path of ['/llms.txt', '/llms-full.txt']) {
+      expect(at(path).get('content-type')).toBe('text/plain; charset=utf-8');
+    }
+  });
 });
 
 describe('lecture du format _headers', () => {

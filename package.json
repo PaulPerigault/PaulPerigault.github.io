@@ -38,7 +38,7 @@
     "verify:worker": "npm --prefix worker run verify",
     "check:links": "node scripts/check-links.mjs",
     "bench": "node scripts/bench.mjs",
-    "check:seo": "playwright test e2e/seo.spec.ts e2e/crawl-files.spec.ts e2e/geo-files.spec.ts e2e/sitemap.spec.ts e2e/indexability.spec.ts",
+    "check:seo": "playwright test e2e/seo.spec.ts e2e/crawl-files.spec.ts e2e/geo-files.spec.ts e2e/sitemap.spec.ts e2e/indexability.spec.ts e2e/llms-full.spec.ts",
     "infra:tf": "node scripts/infra-tf.mjs",
     "infra:dns": "node scripts/infra-dns.mjs",
     "infra:github": "node scripts/infra-github.mjs",

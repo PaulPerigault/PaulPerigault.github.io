@@ -28,7 +28,7 @@ Chaque fonctionnalité est couverte par au moins un test **e2e Playwright** (FR 
 | Accessibilité WCAG 2.2 AA (axe) sur toute la matrice                          | #79   | `accessibility.spec.ts`                                                                                                                                                    |
 | Documentation                                                                 | #80   | n/a : vérifiée par `scripts/check-docs.mjs` (commandes et liens)                                                                                                           |
 | Mentions légales, confidentialité et absence de traceurs (RGPD)               | #102  | `legal.spec.ts`, `privacy.spec.ts`                                                                                                                                         |
-| Visibilité auprès des moteurs et des IA (GEO)                                 | #82   | `geo-files.spec.ts`, `geo-entity.spec.ts`                                                                                                                                  |
+| Visibilité auprès des moteurs et des IA (GEO)                                 | #82   | `geo-files.spec.ts`, `geo-entity.spec.ts`, `llms-full.spec.ts`                                                                                                             |
 | Régression visuelle (FR/EN, clair/sombre, mobile/desktop)                     | #201  | `visual.spec.ts` (job CI `visual` uniquement)                                                                                                                              |
 
 ## Conventions

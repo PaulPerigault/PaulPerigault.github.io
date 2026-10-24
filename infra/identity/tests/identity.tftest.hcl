@@ -160,6 +160,44 @@ run "secrets_actions_du_depot" {
   }
 }
 
+run "secrets_google_absents_tant_que_la_brique_n_est_pas_appliquee" {
+  command = plan
+
+  assert {
+    condition     = length(github_actions_secret.google) == 0 && length(data.terraform_remote_state.google_observability) == 0
+    error_message = "Par défaut, aucun secret Google et aucune lecture du state distant (la brique n'existe pas encore)."
+  }
+}
+
+run "secrets_google_lus_dans_le_state_de_la_brique" {
+  command = plan
+
+  variables {
+    google_observability = true
+  }
+
+  override_data {
+    target = data.terraform_remote_state.google_observability[0]
+    values = {
+      outputs = {
+        crux_psi_api_key_secret    = "cle-factice"
+        workload_identity_provider = "projects/1/locations/global/workloadIdentityPools/github-actions/providers/web-presence"
+        service_account_email      = "web-presence@paulperigault-observability.iam.gserviceaccount.com"
+      }
+    }
+  }
+
+  assert {
+    condition     = toset(keys(github_actions_secret.google)) == toset(["GOOGLE_API_KEY", "GOOGLE_WORKLOAD_IDENTITY_PROVIDER", "GOOGLE_SERVICE_ACCOUNT"])
+    error_message = "Trois secrets : clé d'API, fournisseur de fédération, compte de service. Jamais de clé de compte de service."
+  }
+
+  assert {
+    condition     = alltrue([for secret in github_actions_secret.google : secret.repository == "portfolio"])
+    error_message = "Le seul dépôt PaulPerigault/portfolio."
+  }
+}
+
 run "politiques_ovh_limitees_au_domaine" {
   command = plan
 

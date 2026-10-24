@@ -42,6 +42,7 @@
     "check:seo": "playwright test e2e/seo.spec.ts e2e/crawl-files.spec.ts e2e/geo-files.spec.ts e2e/sitemap.spec.ts e2e/indexability.spec.ts e2e/llms-full.spec.ts",
     "infra:tf": "node scripts/infra-tf.mjs",
     "infra:dns": "node scripts/infra-dns.mjs",
+    "infra:google": "node scripts/infra-google.mjs",
     "infra:github": "node scripts/infra-github.mjs",
     "infra:identity": "node scripts/infra-identity.mjs",
     "infra:identity-push": "node scripts/infra-identity-push.mjs",

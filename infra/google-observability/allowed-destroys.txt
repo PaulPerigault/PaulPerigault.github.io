@@ -1,0 +1,3 @@
+# Destructions admises par l'apply de cette brique (scripts/lib/tf-args.mjs), une adresse par ligne.
+# Ajoutées par la PR de l'étape qui détruit ou remplace, retirées par la PR suivante.
+# Vide = aucune destruction admise.

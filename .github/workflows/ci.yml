@@ -252,6 +252,10 @@ jobs:
       # invariants vérifiés par scripts/infra-github-config.test.mjs.
       - run: tofu -chdir=infra/github init -backend=false -input=false
       - run: tofu -chdir=infra/github validate
+      # Brique google-observability (accès Google en lecture seule, sans clé) : provider simulé.
+      - run: tofu -chdir=infra/google-observability init -backend=false -input=false
+      - run: tofu -chdir=infra/google-observability validate
+      - run: tofu -chdir=infra/google-observability test
 
   # Plan OpenTofu (#203) contre l'infrastructure réelle, avec un token Cloudflare et des clés R2 en
   # LECTURE SEULE (#181). Jamais d'apply ni de verrou. Sans ces secrets (avant leur création, PR de

@@ -46,10 +46,10 @@ Décrits en OpenTofu (un module par service, state dans R2) : formulaire de cont
 
 Relevé du 2026-10-13 (lecture seule, relevé DNS aujourd'hui `npm run infra:dns`) : l'état réel des enregistrements `A`/`www` du `.dev` est décrit à l'étape 2 de la section 2. L'enregistrement `_dmarc` (`p=none`, rapports vers `contact@paulperigault.fr`) est géré par Terraform (module `resend-domain`) ; son durcissement est prévu dans `ROADMAP.md`. Le bucket R2 du state ne doit avoir aucun accès public : contrôle dans `infra/README.md` (« Accès au state »).
 
-## 7. Dépôt design-system et documentation `ds.paulperigault.dev` (ADR-0011, #268)
+## 7. Dépôt design-system et documentation `design.paulperigault.dev` (ADR-0011, #268)
 
 - **Dépôt** `PaulPerigault/design-system` : `infra/github/design-system.tf` et `design-system-protections.tf` (importé, squash seul, rulesets, environnements `npm-publish` et `docs-deploy` limités à `main`).
-- **Docs** : projet Pages `paulperigault-ds` (`module.ds_docs_site`) et CNAME proxifié `ds.paulperigault.dev` (`module.ds_docs_dns`, `infra/modules/dns-cname`).
+- **Docs** : projet Pages `paulperigault-ds` (`module.ds_docs_site`) et CNAME proxifié `design.paulperigault.dev` (`module.ds_docs_dns`, `infra/modules/dns-cname`).
 - **Jeton** : `portfolio-ds-pages-deploy` (Pages Write), secret de l'environnement `docs-deploy` (`infra/identity/github.tf`).
 - **Étapes propriétaire**, dans l'ordre : étendre `GITHUB_IAC_TOKEN` et `IAC_GITHUB_READONLY_TOKEN` au dépôt (réglages des jetons fine-grained, aucune API) ; puis, sur la machine des secrets IaC :
 

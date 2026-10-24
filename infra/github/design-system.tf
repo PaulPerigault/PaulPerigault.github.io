@@ -11,7 +11,7 @@ resource "github_repository" "design_system" {
 
   name         = each.key
   description  = "Design system de paulperigault.fr : tokens DTCG, CSS, composants Astro, garde-fous et CLI"
-  homepage_url = "https://ds.paulperigault.dev"
+  homepage_url = "https://design.paulperigault.dev"
   visibility   = "public"
   topics       = ["design-system", "design-tokens", "astro", "tailwindcss", "accessibility"]
 

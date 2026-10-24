@@ -49,6 +49,17 @@ variable "google_site_verification" {
   }
 }
 
+variable "dmarc_policy" {
+  description = "Valeur de l'enregistrement DMARC du domaine (sans guillemets). Observation (p=none) avec rapports agrégés à une adresse du même domaine, donc sans autorisation externe."
+  type        = string
+  default     = "v=DMARC1; p=none; rua=mailto:contact@paulperigault.fr"
+
+  validation {
+    condition     = startswith(var.dmarc_policy, "v=DMARC1;") && can(regex("; p=(none|quarantine|reject)(;|$)", var.dmarc_policy))
+    error_message = "La politique DMARC doit commencer par « v=DMARC1; » et déclarer p=none, quarantine ou reject."
+  }
+}
+
 variable "github_pages_ipv4" {
   description = "Adresses de GitHub Pages pour l'apex, tant que le site y est servi."
   type        = list(string)

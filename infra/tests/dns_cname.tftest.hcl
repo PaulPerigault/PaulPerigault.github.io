@@ -3,7 +3,7 @@ mock_provider "cloudflare" {}
 
 variables {
   zone_id = "zone-de-test"
-  name    = "ds.paulperigault.dev"
+  name    = "design.paulperigault.dev"
   target  = "paulperigault-ds.pages.dev"
 }
 

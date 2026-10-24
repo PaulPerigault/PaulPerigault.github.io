@@ -7,7 +7,18 @@ locals {
     google = { name = var.domain, value = "google-site-verification=${var.google_site_verification}" }
     # Autorise les rapports DMARC de paulperigault.dev vers une adresse du .fr (RFC 7489 §7.1).
     dmarc_report = { name = "paulperigault.dev._report._dmarc.${var.domain}", value = "v=DMARC1" }
+    # Politique DMARC du .fr (expéditeur : iCloud, SPF et DKIM ci-dessus). Observation d'abord.
+    dmarc = { name = "_dmarc.${var.domain}", value = var.dmarc_policy }
   }
+}
+
+# Autorités de certification admises pour le .fr (celles de Cloudflare, plus Let's Encrypt de
+# GitHub Pages tant que le site y est servi : déjà dans la liste par défaut).
+module "caa" {
+  source = "../dns-caa"
+
+  zone_id = cloudflare_zone.fr.id
+  domain  = var.domain
 }
 
 resource "cloudflare_dns_record" "mx" {
